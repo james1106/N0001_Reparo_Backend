@@ -1,0 +1,1267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:IFWXML="http://i.soa.czbank.com/ifw/DSYWServices" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="IFWXML_WS" targetNamespace="http://i.soa.czbank.com/ifw/DSYWServices">
+  <types>
+    <xsd:schema targetNamespace="http://i.soa.czbank.com/ifw/DSYWServices">
+      <xsd:complexType name="RequestHeader">
+        <xsd:sequence>
+          <xsd:element name="businessAcceptId" type="xsd:string"/>
+          <xsd:element name="serialNumber" type="xsd:string"/>
+          <xsd:element name="version" type="xsd:string"/>
+          <xsd:element name="cmdType" type="xsd:string"/>
+          <xsd:element name="requester" type="xsd:string"/>
+          <xsd:element name="channel" type="xsd:string"/>
+          <xsd:element name="requestTimeStamp" type="xsd:string"/>
+          <xsd:element name="organizationUnitId" type="xsd:string"/>
+          <xsd:element name="teller1" type="xsd:string"/>
+          <xsd:element name="teller2" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="RequestHeader" type="IFWXML:RequestHeader"/>
+      <xsd:complexType name="ResponseHeader">
+        <xsd:sequence>
+          <xsd:element name="hostSerialNo" type="xsd:string"/>
+          <xsd:element name="responseTimeStamp" type="xsd:string"/>
+          <xsd:element name="errorNo" type="xsd:string"/>
+          <xsd:element name="errorInfo" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ResponseHeader" type="IFWXML:ResponseHeader"/>
+      <xsd:complexType name="ErrorInfo">
+        <xsd:sequence>
+          <xsd:element name="errorMessageType" type="xsd:string"/>
+          <xsd:element name="errorCode" type="xsd:string"/>
+          <xsd:element name="errorMessageText" type="xsd:string"/>
+          <xsd:element name="errorState" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ErrorInfo" type="IFWXML:ErrorInfo"/>
+      <!--QueryChannelInfo-->
+      <xsd:complexType name="QueryChannelInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1000</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element minOccurs="0" name="qdbh" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelInfoRequest" type="IFWXML:QueryChannelInfoRequest"/>
+      <xsd:complexType name="QueryChannelInfoResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="qdmc" type="xsd:string"/>
+          <xsd:element name="qybz" type="xsd:string"/>
+          <xsd:element name="qyys" type="xsd:string"/>
+          <xsd:element name="qdzt" type="xsd:string"/>
+          <xsd:element name="sfdz" type="xsd:string"/>
+          <xsd:element name="dzzh" type="xsd:string"/>
+          <xsd:element name="sxfsffs" type="xsd:string"/>
+          <xsd:element name="abje" type="xsd:string"/>
+          <xsd:element name="ablxs" type="xsd:string"/>
+          <xsd:element name="ablfdje" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelInfoResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryChannelInfoResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryChannelInfoResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelInfoResponse" type="IFWXML:QueryChannelInfoResponse"/>
+      <!--CommerceSignIn-->
+      <xsd:complexType name="CommerceSignInRequest">
+        <xsd:annotation>
+          <xsd:documentation>1001</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="shmc" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="dkhtmc" type="xsd:string"/>
+          <xsd:element name="khh" type="xsd:string"/>
+          <xsd:element name="zjlx" type="xsd:string"/>
+          <xsd:element name="zjhm" type="xsd:string"/>
+          <xsd:element name="sxfsffs" type="xsd:string"/>
+          <xsd:element name="abje" type="xsd:string"/>
+          <xsd:element name="ablxs" type="xsd:string"/>
+          <xsd:element name="ablfdje" type="xsd:string"/>
+          <xsd:element name="dbkkxe" type="xsd:string"/>
+          <xsd:element name="rljkkxe" type="xsd:string"/>
+          <xsd:element name="zljkkxe" type="xsd:string"/>
+          <xsd:element name="shrljxe" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="nbzh" type="xsd:string"/>
+          <xsd:element name="dzlx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dzzh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dzed" type="xsd:string"/>
+          <xsd:element name="zbjgh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpdz" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpyhm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpmm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftplj" type="xsd:string"/>
+          <xsd:element name="qdyxbz" type="xsd:string"/>
+          <xsd:element name="yxqdbh" type="xsd:string"/>
+          <xsd:element name="zsdn" type="xsd:string"/>
+          <xsd:element name="dxlx" type="xsd:string"/>
+          <xsd:element name="jqqd" type="xsd:string"/>
+          <xsd:element name="jqys" type="xsd:string"/>
+          <xsd:element name="zcskzh" type="xsd:string"/>
+          <xsd:element name="zffs" type="xsd:string"/>
+          <xsd:element name="tdlx" type="xsd:string"/>
+          <xsd:element name="qylx" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CommerceSignInRequest" type="IFWXML:CommerceSignInRequest"/>
+      <xsd:complexType name="CommerceSignInResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CommerceSignInResponse" type="IFWXML:CommerceSignInResponse"/>
+      <!--ModifyCommerceInfo-->
+      <xsd:complexType name="ModifyCommerceInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1002</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="shmc" type="xsd:string"/>
+          <xsd:element name="dkhtmc" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="khh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zjlx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zjhm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="sxfsffs" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="abje" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ablxs" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ablfdje" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dbkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="rljkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zljkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="shrljxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="nbzh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dzlx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dzzh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dzed" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zbjgh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpdz" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpyhm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftpmm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ftplj" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="qdyxbz" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="yxqdbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zsdn" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dxlx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jqqd" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jqys" type="xsd:string"/>
+          <xsd:element name="zcskzh" type="xsd:string"/>
+          <xsd:element name="zffs" type="xsd:string"/>
+          <xsd:element name="tdlx" type="xsd:string"/>
+          <xsd:element name="qylx" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyCommerceInfoRequest" type="IFWXML:ModifyCommerceInfoRequest"/>
+      <xsd:complexType name="ModifyCommerceInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyCommerceInfoResponse" type="IFWXML:ModifyCommerceInfoResponse"/>
+      <!--QueryCommerceInfo-->
+      <xsd:complexType name="QueryCommerceInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1003</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element minOccurs="0" name="shbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="hth" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="khh" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCommerceInfoRequest" type="IFWXML:QueryCommerceInfoRequest"/>
+      <xsd:complexType name="QueryCommerceInfoResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="shmc" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="dkhtmc" type="xsd:string"/>
+          <xsd:element name="khh" type="xsd:string"/>
+          <xsd:element name="zjlx" type="xsd:string"/>
+          <xsd:element name="zjhm" type="xsd:string"/>
+          <xsd:element name="qybz" type="xsd:string"/>
+          <xsd:element name="sxfsffs" type="xsd:string"/>
+          <xsd:element name="abje" type="xsd:string"/>
+          <xsd:element name="ablxs" type="xsd:string"/>
+          <xsd:element name="ablfdje" type="xsd:string"/>
+          <xsd:element name="dbkkxe" type="xsd:string"/>
+          <xsd:element name="rljkkxe" type="xsd:string"/>
+          <xsd:element name="zljkkxe" type="xsd:string"/>
+          <xsd:element name="shrljxe" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="nbzh" type="xsd:string"/>
+          <xsd:element name="dzlx" type="xsd:string"/>
+          <xsd:element name="dzzh" type="xsd:string"/>
+          <xsd:element name="shrljxe" type="xsd:string"/>
+          <xsd:element name="zbjgh" type="xsd:string"/>
+          <xsd:element name="ftpdz" type="xsd:string"/>
+          <xsd:element name="ftpyhm" type="xsd:string"/>
+          <xsd:element name="ftpmm" type="xsd:string"/>
+          <xsd:element name="ftplj" type="xsd:string"/>
+          <xsd:element name="qdyxbz" type="xsd:string"/>
+          <xsd:element name="yxqdbh" type="xsd:string"/>
+          <xsd:element name="zsdn" type="xsd:string"/>
+          <xsd:element name="dxlx" type="xsd:string"/>
+          <xsd:element name="jqqd" type="xsd:string"/>
+          <xsd:element name="jqys" type="xsd:string"/>
+          <xsd:element name="zcskzh" type="xsd:string"/>
+          <xsd:element name="zffs" type="xsd:string"/>
+          <xsd:element name="tdlx" type="xsd:string"/>
+          <xsd:element name="qylx" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCommerceInfoResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryCommerceInfoResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCommerceInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryCommerceInfoResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCommerceInfoResponse" type="IFWXML:QueryCommerceInfoResponse"/>
+      <!--CommerceSignOut-->
+      <xsd:complexType name="CommerceSignOutRequest">
+        <xsd:annotation>
+          <xsd:documentation>1004</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CommerceSignOutRequest" type="IFWXML:CommerceSignOutRequest"/>
+      <xsd:complexType name="CommerceSignOutResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CommerceSignOutResponse" type="IFWXML:CommerceSignOutResponse"/>
+      <!--CustomerSignIn-->
+      <xsd:complexType name="CustomerSignInRequest">
+        <xsd:annotation>
+          <xsd:documentation>1005</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="xyh" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="hm" type="xsd:string"/>
+          <xsd:element name="hnwbz" type="xsd:string"/>
+          <xsd:element name="zjlx" type="xsd:string"/>
+          <xsd:element name="zjhm" type="xsd:string"/>
+          <xsd:element name="sjh" type="xsd:string"/>
+          <xsd:element name="zhlb" type="xsd:string"/>
+          <xsd:element name="hbdm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="khh" type="xsd:string"/>
+          <xsd:element name="dbkkxe" type="xsd:string"/>
+          <xsd:element name="rljkkxe" type="xsd:string"/>
+          <xsd:element name="zljkkxe" type="xsd:string"/>
+          <xsd:element name="sxrq" type="xsd:string"/>
+          <xsd:element name="zzrq" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerSignInRequest" type="IFWXML:CustomerSignInRequest"/>
+      <xsd:complexType name="CustomerSignInResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerSignInResponse" type="IFWXML:CustomerSignInResponse"/>
+      <!--ModifyCustomerInfo-->
+      <xsd:complexType name="ModifyCustomerInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1006</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="xyh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="hbdm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dbkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="rljkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zljkkxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="sxrq" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zzrq" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyCustomerInfoRequest" type="IFWXML:ModifyCustomerInfoRequest"/>
+      <xsd:complexType name="ModifyCustomerInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyCustomerInfoResponse" type="IFWXML:ModifyCustomerInfoResponse"/>
+      <!--CustomerSignOut-->
+      <xsd:complexType name="CustomerSignOutRequest">
+        <xsd:annotation>
+          <xsd:documentation>1007</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="xyh" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerSignOutRequest" type="IFWXML:CustomerSignOutRequest"/>
+      <xsd:complexType name="CustomerSignOutResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerSignOutResponse" type="IFWXML:CustomerSignOutResponse"/>
+      <!--QueryCustomerInfo-->
+      <xsd:complexType name="QueryCustomerInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1008</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="xyh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="sfzh" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCustomerInfoRequest" type="IFWXML:QueryCustomerInfoRequest"/>
+      <xsd:complexType name="QueryCustomerInfoResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="xyh" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="hm" type="xsd:string"/>
+          <xsd:element name="hnwbz" type="xsd:string"/>
+          <xsd:element name="zjlx" type="xsd:string"/>
+          <xsd:element name="zjhm" type="xsd:string"/>
+          <xsd:element name="sjh" type="xsd:string"/>
+          <xsd:element name="zhlb" type="xsd:string"/>
+          <xsd:element name="hbdm" type="xsd:string"/>
+          <xsd:element name="khh" type="xsd:string"/>
+          <xsd:element name="dbkkxe" type="xsd:string"/>
+          <xsd:element name="rljkkxe" type="xsd:string"/>
+          <xsd:element name="zljkkxe" type="xsd:string"/>
+          <xsd:element name="sxrq" type="xsd:string"/>
+          <xsd:element name="zzrq" type="xsd:string"/>
+          <xsd:element name="zt" type="xsd:string"/>
+          <xsd:element name="rljje" type="xsd:string"/>
+          <xsd:element name="sbjyrq" type="xsd:string"/>
+          <xsd:element name="zljje" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCustomerInfoResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryCustomerInfoResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCustomerInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryCustomerInfoResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCustomerInfoResponse" type="IFWXML:QueryCustomerInfoResponse"/>
+      <!--QueryCustomerChannelInfo-->
+      <xsd:complexType name="QueryCustomerChannelInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1009</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="sfzh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="sjh" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCustomerChannelInfoRequest" type="IFWXML:QueryCustomerChannelInfoRequest"/>
+      <xsd:complexType name="QueryCustomerChannelInfoResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="hm" type="xsd:string"/>
+          <xsd:element name="sfzh" type="xsd:string"/>
+          <xsd:element name="sjh" type="xsd:string"/>
+          <xsd:element name="bdbh" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCustomerChannelInfoResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryCustomerChannelInfoResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryCustomerChannelInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryCustomerChannelInfoResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCustomerChannelInfoResponse" type="IFWXML:QueryCustomerChannelInfoResponse"/>
+      <!--AddChannelParameters-->
+      <xsd:complexType name="AddChannelParametersRequest">
+        <xsd:annotation>
+          <xsd:documentation>1010</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="hbdm" type="xsd:string"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="fkzhlb" type="xsd:string"/>
+          <xsd:element name="dbxe" type="xsd:string"/>
+          <xsd:element name="rljxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="yxj" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="AddChannelParametersRequest" type="IFWXML:AddChannelParametersRequest"/>
+      <xsd:complexType name="AddChannelParametersResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="AddChannelParametersResponse" type="IFWXML:AddChannelParametersResponse"/>
+      <!--ModifyChannelParameters-->
+      <xsd:complexType name="ModifyChannelParametersRequest">
+        <xsd:annotation>
+          <xsd:documentation>1011</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="hbdm" type="xsd:string"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="fkzhlb" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="dbxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="rljxe" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="yxj" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="zt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyChannelParametersRequest" type="IFWXML:ModifyChannelParametersRequest"/>
+      <xsd:complexType name="ModifyChannelParametersResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ModifyChannelParametersResponse" type="IFWXML:ModifyChannelParametersResponse"/>
+      <!--QuerychannelParameters-->
+      <xsd:complexType name="QuerychannelParametersRequest">
+        <xsd:annotation>
+          <xsd:documentation>1012</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element minOccurs="0" name="hbdm" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="qdbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="fkzhlb" type="xsd:string"/>
+          <xsd:element name="zyqdbz" type="xsd:string"/>
+          <xsd:element name="shbm" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QuerychannelParametersRequest" type="IFWXML:QuerychannelParametersRequest"/>
+      <xsd:complexType name="QuerychannelParametersResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="hbdm" type="xsd:string"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="fkzhlb" type="xsd:string"/>
+          <xsd:element name="dbxe" type="xsd:string"/>
+          <xsd:element name="rljxe" type="xsd:string"/>
+          <xsd:element name="yxj" type="xsd:string"/>
+          <xsd:element name="zt" type="xsd:string"/>
+          <xsd:element name="hm" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QuerychannelParametersResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QuerychannelParametersResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QuerychannelParametersResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QuerychannelParametersResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QuerychannelParametersResponse" type="IFWXML:QuerychannelParametersResponse"/>
+      <!--Payment-->
+      <xsd:complexType name="PaymentRequest">
+        <xsd:annotation>
+          <xsd:documentation>1013</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="xyh" type="xsd:string"/>
+          <xsd:element name="zdskzh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="skzh" type="xsd:string"/>
+          <xsd:element name="je" type="xsd:string"/>
+          <xsd:element name="yt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="PaymentRequest" type="IFWXML:PaymentRequest"/>
+      <xsd:complexType name="PaymentResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zt" type="xsd:string"/>
+          <xsd:element name="zwrq" type="xsd:string"/>
+          <xsd:element name="dzzt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="PaymentResponse" type="IFWXML:PaymentResponse"/>
+      <!--QueryTransactionDetails-->
+      <xsd:complexType name="QueryTransactionDetailsRequest">
+        <xsd:annotation>
+          <xsd:documentation>1014</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="qsrq" type="xsd:string"/>
+          <xsd:element name="jsrq" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ywslbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="shbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="hth" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="xyh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jylx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jyzt" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryTransactionDetailsRequest" type="IFWXML:QueryTransactionDetailsRequest"/>
+      <xsd:complexType name="QueryTransactionDetailsResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="ptlsh" type="xsd:string"/>
+          <xsd:element name="shlsh" type="xsd:string"/>
+          <xsd:element name="qdlsh" type="xsd:string"/>
+          <xsd:element name="jyrq" type="xsd:string"/>
+          <xsd:element name="jysj" type="xsd:string"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="xyh" type="xsd:string"/>
+          <xsd:element name="fkzh" type="xsd:string"/>
+          <xsd:element name="skzh" type="xsd:string"/>
+          <xsd:element name="ykje" type="xsd:string"/>
+          <xsd:element name="fse" type="xsd:string"/>
+          <xsd:element name="sxf" type="xsd:string"/>
+          <xsd:element name="jylx" type="xsd:string"/>
+          <xsd:element name="jyzt" type="xsd:string"/>
+          <xsd:element name="jbwd" type="xsd:string"/>
+          <xsd:element name="jbgy" type="xsd:string"/>
+          <xsd:element name="hb" type="xsd:string"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="fkzhlb" type="xsd:string"/>
+          <xsd:element name="sfdz" type="xsd:string"/>
+          <xsd:element name="yt" type="xsd:string"/>
+          <xsd:element name="fhm" type="xsd:string"/>
+          <xsd:element name="fhxx" type="xsd:string"/>
+          <xsd:element name="zwrq" type="xsd:string"/>
+          <xsd:element name="dzbz" type="xsd:string"/>
+          <xsd:element name="dzzt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryTransactionDetailsResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryTransactionDetailsResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryTransactionDetailsResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryTransactionDetailsResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryTransactionDetailsResponse" type="IFWXML:QueryTransactionDetailsResponse"/>
+      <!--QueryNonTransDetails-->
+      <xsd:complexType name="QueryNonTransDetailsRequest">
+        <xsd:annotation>
+          <xsd:documentation>1015</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="qsrq" type="xsd:string"/>
+          <xsd:element name="jsrq" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="ywslbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="shbh" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="hth" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jylx" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="jyzt" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryNonTransDetailsRequest" type="IFWXML:QueryNonTransDetailsRequest"/>
+      <xsd:complexType name="QueryNonTransDetailsResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="ptlsh" type="xsd:string"/>
+          <xsd:element name="shlsh" type="xsd:string"/>
+          <xsd:element name="qdlsh" type="xsd:string"/>
+          <xsd:element name="jyrq" type="xsd:string"/>
+          <xsd:element name="jysj" type="xsd:string"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="jylx" type="xsd:string"/>
+          <xsd:element name="zt" type="xsd:string"/>
+          <xsd:element name="jbwd" type="xsd:string"/>
+          <xsd:element name="jbgy" type="xsd:string"/>
+          <xsd:element name="fhm" type="xsd:string"/>
+          <xsd:element name="fhxx" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryNonTransDetailsResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryNonTransDetailsResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryNonTransDetailsResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryNonTransDetailsResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryNonTransDetailsResponse" type="IFWXML:QueryNonTransDetailsResponse"/>
+      <!--QueryCommerceCheckInfo-->
+      <xsd:complexType name="QueryCommerceCheckInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1016</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="dzrq" type="xsd:string"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCommerceCheckInfoRequest" type="IFWXML:QueryCommerceCheckInfoRequest"/>
+      <xsd:complexType name="QueryCommerceCheckInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="dzrq" type="xsd:string"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="zje" type="xsd:string"/>
+          <xsd:element name="sxfzje" type="xsd:string"/>
+          <xsd:element name="wjm" type="xsd:string"/>
+          <xsd:element name="qsrq" type="xsd:string"/>
+          <xsd:element name="qsje" type="xsd:string"/>
+          <xsd:element name="zt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryCommerceCheckInfoResponse" type="IFWXML:QueryCommerceCheckInfoResponse"/>
+      <!--QueryChannelCheckInfo-->
+      <xsd:complexType name="QueryChannelCheckInfoRequest">
+        <xsd:annotation>
+          <xsd:documentation>1017</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="dzrq" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="qdbh" type="xsd:string"/>
+          <xsd:element name="ys" type="xsd:string"/>
+          <xsd:element name="xsts" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelCheckInfoRequest" type="IFWXML:QueryChannelCheckInfoRequest"/>
+      <xsd:complexType name="QueryChannelCheckInfoResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="dzrq" type="xsd:string"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+          <xsd:element name="zbs" type="xsd:string"/>
+          <xsd:element name="zje" type="xsd:string"/>
+          <xsd:element name="zt" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelCheckInfoResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryChannelCheckInfoResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelCheckInfoResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryChannelCheckInfoResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelCheckInfoResponse" type="IFWXML:QueryChannelCheckInfoResponse"/>
+      <!--QueryChannelFeeSection-->
+      <xsd:complexType name="QueryChannelFeeSectionRequest">
+        <xsd:annotation>
+          <xsd:documentation>1018</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="qdbh" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelFeeSectionRequest" type="IFWXML:QueryChannelFeeSectionRequest"/>
+      <xsd:complexType name="QueryChannelFeeSectionResponseBodyListRow">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="qsje" type="xsd:string"/>
+          <xsd:element name="jsje" type="xsd:string"/>
+          <xsd:element name="sxf" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelFeeSectionResponseBodyList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="row" type="IFWXML:QueryChannelFeeSectionResponseBodyListRow" maxOccurs="unbounded" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="QueryChannelFeeSectionResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+          <xsd:element name="zjls" type="xsd:string"/>
+          <xsd:element name="list" type="IFWXML:QueryChannelFeeSectionResponseBodyList" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="QueryChannelFeeSectionResponse" type="IFWXML:QueryChannelFeeSectionResponse"/>
+      <!--CustomerAuthentication-->
+      <xsd:complexType name="CustomerAuthenticationRequest">
+        <xsd:annotation>
+          <xsd:documentation>1019</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="requestHeader" type="IFWXML:RequestHeader"/>
+          <xsd:element name="shbh" type="xsd:string"/>
+          <xsd:element name="hth" type="xsd:string"/>
+          <xsd:element name="zh" type="xsd:string"/>
+          <xsd:element name="hm" type="xsd:string"/>
+          <xsd:element name="zjlx" type="xsd:string"/>
+          <xsd:element name="zjhm" type="xsd:string"/>
+          <xsd:element name="sjh" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerAuthenticationRequest" type="IFWXML:CustomerAuthenticationRequest"/>
+      <xsd:complexType name="CustomerAuthenticationResponse">
+        <xsd:sequence minOccurs="0" maxOccurs="1">
+          <xsd:element name="responseHeader" type="IFWXML:ResponseHeader"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerAuthenticationResponse" type="IFWXML:CustomerAuthenticationResponse"/>
+    </xsd:schema>
+  </types>
+  <!-- MESSAGE BLOCKS -->
+  <message name="QueryChannelInfoRequest">
+    <part name="QueryChannelInfo" element="IFWXML:QueryChannelInfoRequest"/>
+  </message>
+  <message name="QueryChannelInfoResponse">
+    <part name="QueryChannelInfo" element="IFWXML:QueryChannelInfoResponse"/>
+  </message>
+  <message name="CommerceSignInRequest">
+    <part name="CommerceSignIn" element="IFWXML:CommerceSignInRequest"/>
+  </message>
+  <message name="CommerceSignInResponse">
+    <part name="CommerceSignIn" element="IFWXML:CommerceSignInResponse"/>
+  </message>
+  <message name="ModifyCommerceInfoRequest">
+    <part name="ModifyCommerceInfo" element="IFWXML:ModifyCommerceInfoRequest"/>
+  </message>
+  <message name="ModifyCommerceInfoResponse">
+    <part name="ModifyCommerceInfo" element="IFWXML:ModifyCommerceInfoResponse"/>
+  </message>
+  <message name="QueryCommerceInfoRequest">
+    <part name="QueryCommerceInfo" element="IFWXML:QueryCommerceInfoRequest"/>
+  </message>
+  <message name="QueryCommerceInfoResponse">
+    <part name="QueryCommerceInfo" element="IFWXML:QueryCommerceInfoResponse"/>
+  </message>
+  <message name="CommerceSignOutRequest">
+    <part name="CommerceSignOut" element="IFWXML:CommerceSignOutRequest"/>
+  </message>
+  <message name="CommerceSignOutResponse">
+    <part name="CommerceSignOut" element="IFWXML:CommerceSignOutResponse"/>
+  </message>
+  <message name="CustomerSignInRequest">
+    <part name="CustomerSignIn" element="IFWXML:CustomerSignInRequest"/>
+  </message>
+  <message name="CustomerSignInResponse">
+    <part name="CustomerSignIn" element="IFWXML:CustomerSignInResponse"/>
+  </message>
+  <message name="ModifyCustomerInfoRequest">
+    <part name="ModifyCustomerInfo" element="IFWXML:ModifyCustomerInfoRequest"/>
+  </message>
+  <message name="ModifyCustomerInfoResponse">
+    <part name="ModifyCustomerInfo" element="IFWXML:ModifyCustomerInfoResponse"/>
+  </message>
+  <message name="CustomerSignOutRequest">
+    <part name="CustomerSignOut" element="IFWXML:CustomerSignOutRequest"/>
+  </message>
+  <message name="CustomerSignOutResponse">
+    <part name="CustomerSignOut" element="IFWXML:CustomerSignOutResponse"/>
+  </message>
+  <message name="QueryCustomerInfoRequest">
+    <part name="QueryCustomerInfo" element="IFWXML:QueryCustomerInfoRequest"/>
+  </message>
+  <message name="QueryCustomerInfoResponse">
+    <part name="QueryCustomerInfo" element="IFWXML:QueryCustomerInfoResponse"/>
+  </message>
+  <message name="QueryCustomerChannelInfoRequest">
+    <part name="QueryCustomerChannelInfo" element="IFWXML:QueryCustomerChannelInfoRequest"/>
+  </message>
+  <message name="QueryCustomerChannelInfoResponse">
+    <part name="QueryCustomerChannelInfo" element="IFWXML:QueryCustomerChannelInfoResponse"/>
+  </message>
+  <message name="AddChannelParametersRequest">
+    <part name="AddChannelParameters" element="IFWXML:AddChannelParametersRequest"/>
+  </message>
+  <message name="AddChannelParametersResponse">
+    <part name="AddChannelParameters" element="IFWXML:AddChannelParametersResponse"/>
+  </message>
+  <message name="ModifyChannelParametersRequest">
+    <part name="ModifyChannelParameters" element="IFWXML:ModifyChannelParametersRequest"/>
+  </message>
+  <message name="ModifyChannelParametersResponse">
+    <part name="ModifyChannelParameters" element="IFWXML:ModifyChannelParametersResponse"/>
+  </message>
+  <message name="QuerychannelParametersRequest">
+    <part name="QuerychannelParameters" element="IFWXML:QuerychannelParametersRequest"/>
+  </message>
+  <message name="QuerychannelParametersResponse">
+    <part name="QuerychannelParameters" element="IFWXML:QuerychannelParametersResponse"/>
+  </message>
+  <message name="PaymentRequest">
+    <part name="Payment" element="IFWXML:PaymentRequest"/>
+  </message>
+  <message name="PaymentResponse">
+    <part name="Payment" element="IFWXML:PaymentResponse"/>
+  </message>
+  <message name="QueryTransactionDetailsRequest">
+    <part name="QueryTransactionDetails" element="IFWXML:QueryTransactionDetailsRequest"/>
+  </message>
+  <message name="QueryTransactionDetailsResponse">
+    <part name="QueryTransactionDetails" element="IFWXML:QueryTransactionDetailsResponse"/>
+  </message>
+  <message name="QueryNonTransDetailsRequest">
+    <part name="QueryNonTransDetails" element="IFWXML:QueryNonTransDetailsRequest"/>
+  </message>
+  <message name="QueryNonTransDetailsResponse">
+    <part name="QueryNonTransDetails" element="IFWXML:QueryNonTransDetailsResponse"/>
+  </message>
+  <message name="QueryCommerceCheckInfoRequest">
+    <part name="QueryCommerceCheckInfo" element="IFWXML:QueryCommerceCheckInfoRequest"/>
+  </message>
+  <message name="QueryCommerceCheckInfoResponse">
+    <part name="QueryCommerceCheckInfo" element="IFWXML:QueryCommerceCheckInfoResponse"/>
+  </message>
+  <message name="QueryChannelCheckInfoRequest">
+    <part name="QueryChannelCheckInfo" element="IFWXML:QueryChannelCheckInfoRequest"/>
+  </message>
+  <message name="QueryChannelCheckInfoResponse">
+    <part name="QueryChannelCheckInfo" element="IFWXML:QueryChannelCheckInfoResponse"/>
+  </message>
+  <message name="QueryChannelFeeSectionRequest">
+    <part name="QueryChannelFeeSection" element="IFWXML:QueryChannelFeeSectionRequest"/>
+  </message>
+  <message name="QueryChannelFeeSectionResponse">
+    <part name="QueryChannelFeeSection" element="IFWXML:QueryChannelFeeSectionResponse"/>
+  </message>
+  <message name="CustomerAuthenticationRequest">
+    <part name="CustomerAuthentication" element="IFWXML:CustomerAuthenticationRequest"/>
+  </message>
+  <message name="CustomerAuthenticationResponse">
+    <part name="CustomerAuthentication" element="IFWXML:CustomerAuthenticationResponse"/>
+  </message>
+  <message name="ErrorInfo">
+    <part name="ErrorInfo" element="IFWXML:ErrorInfo"/>
+  </message>
+  <!-- END MESSAGE BLOCKS -->
+  <!-- PORT TYPES -->
+  <portType name="DSYWServices">
+    <operation name="QueryChannelInfo">
+      <input message="IFWXML:QueryChannelInfoRequest"/>
+      <output message="IFWXML:QueryChannelInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="CommerceSignIn">
+      <input message="IFWXML:CommerceSignInRequest"/>
+      <output message="IFWXML:CommerceSignInResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="ModifyCommerceInfo">
+      <input message="IFWXML:ModifyCommerceInfoRequest"/>
+      <output message="IFWXML:ModifyCommerceInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryCommerceInfo">
+      <input message="IFWXML:QueryCommerceInfoRequest"/>
+      <output message="IFWXML:QueryCommerceInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="CommerceSignOut">
+      <input message="IFWXML:CommerceSignOutRequest"/>
+      <output message="IFWXML:CommerceSignOutResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="CustomerSignIn">
+      <input message="IFWXML:CustomerSignInRequest"/>
+      <output message="IFWXML:CustomerSignInResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="ModifyCustomerInfo">
+      <input message="IFWXML:ModifyCustomerInfoRequest"/>
+      <output message="IFWXML:ModifyCustomerInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="CustomerSignOut">
+      <input message="IFWXML:CustomerSignOutRequest"/>
+      <output message="IFWXML:CustomerSignOutResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryCustomerInfo">
+      <input message="IFWXML:QueryCustomerInfoRequest"/>
+      <output message="IFWXML:QueryCustomerInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryCustomerChannelInfo">
+      <input message="IFWXML:QueryCustomerChannelInfoRequest"/>
+      <output message="IFWXML:QueryCustomerChannelInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="AddChannelParameters">
+      <input message="IFWXML:AddChannelParametersRequest"/>
+      <output message="IFWXML:AddChannelParametersResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="ModifyChannelParameters">
+      <input message="IFWXML:ModifyChannelParametersRequest"/>
+      <output message="IFWXML:ModifyChannelParametersResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QuerychannelParameters">
+      <input message="IFWXML:QuerychannelParametersRequest"/>
+      <output message="IFWXML:QuerychannelParametersResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="Payment">
+      <input message="IFWXML:PaymentRequest"/>
+      <output message="IFWXML:PaymentResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryTransactionDetails">
+      <input message="IFWXML:QueryTransactionDetailsRequest"/>
+      <output message="IFWXML:QueryTransactionDetailsResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryNonTransDetails">
+      <input message="IFWXML:QueryNonTransDetailsRequest"/>
+      <output message="IFWXML:QueryNonTransDetailsResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryCommerceCheckInfo">
+      <input message="IFWXML:QueryCommerceCheckInfoRequest"/>
+      <output message="IFWXML:QueryCommerceCheckInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryChannelCheckInfo">
+      <input message="IFWXML:QueryChannelCheckInfoRequest"/>
+      <output message="IFWXML:QueryChannelCheckInfoResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="QueryChannelFeeSection">
+      <input message="IFWXML:QueryChannelFeeSectionRequest"/>
+      <output message="IFWXML:QueryChannelFeeSectionResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+    <operation name="CustomerAuthentication">
+      <input message="IFWXML:CustomerAuthenticationRequest"/>
+      <output message="IFWXML:CustomerAuthenticationResponse"/>
+      <fault name="ErrorResponseType" message="IFWXML:ErrorInfo"/>
+    </operation>
+  </portType>
+  <!-- end of PORT TYPES -->
+  <!-- BINDINGS -->
+  <binding name="DSYWServicesSOAPBinding" type="IFWXML:DSYWServices">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="QueryChannelInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryChannelInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="CommerceSignIn">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/CommerceSignIn"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="ModifyCommerceInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/ModifyCommerceInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryCommerceInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryCommerceInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="CommerceSignOut">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/CommerceSignOut"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="CustomerSignIn">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/CustomerSignIn"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="ModifyCustomerInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/ModifyCustomerInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="CustomerSignOut">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/CustomerSignOut"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryCustomerInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryCustomerInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryCustomerChannelInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryCustomerChannelInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="AddChannelParameters">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/AddChannelParameters"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="ModifyChannelParameters">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/ModifyChannelParameters"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QuerychannelParameters">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QuerychannelParameters"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="Payment">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/Payment"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryTransactionDetails">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryTransactionDetails"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryNonTransDetails">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryNonTransDetails"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryCommerceCheckInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryCommerceCheckInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryChannelCheckInfo">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryChannelCheckInfo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="QueryChannelFeeSection">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/QueryChannelFeeSection"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <operation name="CustomerAuthentication">
+      <soap:operation soapAction="http://www.ibm.com/ima/ifw/CustomerAuthentication"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorResponseType">
+        <soap:fault use="literal" name="ErrorResponseType" namespace=""/>
+      </fault>
+    </operation>
+    <!-- end of BINDINGS -->
+  </binding>
+  <!-- SERVICE BLOCKS -->
+  <service name="DSYWServicesService">
+    <port name="DSYWServicesSOAPPort" binding="IFWXML:DSYWServicesSOAPBinding">
+      <soap:address location="http://esb.czbank.com:7080/soa/services/IDSYWServices"/>
+    </port>
+  </service>
+  <!-- end of SERVICE BLOCKS -->
+</definitions>
+
+

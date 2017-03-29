@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:ebank="http://ebank.czbank.com/outSrv/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  name="IEbankServices" targetNamespace="http://ebank.czbank.com/outSrv/">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://ebank.czbank.com/outSrv/">
+            <xsd:complexType name="RequestHeader">
+                <xsd:sequence>
+                    <xsd:element name="serviceId" nillable="true" type="xsd:string"/>
+                    <xsd:element name="businessAcceptId" nillable="true" type="xsd:string"/>
+                    <xsd:element name="serialNumber" nillable="true" type="xsd:string"/>
+                    <xsd:element name="version" nillable="true" type="xsd:string"/>
+                    <xsd:element name="cmdType" nillable="true" type="xsd:string"/>
+                    <xsd:element name="requester" nillable="true" type="xsd:string"/>
+                    <xsd:element name="channel" nillable="true" type="xsd:string"/>
+                    <xsd:element name="requestTimeStamp" nillable="true" type="xsd:string"/>
+                    <xsd:element name="organizationUnitId" nillable="true" type="xsd:string"/>
+                    <xsd:element name="teller1" nillable="true" type="xsd:string"/>
+                    <xsd:element name="teller2" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="ResponseHeader">
+                <xsd:sequence>
+                    <xsd:element name="hostSerialNo" nillable="true" type="xsd:string"/>
+                    <xsd:element name="responseTimeStamp" nillable="true" type="xsd:string"/>
+                    <xsd:element name="errorNo" nillable="true" type="xsd:string"/>
+                    <xsd:element name="errorInfo" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <!-- 代扣订单查询结束 -->
+
+            <!-- 代扣鉴权接口 -->
+            <xsd:element name="upDeductAuthRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="requestHeader" type="ebank:RequestHeader"/>
+                        <xsd:element name="channelNo" nillable="true" type="xsd:string"/>
+                        <xsd:element name="cardNo" nillable="true" type="xsd:string"/>
+                        <xsd:element name="accName" nillable="true" type="xsd:string"/>
+                        <xsd:element name="certtype" nillable="true" type="xsd:string"/>
+                        <xsd:element name="certid" nillable="true" type="xsd:string"/>
+                        <xsd:element name="mobile" nillable="true" type="xsd:string"/>
+                        <xsd:element name="cvn" nillable="true" type="xsd:string"/>
+                        <xsd:element name="startDate" nillable="true" type="xsd:string"/>
+                        <xsd:element name="bak1" nillable="true" type="xsd:string"/>
+                        <xsd:element name="bak2" nillable="true" type="xsd:string"/>
+                        <xsd:element name="expire" nillable="true" type="xsd:string"/>
+                        <xsd:element name="toChannelNo" nillable="true" type="xsd:string">
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="upDeductAuthResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="responseHeader" type="ebank:ResponseHeader"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!-- 代扣鉴权接口结束 -->
+              <!-- 移动汇票短信通知 -->
+              <xsd:element name="signIssueSendMsgRequest">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="requestHeader" type="ebank:RequestHeader" />
+            			<xsd:element name="certType" nillable="true" type="xsd:string" />
+            			<xsd:element name="certNo" nillable="true" type="xsd:string" />
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="signIssueSendMsgResponse">
+            	<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="responseHeader" type="ebank:ResponseHeader" />
+					</xsd:sequence>
+				</xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="upDeductAuthRequest">
+        <wsdl:part element="ebank:upDeductAuthRequest" name="upDeductAuthRequest"/>
+    </wsdl:message>
+    <wsdl:message name="upDeductAuthResponse">
+        <wsdl:part element="ebank:upDeductAuthResponse" name="upDeductAuthResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="signIssueSendMsgRequest">
+		<wsdl:part name="signIssueSendMsgRequest" element="ebank:signIssueSendMsgRequest"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="signIssueSendMsgResponse">
+		<wsdl:part name="signIssueSendMsgResponse" element="ebank:signIssueSendMsgResponse"></wsdl:part>
+	</wsdl:message>
+
+    <wsdl:portType name="IEbankServices">
+        <wsdl:operation name="upDeductAuth">
+            <wsdl:input message="ebank:upDeductAuthRequest"/>
+            <wsdl:output message="ebank:upDeductAuthResponse"/>
+        </wsdl:operation>
+       <wsdl:operation name="signIssueSendMsg">
+			<wsdl:input message="ebank:signIssueSendMsgRequest"></wsdl:input>
+			<wsdl:output message="ebank:signIssueSendMsgResponse"></wsdl:output>
+		</wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="IEbankServicesSOAPPort" type="ebank:IEbankServices">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="upDeductAuth">
+            <soap:operation soapAction="http://ebank.czbank.com/outSrv/upDeductAuth"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+		
+        <wsdl:operation name="signIssueSendMsg"><soap:operation soapAction="http://ebank.czbank.com/outSrv/signIssueSendMsg"></soap:operation><wsdl:input><soap:body use="literal"></soap:body></wsdl:input><wsdl:output><soap:body use="literal"></soap:body></wsdl:output></wsdl:operation>
+
+    </wsdl:binding>
+    <wsdl:service name="IEbankService">
+        <wsdl:port binding="ebank:IEbankServicesSOAPPort" name="IEbankServicesSOAPPort">
+            <soap:address location="http://esb.czbank.com:7080/soa/services/IEbankServices"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

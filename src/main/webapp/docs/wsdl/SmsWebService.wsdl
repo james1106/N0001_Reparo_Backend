@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sms="http://sms.czbank.com/service/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SmsWebService" targetNamespace="http://sms.czbank.com/service/">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://sms.czbank.com/service/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="RequestHeader">
+				<xsd:sequence>
+					<xsd:element name="serviceId" nillable="true" type="xsd:string"/>
+					<xsd:element name="businessAcceptId" nillable="true" type="xsd:string"/>
+					<xsd:element name="serialNumber" nillable="true" type="xsd:string"/>
+					<xsd:element name="version" nillable="true" type="xsd:string"/>
+					<xsd:element name="cmdType" nillable="true" type="xsd:string"/>
+					<xsd:element name="requester" nillable="true" type="xsd:string"/>
+					<xsd:element name="channel" nillable="true" type="xsd:string"/>
+					<xsd:element name="requestTimeStamp" nillable="true" type="xsd:string"/>
+					<xsd:element name="organizationUnitId" nillable="true" type="xsd:string"/>
+					<xsd:element name="teller1" nillable="true" type="xsd:string"/>
+					<xsd:element name="teller2" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ResponseHeader">
+				<xsd:sequence>
+					<xsd:element name="hostSerialNo" nillable="true" type="xsd:string"/>
+					<xsd:element name="responseTimeStamp" nillable="true" type="xsd:string"/>
+					<xsd:element name="errorNo" nillable="true" type="xsd:string"/>
+					<xsd:element name="errorInfo" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="QueryVerifyResponseResult">
+				<xsd:sequence>
+					<xsd:element name="FLOWID" nillable="true" type="xsd:string"/>
+					<xsd:element name="MOBILE" nillable="true" type="xsd:string"/>
+					<xsd:element name="CMDCODE" nillable="true" type="xsd:string"/>
+					<xsd:element name="MTCONTENT" nillable="true" type="xsd:string"/>
+					<xsd:element name="MTTIME" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="LaunchVerifyRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="CMDTYPE" nillable="true" type="xsd:string"/>
+					<xsd:element name="CHANNEL" nillable="true" type="xsd:string"/>
+					<xsd:element name="SRVID" nillable="true" type="xsd:string"/>
+					<xsd:element name="MOBILE" nillable="true" type="xsd:string"/>
+					<xsd:element name="SEED" nillable="true" type="xsd:string"/>
+					<xsd:element name="SMSCONTENT" nillable="true" type="xsd:string"/>
+					<xsd:element name="NEEDREPLY" nillable="true" type="xsd:string"/>
+					<xsd:element name="SMSAGREEREPLY" nillable="true" type="xsd:string"/>
+					<xsd:element name="SMSUNAGREEREPLY" nillable="true" type="xsd:string"/>
+					<xsd:element name="FLOWID" nillable="true" type="xsd:string"/>
+					<xsd:element name="SMSLIFE" nillable="true" type="xsd:string"/>
+					
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="LaunchVerifyResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="QueryVerifyRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="SRVID" nillable="true" type="xsd:string"/>
+					<xsd:element name="STARTTIME" nillable="true" type="xsd:string"/>
+					<xsd:element name="ENDTIME" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="QueryVerifyResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+					<xsd:element name="QueryVerifyResponseResult" nillable="true" type="sms:QueryVerifyResponseResult" maxOccurs="unbounded" minOccurs="0">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="SendMsgDataRequest">
+				<xsd:sequence>
+					<xsd:element name="OBJADDR" nillable="true" type="xsd:string"/>
+					<xsd:element name="MSGCONT" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="SendMsgRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="SRVID" nillable="true" type="xsd:string"/>
+					<xsd:element name="IMMEDFLAG" nillable="true" type="xsd:string"/>
+					<xsd:element name="LASTSNDTIME" nillable="true" type="xsd:string"/>
+					<xsd:element name="SPCODE" nillable="true" type="xsd:string"/>
+					<xsd:element name="REPEAT" nillable="true" type="xsd:string"/>
+					<xsd:element name="LONGSMS" nillable="true" type="xsd:string"/>
+					<xsd:element name="SMSLIFE" nillable="true" type="xsd:string"/>
+					<xsd:element name="SendMsgDataRequest" nillable="true" type="sms:SendMsgDataRequest" maxOccurs="unbounded" minOccurs="0">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="SendMsgResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="SendMailRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="SUBJECT" nillable="true" type="xsd:string"/>
+					<xsd:element name="BODY" nillable="true" type="xsd:string"/>
+					<xsd:element name="TO" nillable="true" type="xsd:string"/>
+					<xsd:element name="FROM" nillable="true" type="xsd:string"/>
+					<xsd:element name="AFFIX" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="SendMailResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="QueryTodaySmsRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="mobile" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="MsgData">
+				<xsd:sequence>
+					<xsd:element name="agentno" nillable="true" type="xsd:string"/>
+					<xsd:element name="crtdate" nillable="true" type="xsd:string"/>
+					<xsd:element name="crttime" nillable="true" type="xsd:string"/>
+					<xsd:element name="msgstat" nillable="true" type="xsd:string"/>
+					<xsd:element name="channo" nillable="true" type="xsd:string"/>
+					<xsd:element name="txntlr" nillable="true" type="xsd:string"/>
+					<xsd:element name="msgcont" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
+			<xsd:complexType name="QueryTodaySmsResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+					<xsd:element name="MsgData" nillable="true" type="sms:MsgData" maxOccurs="unbounded" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="QueryHistorySmsRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="sms:RequestHeader">
+					</xsd:element>
+					<xsd:element name="mobile" nillable="true" type="xsd:string"/>
+					<xsd:element name="beginTime" nillable="true" type="xsd:string"/>
+					<xsd:element name="endTime" nillable="true" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="QueryHistorySmsResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" nillable="true" type="sms:ResponseHeader">
+					</xsd:element>
+					<xsd:element name="MsgData" nillable="true" type="sms:MsgData" maxOccurs="unbounded" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+
+			<xsd:element name="LaunchVerifyRequest" type="sms:LaunchVerifyRequest">
+			</xsd:element>
+			<xsd:element name="LaunchVerifyResponse" type="sms:LaunchVerifyResponse">
+			</xsd:element>
+			
+			<xsd:element name="queryVerifyRequest" type="sms:QueryVerifyRequest">
+			</xsd:element>
+			<xsd:element name="queryVerifyResponse" type="sms:QueryVerifyResponse">
+			</xsd:element>
+			
+			<xsd:element name="SendMsgRequest" type="sms:SendMsgRequest">
+			</xsd:element>
+			<xsd:element name="SendMsgResponse" type="sms:SendMsgResponse">
+			</xsd:element>
+			
+			<xsd:element name="SendMailRequest" type="sms:SendMailRequest">
+			</xsd:element>
+			<xsd:element name="SendMailResponse" type="sms:SendMailResponse">
+			</xsd:element>
+			
+			<xsd:element name="QueryTodaySmsRequest" type="sms:QueryTodaySmsRequest">
+			</xsd:element>
+			<xsd:element name="QueryTodaySmsResponse" type="sms:QueryTodaySmsResponse">
+			</xsd:element>
+			
+			<xsd:element name="QueryHistorySmsRequest" type="sms:QueryHistorySmsRequest">
+			</xsd:element>
+			<xsd:element name="QueryHistorySmsResponse" type="sms:QueryHistorySmsResponse">
+			</xsd:element>
+			
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="LaunchVerifyRequest">
+		<wsdl:part element="sms:LaunchVerifyRequest" name="LaunchVerifyRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="LaunchVerifyResponse">
+		<wsdl:part element="sms:LaunchVerifyResponse" name="LaunchVerifyResponse">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:message name="queryVerifyRequest">
+		<wsdl:part element="sms:queryVerifyRequest" name="queryVerifyRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="queryVerifyResponse">
+		<wsdl:part element="sms:queryVerifyResponse" name="queryVerifyResponse">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:message name="SendMsgRequest">
+		<wsdl:part element="sms:SendMsgRequest" name="SendMsgRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="SendMsgResponse">
+		<wsdl:part element="sms:SendMsgResponse" name="SendMsgResponse">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="SendMailRequest">
+		<wsdl:part element="sms:SendMailRequest" name="SendMailRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="SendMailResponse">
+		<wsdl:part element="sms:SendMailResponse" name="SendMailResponse">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:message name="QueryTodaySmsRequest">
+		<wsdl:part element="sms:QueryTodaySmsRequest" name="QueryTodaySmsRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="QueryTodaySmsResponse">
+		<wsdl:part element="sms:QueryTodaySmsResponse" name="QueryTodaySmsResponse">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:message name="QueryHistorySmsRequest">
+		<wsdl:part element="sms:QueryHistorySmsRequest" name="QueryHistorySmsRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="QueryHistorySmsResponse">
+		<wsdl:part element="sms:QueryHistorySmsResponse" name="QueryHistorySmsResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:portType name="SmsWebService">
+		<wsdl:operation name="launchVerify">
+			<wsdl:input message="sms:LaunchVerifyRequest"/>
+			<wsdl:output message="sms:LaunchVerifyResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="queryVerify">
+			<wsdl:input message="sms:queryVerifyRequest"/>
+			<wsdl:output message="sms:queryVerifyResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendMsg">
+			<wsdl:input message="sms:SendMsgRequest"/>
+			<wsdl:output message="sms:SendMsgResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="sendMail">
+			<wsdl:input message="sms:SendMailRequest"/>
+			<wsdl:output message="sms:SendMailResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="queryTodaySms">
+			<wsdl:input message="sms:QueryTodaySmsRequest"/>
+			<wsdl:output message="sms:QueryTodaySmsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="queryHistorySms">
+			<wsdl:input message="sms:QueryHistorySmsRequest"/>
+			<wsdl:output message="sms:QueryHistorySmsResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="SmsWebServiceSOAP" type="sms:SmsWebService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="launchVerify">
+			<soap:operation
+				soapAction="http://sms.czbank.com/service/SmsWebService" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="queryVerify">
+			<soap:operation
+				soapAction="http://sms.czbank.com/service/SmsWebService" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="sendMsg">
+			<soap:operation
+				soapAction="http://sms.czbank.com/service/SmsWebService" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+        <wsdl:operation name="sendMail"><soap:operation soapAction="http://sms.czbank.com/service/sendMail"></soap:operation><wsdl:input><soap:body use="literal"></soap:body></wsdl:input><wsdl:output><soap:body use="literal"></soap:body></wsdl:output></wsdl:operation>
+        <wsdl:operation name="queryTodaySms"><soap:operation soapAction="http://sms.czbank.com/service/queryTodaySms"></soap:operation><wsdl:input><soap:body use="literal"></soap:body></wsdl:input><wsdl:output><soap:body use="literal"></soap:body></wsdl:output></wsdl:operation>
+        <wsdl:operation name="queryHistorySms"><soap:operation soapAction="http://sms.czbank.com/service/queryHistorySms"></soap:operation><wsdl:input><soap:body use="literal"></soap:body></wsdl:input><wsdl:output><soap:body use="literal"></soap:body></wsdl:output></wsdl:operation>
+    </wsdl:binding>
+	<wsdl:service name="SmsWebService">
+		<wsdl:port binding="sms:SmsWebServiceSOAP" name="SmsWebServiceSOAPPort">
+			<soap:address location="http://esb.czbank.com:7080/soa/services/ISmsService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

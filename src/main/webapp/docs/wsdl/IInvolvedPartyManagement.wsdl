@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<wsdl:definitions targetNamespace="http://cif.czbank.com/ip/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cif.czbank.com/ip/" xmlns:intf="http://cif.czbank.com/ip/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<schema targetNamespace="http://cif.czbank.com/ip/" xmlns="http://www.w3.org/2001/XMLSchema">
+			<complexType name="RequestHeader">
+				<sequence>
+					<element name="serviceId" nillable="true" type="xsd:string" />
+					<element name="businessAcceptId" nillable="true" type="xsd:string" />
+					<element name="serialNumber" nillable="true" type="xsd:string" />
+					<element name="version" nillable="true" type="xsd:string" />
+					<element name="cmdType" nillable="true" type="xsd:string" />
+					<element name="requester" nillable="true" type="xsd:string" />
+					<element name="channel" nillable="true" type="xsd:string" />
+					<element name="requestTimeStamp" nillable="true" type="xsd:string" />
+					<element name="organizationUnitId" nillable="true" type="xsd:string" />
+					<element name="teller1" nillable="true" type="xsd:string" />
+					<element name="teller2" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="TerminateCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="customerId" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="terminateCustomerRequest" type="impl:TerminateCustomerRequest" />
+			<complexType name="ResponseHeader">
+				<sequence>
+					<element name="hostSerialNo" nillable="true" type="xsd:string" />
+					<element name="responseTimeStamp" nillable="true" type="xsd:string" />
+					<element name="errorNo" nillable="true" type="xsd:string" />
+					<element name="errorInfo" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="TerminateCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+				</sequence>
+			</complexType>
+			<element name="terminateCustomerResponse" type="impl:TerminateCustomerResponse" />
+			<complexType name="BaseCustomerDetails">
+				<sequence>
+					<element name="customerId" nillable="true" type="xsd:string" />
+					<element name="elecDocuments" nillable="true" type="xsd:string" />
+					<element name="customerType" nillable="true" type="xsd:string" />
+					<element name="chineseName" nillable="true" type="xsd:string" />
+					<element name="englishName" nillable="true" type="xsd:string" />
+					<element name="customerCode" nillable="true" type="xsd:string" />
+					<element name="postalAddress" nillable="true" type="xsd:string" />
+					<element name="postalCode" nillable="true" type="xsd:string" />
+					<element name="telephone" nillable="true" type="xsd:string" />
+					<element name="faxNumber" nillable="true" type="xsd:string" />
+					<element name="mobile" nillable="true" type="xsd:string" />
+					<element name="email" nillable="true" type="xsd:string" />
+					<element name="certificateType" nillable="true" type="xsd:string" />
+					<element name="certificateNumber" nillable="true" type="xsd:string" />
+					<element name="certificateAuthority" nillable="true" type="xsd:string" />
+					<element name="certificateLocation" nillable="true" type="xsd:string" />
+					<element name="certificateProvince" nillable="true" type="xsd:string" />
+					<element name="certificateCity" nillable="true" type="xsd:string" />
+					<element name="certificateCounty" nillable="true" type="xsd:string" />
+					<element name="issuedDate" nillable="true" type="xsd:date" />
+					<element name="expirationDate" nillable="true" type="xsd:date" />
+					<element name="customerManager" nillable="true" type="xsd:string" />
+					<element name="spokenLanguage" nillable="true" type="xsd:string" />
+					<element name="importanceLevel" nillable="true" type="xsd:string" />
+					<element name="initialCreateOUId" nillable="true" type="xsd:string" />
+					<element name="initialCreateDate" nillable="true" type="xsd:date" />
+					<element name="initialCreateTellerId" nillable="true" type="xsd:string" />
+					<element name="updateOrganizationUnitId" nillable="true" type="xsd:string" />
+					<element name="updateDate" nillable="true" type="xsd:date" />
+					<element name="updateTellerId" nillable="true" type="xsd:string" />
+					<element name="statementPostType" nillable="true" type="xsd:string" />
+					<element name="statementTelephone" nillable="true" type="xsd:string" />
+					<element name="statementEmail" nillable="true" type="xsd:string" />
+					<element name="statementPostalAddress" nillable="true" type="xsd:string" />
+					<element name="statementPostalCode" nillable="true" type="xsd:string" />
+					<element name="description" nillable="true" type="xsd:string" />
+					<element name="riskLevel" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="IndividualCustomerDetails">
+				<complexContent>
+					<extension base="impl:BaseCustomerDetails">
+						<sequence>
+							<element name="gender" nillable="true" type="xsd:string" />
+							<element name="birthDate" nillable="true" type="xsd:date" />
+							<element name="educationLevel" nillable="true" type="xsd:string" />
+							<element name="maritalStatus" nillable="true" type="xsd:string" />
+							<element name="nationNality" nillable="true" type="xsd:string" />
+							<element name="ethnicType" nillable="true" type="xsd:string" />
+							<element name="nativePlace" nillable="true" type="xsd:string" />
+							<element name="employerName" nillable="true" type="xsd:string" />
+							<element name="employerAddress" nillable="true" type="xsd:string" />
+							<element name="occupation" nillable="true" type="xsd:string" />
+							<element name="position" nillable="true" type="xsd:string" />
+							<element name="agentIndividualName" nillable="true" type="xsd:string" />
+							<element name="spellName" nillable="true" type="xsd:string" />
+							<element name="officeTelephone" nillable="true" type="xsd:string" />
+							<element name="employerPostalCode" nillable="true" type="xsd:string" />
+						</sequence>
+					</extension>
+				</complexContent>
+			</complexType>
+			<complexType name="RecordIndividualCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="individualCustomerDetails" nillable="true" type="impl:IndividualCustomerDetails" />
+				</sequence>
+			</complexType>
+			<element name="recordIndividualCustomerRequest" type="impl:RecordIndividualCustomerRequest" />
+			<complexType name="RecordIndividualCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+					<element name="customerId" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="recordIndividualCustomerResponse" type="impl:RecordIndividualCustomerResponse" />
+			<complexType name="OrganizationCustomerDetails">
+				<complexContent>
+					<extension base="impl:BaseCustomerDetails">
+						<sequence>
+							<element name="financialOrganizationFlag" nillable="true" type="xsd:string" />
+							<element name="bankCode" nillable="true" type="xsd:string" />
+							<element name="legalPersonRepresentName" nillable="true" type="xsd:string" />
+							<element name="legalPrsnREPCertificateType" nillable="true" type="xsd:string" />
+							<element name="legalPrsnREPCertificateNumber" nillable="true" type="xsd:string" />
+							<element name="legalPrsnREPCertificateEXPDate" nillable="true" type="xsd:date" />
+							<element name="businessLicenseId" nillable="true" type="xsd:string" />
+							<element name="businessLicenseExpirationDate" nillable="true" type="xsd:date" />
+							<element name="businessLicenseCheckDate" nillable="true" type="xsd:date" />
+							<element name="accountOpeningPermissionNo" nillable="true" type="xsd:string" />
+							<element name="specialIndustryPermissionNo" nillable="true" type="xsd:string" />
+							<element name="nationalTaxNumber" nillable="true" type="xsd:string" />
+							<element name="localTaxNumber" nillable="true" type="xsd:string" />
+							<element name="registrationPostalAddress" nillable="true" type="xsd:string" />
+							<element name="registrationPostalCode" nillable="true" type="xsd:string" />
+							<element name="registrationCapital" nillable="true" type="xsd:double" />
+							<element name="financialContactName" nillable="true" type="xsd:string" />
+							<element name="financialContactType" nillable="true" type="xsd:string" />
+							<element name="financialContactNo" nillable="true" type="xsd:string" />
+							<element name="operationScope" nillable="true" type="xsd:string" />
+							<element name="capitalType" nillable="true" type="xsd:string" />
+							<element name="customerSort" nillable="true" type="xsd:string" />
+							<element name="industryType" nillable="true" type="xsd:string" />
+							<element name="contactPersonName1" nillable="true" type="xsd:string" />
+							<element name="contactPersonTelephone1" nillable="true" type="xsd:string" />
+							<element name="contactPersonMobile1" nillable="true" type="xsd:string" />
+							<element name="contactPersonName2" nillable="true" type="xsd:string" />
+							<element name="contactPersonTelephone2" nillable="true" type="xsd:string" />
+							<element name="contactPersonMobile2" nillable="true" type="xsd:string" />
+							<element name="contactPersonName3" nillable="true" type="xsd:string" />
+							<element name="contactPersonTelephone3" nillable="true" type="xsd:string" />
+							<element name="contactPersonMobile3" nillable="true" type="xsd:string" />
+							<element name="authorizeAgentIndividualName" nillable="true" type="xsd:string" />
+							<element name="authAgentIDVCertificateNumber" nillable="true" type="xsd:string" />
+							<element name="authAgentIDVCertificateType" nillable="true" type="xsd:string" />
+							<element name="authAgentIDVCertificateEXPDate" nillable="true" type="xsd:date" />
+							<element name="corpCode" nillable="true" type="xsd:string" />
+						</sequence>
+					</extension>
+				</complexContent>
+			</complexType>
+			<complexType name="RecordOrganizationCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="organizationCustomerDetails" nillable="true" type="impl:OrganizationCustomerDetails" />
+				</sequence>
+			</complexType>
+			<element name="recordOrganizationCustomerRequest" type="impl:RecordOrganizationCustomerRequest" />
+			<complexType name="RecordOrganizationCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+					<element name="customerId" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="recordOrganizationCustomerResponse" type="impl:RecordOrganizationCustomerResponse" />
+			<complexType name="ModifyIndividualCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="individualCustomerDetails" nillable="true" type="impl:IndividualCustomerDetails" />
+				</sequence>
+			</complexType>
+			<element name="modifyIndividualCustomerRequest" type="impl:ModifyIndividualCustomerRequest" />
+			<complexType name="ModifyIndividualCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+				</sequence>
+			</complexType>
+			<element name="modifyIndividualCustomerResponse" type="impl:ModifyIndividualCustomerResponse" />
+			<complexType name="ModifyOrganizationCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="organizationCustomerDetails" nillable="true" type="impl:OrganizationCustomerDetails" />
+				</sequence>
+			</complexType>
+			<element name="modifyOrganizationCustomerRequest" type="impl:ModifyOrganizationCustomerRequest" />
+			<complexType name="ModifyOrganizationCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+				</sequence>
+			</complexType>
+			<element name="modifyOrganizationCustomerResponse" type="impl:ModifyOrganizationCustomerResponse" />
+			<complexType name="RetrieveCustomerRequest">
+				<sequence>
+					<element name="requestHeader" nillable="true" type="impl:RequestHeader" />
+					<element name="queryType" nillable="true" type="xsd:string" />
+					<element name="customerId" nillable="true" type="xsd:string" />
+					<element name="certificateNumber" nillable="true" type="xsd:string" />
+					<element name="certificateType" nillable="true" type="xsd:string" />
+					<element name="accountNumber" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="retrieveCustomerBasicRequest" type="impl:RetrieveCustomerRequest" />
+			<complexType name="RetrieveCustomerBasicResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+					<element name="baseCustomerDetails" nillable="true" type="impl:BaseCustomerDetails" />
+					<element name="validAccount" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="retrieveCustomerBasicResponse" type="impl:RetrieveCustomerBasicResponse" />
+			<element name="retrieveIndividualCustomerRequest" type="impl:RetrieveCustomerRequest" />
+			<complexType name="RetrieveIndividualCustomerReponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+					<element name="individualCustomerDetails" nillable="true" type="impl:IndividualCustomerDetails" />
+					<element name="validAccount" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="retrieveIndividualCustomerResponse" type="impl:RetrieveIndividualCustomerReponse" />
+			<element name="retrieveOrganizationCustomerRequest" type="impl:RetrieveCustomerRequest" />
+			<complexType name="RetrieveOrganizationCustomerResponse">
+				<sequence>
+					<element name="responseHeader" nillable="true" type="impl:ResponseHeader" />
+					<element name="organizationCustomerDetails" nillable="true" type="impl:OrganizationCustomerDetails" />
+					<element name="validAccount" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<element name="retrieveOrganizationCustomerResponse" type="impl:RetrieveOrganizationCustomerResponse" />
+		</schema>
+	</wsdl:types>
+	<wsdl:message name="terminateCustomerRequest">
+		<wsdl:part element="intf:terminateCustomerRequest" name="terminateCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="terminateCustomerResponse">
+		<wsdl:part element="intf:terminateCustomerResponse" name="terminateCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="modifyIndividualCustomerDetailsResponse">
+		<wsdl:part element="intf:modifyIndividualCustomerResponse" name="modifyIndividualCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="retrieveOrganizationCustomerDetailsRequest">
+		<wsdl:part element="intf:retrieveOrganizationCustomerRequest" name="retrieveOrganizationCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="modifyOrganizationCustomerDetailsRequest">
+		<wsdl:part element="intf:modifyOrganizationCustomerRequest" name="modifyOrganizationCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="retrieveCustomerBasicDetailsResponse">
+		<wsdl:part element="intf:retrieveCustomerBasicResponse" name="retrieveCustomerBasicResponse" />
+	</wsdl:message>
+	<wsdl:message name="retrieveIndividualCustomerDetailsRequest">
+		<wsdl:part element="intf:retrieveIndividualCustomerRequest" name="retrieveIndividualCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="retrieveOrganizationCustomerDetailsResponse">
+		<wsdl:part element="intf:retrieveOrganizationCustomerResponse" name="retrieveOrganizationCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="recordOrganizationCustomerDetailsRequest">
+		<wsdl:part element="intf:recordOrganizationCustomerRequest" name="recordOrganizationCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="modifyIndividualCustomerDetailsRequest">
+		<wsdl:part element="intf:modifyIndividualCustomerRequest" name="modifyIndividualCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="recordIndividualCustomerDetailsResponse">
+		<wsdl:part element="intf:recordIndividualCustomerResponse" name="recordIndividualCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="retrieveCustomerBasicDetailsRequest">
+		<wsdl:part element="intf:retrieveCustomerBasicRequest" name="retrieveCustomerBasicRequest" />
+	</wsdl:message>
+	<wsdl:message name="retrieveIndividualCustomerDetailsResponse">
+		<wsdl:part element="intf:retrieveIndividualCustomerResponse" name="retrieveIndividualCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="recordIndividualCustomerDetailsRequest">
+		<wsdl:part element="intf:recordIndividualCustomerRequest" name="recordIndividualCustomerRequest" />
+	</wsdl:message>
+	<wsdl:message name="recordOrganizationCustomerDetailsResponse">
+		<wsdl:part element="intf:recordOrganizationCustomerResponse" name="recordOrganizationCustomerResponse" />
+	</wsdl:message>
+	<wsdl:message name="modifyOrganizationCustomerDetailsResponse">
+		<wsdl:part element="intf:modifyOrganizationCustomerResponse" name="modifyOrganizationCustomerResponse" />
+	</wsdl:message>
+	<wsdl:portType name="IInvolvedPartyManagement">
+		<wsdl:operation name="terminateCustomer" parameterOrder="terminateCustomerRequest">
+			<wsdl:input message="intf:terminateCustomerRequest" name="terminateCustomerRequest" />
+			<wsdl:output message="intf:terminateCustomerResponse" name="terminateCustomerResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="recordIndividualCustomerDetails" parameterOrder="recordIndividualCustomerRequest">
+			<wsdl:input message="intf:recordIndividualCustomerDetailsRequest" name="recordIndividualCustomerDetailsRequest" />
+			<wsdl:output message="intf:recordIndividualCustomerDetailsResponse" name="recordIndividualCustomerDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="recordOrganizationCustomerDetails" parameterOrder="recordOrganizationCustomerRequest">
+			<wsdl:input message="intf:recordOrganizationCustomerDetailsRequest" name="recordOrganizationCustomerDetailsRequest" />
+			<wsdl:output message="intf:recordOrganizationCustomerDetailsResponse" name="recordOrganizationCustomerDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="modifyIndividualCustomerDetails" parameterOrder="modifyIndividualCustomerRequest">
+			<wsdl:input message="intf:modifyIndividualCustomerDetailsRequest" name="modifyIndividualCustomerDetailsRequest" />
+			<wsdl:output message="intf:modifyIndividualCustomerDetailsResponse" name="modifyIndividualCustomerDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="modifyOrganizationCustomerDetails" parameterOrder="modifyOrganizationCustomerRequest">
+			<wsdl:input message="intf:modifyOrganizationCustomerDetailsRequest" name="modifyOrganizationCustomerDetailsRequest" />
+			<wsdl:output message="intf:modifyOrganizationCustomerDetailsResponse" name="modifyOrganizationCustomerDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="retrieveCustomerBasicDetails" parameterOrder="retrieveCustomerBasicRequest">
+			<wsdl:input message="intf:retrieveCustomerBasicDetailsRequest" name="retrieveCustomerBasicDetailsRequest" />
+			<wsdl:output message="intf:retrieveCustomerBasicDetailsResponse" name="retrieveCustomerBasicDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="retrieveIndividualCustomerDetails" parameterOrder="retrieveIndividualCustomerRequest">
+			<wsdl:input message="intf:retrieveIndividualCustomerDetailsRequest" name="retrieveIndividualCustomerDetailsRequest" />
+			<wsdl:output message="intf:retrieveIndividualCustomerDetailsResponse" name="retrieveIndividualCustomerDetailsResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="retrieveOrganizationCustomerDetails" parameterOrder="retrieveOrganizationCustomerRequest">
+			<wsdl:input message="intf:retrieveOrganizationCustomerDetailsRequest" name="retrieveOrganizationCustomerDetailsRequest" />
+			<wsdl:output message="intf:retrieveOrganizationCustomerDetailsResponse" name="retrieveOrganizationCustomerDetailsResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="InvolvedPartyManagementSOAPPortSoapBinding" type="intf:IInvolvedPartyManagement">
+		<wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="terminateCustomer">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/terminateCustomer" />
+			<wsdl:input name="terminateCustomerRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="terminateCustomerResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="recordIndividualCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/recordIndividualCustomerDetails" />
+			<wsdl:input name="recordIndividualCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="recordIndividualCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="recordOrganizationCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/recordOrganizationCustomerDetails" />
+			<wsdl:input name="recordOrganizationCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="recordOrganizationCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="modifyIndividualCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/modifyIndividualCustomerDetails" />
+			<wsdl:input name="modifyIndividualCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="modifyIndividualCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="modifyOrganizationCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/modifyOrganizationCustomerDetails" />
+			<wsdl:input name="modifyOrganizationCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="modifyOrganizationCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveCustomerBasicDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/retrieveCustomerBasicDetails" />
+			<wsdl:input name="retrieveCustomerBasicDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="retrieveCustomerBasicDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveIndividualCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/retrieveIndividualCustomerDetails" />
+			<wsdl:input name="retrieveIndividualCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="retrieveIndividualCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveOrganizationCustomerDetails">
+			<wsdlsoap:operation soapAction="http://cif.czbank.com/ip/retrieveOrganizationCustomerDetails" />
+			<wsdl:input name="retrieveOrganizationCustomerDetailsRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="retrieveOrganizationCustomerDetailsResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="InvolvedPartyManagementService">
+		<wsdl:port binding="intf:InvolvedPartyManagementSOAPPortSoapBinding" name="InvolvedPartyManagementSOAPPort">
+			<wsdlsoap:address location="http://esb.czbank.com:7080/soa/services/IInvolvedPartyManagement" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

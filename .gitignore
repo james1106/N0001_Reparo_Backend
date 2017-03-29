@@ -1,0 +1,25 @@
+# Built application files
+target
+out
+
+# Java class files
+*.class
+# Generated files
+bin/
+gen/
+
+# Log Files
+*.log
+
+.idea
+
+*.iml
+
+.DS_Store
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/docs/index.html
+
+# 忽略合约源码、abi、bin
+# src/main/resources/contractAbi/
+# src/main/resources/contractBin/
+# src/main/resources/contractSourceCode/

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<wsdl:definitions name="InvolvedPartyCheckID" targetNamespace="http://cif.czbank.com/check/" xmlns:cif="http://cif.czbank.com/check/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://cif.czbank.com/check/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="RequestHeader">
+				<xsd:sequence>
+					<xsd:element name="serviceId" nillable="true" type="xsd:string" />
+					<xsd:element name="businessAcceptId" nillable="true" type="xsd:string" />
+					<xsd:element name="serialNumber" nillable="true" type="xsd:string" />
+					<xsd:element name="version" nillable="true" type="xsd:string" />
+					<xsd:element name="cmdType" nillable="true" type="xsd:string" />
+					<xsd:element name="requester" nillable="true" type="xsd:string" />
+					<xsd:element name="channel" nillable="true" type="xsd:string" />
+					<xsd:element name="requestTimeStamp" nillable="true" type="xsd:string" />
+					<xsd:element name="organizationUnitId" nillable="true" type="xsd:string" />
+					<xsd:element name="teller1" nillable="true" type="xsd:string" />
+					<xsd:element name="teller2" nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ResponseHeader">
+				<xsd:sequence>
+					<xsd:element name="hostSerialNo" nillable="true" type="xsd:string" />
+					<xsd:element name="responseTimeStamp" nillable="true" type="xsd:string" />
+					<xsd:element name="errorNo" nillable="true" type="xsd:string" />
+					<xsd:element name="errorInfo" nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="CheckCustomerIDRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="cif:RequestHeader" />
+					<xsd:element name="custName" nillable="true" type="xsd:string" />
+					<xsd:element name="certType" nillable="true" type="xsd:string" />
+					<xsd:element name="certNo" nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="CheckCustomerIDResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" type="cif:ResponseHeader" />
+					<xsd:element name="CheckResult" nillable="true" type="xsd:string" />
+					<xsd:element name="IssueOffice" nillable="true" type="xsd:string" />
+					<xsd:element name="Name" nillable="true" type="xsd:string" />
+					<xsd:element name="ID" nillable="true" type="xsd:string" />
+					<xsd:element name="Photo" nillable="true" type="xsd:string" />
+					<xsd:element name="MsgID" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="checkCustomerIDRequest" type="cif:CheckCustomerIDRequest" />
+			<xsd:element name="checkCustomerIDResponse" type="cif:CheckCustomerIDResponse" />
+			<xsd:element name="feedbackCheckCustomerID">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="in" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="feedbackCheckCustomerIDResponse" type="cif:feedbackCheckCustomerIDResponse" />
+			<xsd:element name="feedbackCheckCustomerIDRequest" type="cif:feedbackCheckCustomerIDRequest" />
+			<xsd:complexType name="feedbackCheckCustomerIDRequest">
+				<xsd:sequence>
+					<xsd:element name="RequestHeader" type="cif:RequestHeader" />
+					<xsd:element name="MsgId" type="xsd:string" />
+					<xsd:element name="feedbackInfo" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="feedbackCheckCustomerIDResponse">
+				<xsd:sequence>
+					<xsd:element name="feedbackCheckCustomerIDResponse" type="cif:ResponseHeader" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BatchCheckCustomerIDRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="cif:RequestHeader" />
+					<xsd:element name="totalCount" nillable="true" type="xsd:string" />
+					<xsd:element name="Content" nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BatchCheckCustomerIDResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" type="cif:ResponseHeader" />
+					<xsd:element name="MsgId" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="batchCheckCustomerIDRequest" type="cif:BatchCheckCustomerIDRequest" />
+			<xsd:element name="batchCheckCustomerIDResponse" type="cif:BatchCheckCustomerIDResponse" />
+			<xsd:complexType name="BatchResultCustomerIDRequest">
+				<xsd:sequence>
+					<xsd:element name="requestHeader" nillable="true" type="cif:RequestHeader" />
+					<xsd:element name="MsgId" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="BatchResultCustomerIDResponse">
+				<xsd:sequence>
+					<xsd:element name="responseHeader" type="cif:ResponseHeader" />
+					<xsd:element name="totalCount" nillable="true" type="xsd:string" />
+					<xsd:element name="successCount" nillable="true" type="xsd:string" />
+					<xsd:element name="failCount" nillable="true" type="xsd:string" />
+					<xsd:element name="errorCount" nillable="true" type="xsd:string" />
+					<xsd:element name="Content" nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="batchResultCustomerIDRequest" type="cif:BatchResultCustomerIDRequest" />
+			<xsd:element name="batchResultCustomerIDResponse" type="cif:BatchResultCustomerIDResponse" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="checkCustomerIDRequest">
+		<wsdl:part element="cif:checkCustomerIDRequest" name="checkCustomerIDRequest" />
+	</wsdl:message>
+	<wsdl:message name="feedbackCheckCustomerIDResponse">
+		<wsdl:part element="cif:feedbackCheckCustomerIDResponse" name="feedbackCheckCustomerIDResponse" />
+	</wsdl:message>
+	<wsdl:message name="feedbackCheckCustomerIDRequest">
+		<wsdl:part element="cif:feedbackCheckCustomerIDRequest" name="feedbackCheckCustomerIDRequest" />
+	</wsdl:message>
+	<wsdl:message name="checkCustomerIDResponse">
+		<wsdl:part element="cif:checkCustomerIDResponse" name="checkCustomerIDResponse" />
+	</wsdl:message>
+	<wsdl:message name="batchCheckCustomerIDRequest">
+		<wsdl:part element="cif:batchCheckCustomerIDRequest" name="batchCheckCustomerIDRequest" />
+	</wsdl:message>
+	<wsdl:message name="batchCheckCustomerIDResponse">
+		<wsdl:part element="cif:batchCheckCustomerIDResponse" name="batchCheckCustomerIDResponse" />
+	</wsdl:message>
+	<wsdl:message name="batchResultCustomerIDRequest">
+		<wsdl:part element="cif:batchResultCustomerIDRequest" name="batchResultCustomerIDRequest" />
+	</wsdl:message>
+	<wsdl:message name="batchResultCustomerIDResponse">
+		<wsdl:part element="cif:batchResultCustomerIDResponse" name="batchResultCustomerIDResponse" />
+	</wsdl:message>
+	<wsdl:portType name="IInvolvedPartyCheckID">
+		<wsdl:operation name="checkCustomerID">
+			<wsdl:input message="cif:checkCustomerIDRequest" />
+			<wsdl:output message="cif:checkCustomerIDResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="feedbackCheckCustomerID">
+			<wsdl:input message="cif:feedbackCheckCustomerIDRequest" />
+			<wsdl:output message="cif:feedbackCheckCustomerIDResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="batchCheckCustomerID">
+			<wsdl:input message="cif:batchCheckCustomerIDRequest" />
+			<wsdl:output message="cif:batchCheckCustomerIDResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="batchResultCustomerID">
+			<wsdl:input message="cif:batchResultCustomerIDRequest" />
+			<wsdl:output message="cif:batchResultCustomerIDResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="InvolvedPartyCheckIDSOAP" type="cif:IInvolvedPartyCheckID">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="checkCustomerID">
+			<soap:operation soapAction="http://cif.czbank.com/check/checkCustomerID" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="feedbackCheckCustomerID">
+			<soap:operation soapAction="http://cif.czbank.com/check/feedbackCheckCustomerID" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="batchCheckCustomerID">
+			<soap:operation soapAction="http://cif.czbank.com/check/batchCheckCustomerID" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="batchResultCustomerID">
+			<soap:operation soapAction="http://cif.czbank.com/check/batchResultCustomerID" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="InvolvedPartyCheckIDService">
+		<wsdl:port binding="cif:InvolvedPartyCheckIDSOAP" name="InvolvedPartyCheckIDSOAPPort">
+			<soap:address location="http://esb.czbank.com:7080/soa/services/IInvolvedPartyCheckIDNew" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
