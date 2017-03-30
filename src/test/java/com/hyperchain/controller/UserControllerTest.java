@@ -12,7 +12,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class UserControllerTest {
 
-    private String urlBase = "http://localhost:8080/Reparo/v1/account";
+    private String urlBase = "http://localhost:8080/reparo/v1/account";
 
 
     @Test
