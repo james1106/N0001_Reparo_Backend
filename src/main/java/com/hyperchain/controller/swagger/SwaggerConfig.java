@@ -32,7 +32,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         ApiInfo apiInfo = new ApiInfo("项目接口文档",
-                "接口描述", "国金平台",
+                "接口描述", "供应链金融平台",
                 "", "",
                 "");
         return apiInfo;
