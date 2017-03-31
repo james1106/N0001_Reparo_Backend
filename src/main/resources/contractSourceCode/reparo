@@ -14,7 +14,7 @@ contract Reparo {
     function addUser(uint _id, 
     bytes32 _nickName, 
     bytes32 _password, 
-    bytes32 _phoneNum) returns(bool){
+    bytes32 _phoneNum) returns(uint, bool){
         user[_id].id = _id;
         user[_id].nickName = _nickName;
         user[_id].password = _password;
@@ -22,7 +22,7 @@ contract Reparo {
         
         users.push(_id);
     
-        return true;
+        return (10, true);
     }
     
     function queryUser(uint _id)returns(bytes32, bytes32, bytes32) {

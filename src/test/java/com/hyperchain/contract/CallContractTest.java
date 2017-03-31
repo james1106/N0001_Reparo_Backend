@@ -4,11 +4,13 @@ import cn.hyperchain.sdk.rpc.Transaction.Transaction;
 import cn.hyperchain.sdk.rpc.returns.CompileReturn;
 import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
+import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.exception.ESDKException;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 /**
@@ -83,5 +85,28 @@ public class CallContractTest {
         //返回值解码
         List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
         System.out.println("after decode result:" + retDecode);
+    }
+
+    @Test
+    public void invokeUserController() throws Exception {
+
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        // 合约方法参数
+        Object[] contractParams = new Object[4];
+        contractParams[0] = 1;
+        contractParams[1] = "Jack";
+        contractParams[2] = "123456";
+        contractParams[3] = "110";
+
+        String[] resultParams = new String[1];
+
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "addUser", contractParams, resultParams);
+        System.out.println("contractResult:" + contractResult);
     }
 }
