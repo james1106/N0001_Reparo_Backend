@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
-import com.wordnik.swagger.model.ApiInfo;
+import com.mangofactory.swagger.models.dto.ApiInfo;
 
 /**
  * swagger接口浏览器
