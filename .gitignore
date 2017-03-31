@@ -14,10 +14,10 @@ gen/
 .idea
 
 *.iml
-
+.gitignore
 .DS_Store
 src/main/webapp/WEB-INF/classes/
-src/main/webapp/docs/index.html
+#src/main/webapp/docs/index.html
 
 # 忽略合约源码、abi、bin
 # src/main/resources/contractAbi/
