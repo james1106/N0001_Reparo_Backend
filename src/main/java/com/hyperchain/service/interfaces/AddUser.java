@@ -1,11 +1,11 @@
-package com.hyperchain.service;
+package com.hyperchain.service.interfaces;
 
 import com.hyperchain.service.base.BaseInterface;
 
 /**
- * Created by martin on 2017/3/17.
+ * by chenyufeng on 2017/3/31 .
  */
-public interface QueryUser extends BaseInterface{
+public interface AddUser extends BaseInterface{
     String contractMethodName = "addUser";
     String[] contractMethodReturns = new String[]{"logistics_exchange_code","role"};
 }

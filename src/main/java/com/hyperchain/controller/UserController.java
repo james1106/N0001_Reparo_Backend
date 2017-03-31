@@ -3,15 +3,13 @@ package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
-import com.hyperchain.common.constant.BaseConstant.Code;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.base.BaseController;
-import com.hyperchain.common.util.ParamsCheck;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.service.QueryUser;
+import com.hyperchain.service.interfaces.AddUser;
+import com.hyperchain.service.interfaces.QueryUser;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -35,13 +33,17 @@ public class UserController extends BaseController {
 
     @Autowired
     QueryUser queryUser;
+    AddUser addUser;
 
     @LogInterceptor
-    @ApiOperation(value = "查询用户账号", notes = "通用")
+    @ApiOperation(value = "添加用户", notes = "通用")
     @ResponseBody
-    @RequestMapping(method = RequestMethod.GET)
-    public BaseResult<Object> create(
-            @ApiParam("Id") @RequestParam("My_Id") String Id
+    @RequestMapping(value = "addUser",method = RequestMethod.GET)
+    public BaseResult<Object> addUser(
+            @ApiParam(value = "ID", required = true) @RequestParam String id,
+            @ApiParam(value = "用户名", required = true) @RequestParam String nickName,
+            @ApiParam(value = "密码", required = true) @RequestParam String password,
+            @ApiParam(value = "手机", required = true) @RequestParam String phoneNum
     ) throws Exception {
 
         List<String> keyInfos = ESDKUtil.newAccount();
@@ -53,15 +55,43 @@ public class UserController extends BaseController {
 
         // 合约方法参数（公钥，角色代码，物流交换码）
         Object[] contractParams = new Object[4];
-        contractParams[0] = 1;
-        contractParams[1] = "Jack";
-        contractParams[2] = "123456";
-        contractParams[3] = "110";
+        contractParams[0] = id;
+        contractParams[1] = nickName;
+        contractParams[2] = password;
+        contractParams[3] = phoneNum;
 
         String[] resultParams = new String[1];
 
         ContractResult contractResult = ContractUtil.invokeContract(contractKey,"addUser", contractParams, resultParams);
-        System.out.println("结果11：" + contractResult.getValue());
+        System.out.println("合约返回结果：" + contractResult.getValue());
+
+        // 调用合约查询账户，获取返回结果
+        return addUser.invokeContract(contractKey, contractParams);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询用户", notes = "通用")
+    @ResponseBody
+    @RequestMapping(value = "queryUser",method = RequestMethod.GET)
+    public BaseResult<Object> addUser(
+            @ApiParam(value = "ID", required = true) @RequestParam String id
+    ) throws Exception {
+
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        // 合约方法参数（公钥，角色代码，物流交换码）
+        Object[] contractParams = new Object[1];
+        contractParams[0] = id;
+
+        String[] resultParams = new String[3];
+
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey,"queryUser", contractParams, resultParams);
+        System.out.println("合约返回结果：" + contractResult.getValue());
 
         // 调用合约查询账户，获取返回结果
         return queryUser.invokeContract(contractKey, contractParams);
