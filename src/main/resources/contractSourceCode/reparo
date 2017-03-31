@@ -1,0 +1,35 @@
+contract Reparo {
+    
+    struct User{
+        uint id;
+        bytes32 nickName;
+        bytes32 password;
+        bytes32 phoneNum;
+    }
+    
+    mapping (uint=>User) user;
+    
+    uint[] users;
+    
+    function addUser(uint _id, 
+    bytes32 _nickName, 
+    bytes32 _password, 
+    bytes32 _phoneNum) returns(bool){
+        user[_id].id = _id;
+        user[_id].nickName = _nickName;
+        user[_id].password = _password;
+        user[_id].phoneNum = _phoneNum;
+        
+        users.push(_id);
+    
+        return true;
+    }
+    
+    function queryUser(uint _id)returns(bytes32, bytes32, bytes32) {
+        return(user[_id].nickName, user[_id].password, user[_id].phoneNum);
+    }
+    
+    function queryUserArray() returns(uint[]) {
+        return users;
+    }
+}
