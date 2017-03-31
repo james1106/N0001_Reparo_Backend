@@ -22,11 +22,11 @@ contract Reparo {
         
         users.push(_id);
     
-        return (10, true);
+        return (0, true);
     }
     
     function queryUser(uint _id)returns(uint, bytes32, bytes32, bytes32) {
-        return(1, user[_id].nickName, user[_id].password, user[_id].phoneNum);
+        return(0, user[_id].nickName, user[_id].password, user[_id].phoneNum);
     }
     
     function queryUserArray() returns(uint[]) {

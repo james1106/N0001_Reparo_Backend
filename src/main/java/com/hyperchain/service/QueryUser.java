@@ -7,5 +7,5 @@ import com.hyperchain.service.base.BaseInterface;
  */
 public interface QueryUser extends BaseInterface{
     String contractMethodName = "queryUser";
-    String[] contractMethodReturns = new String[]{"logistics_exchange_code","role", "role2"};
+    String[] contractMethodReturns = new String[]{"nickname","password", "phoneNum"};
 }
