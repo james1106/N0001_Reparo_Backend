@@ -55,7 +55,7 @@ public interface BankCardRepository extends
      */
     BankCard findByAccountIdAndTypeAndStatusNot(Long accountId, String type, Integer status);
 
-    List<BankCard> findByAccountIdAndBankCardNumber(Long accountId,String bankCardNumber);
+    List<BankCard> findByAccountIdAndBankCardNumber(Long accountId, String bankCardNumber);
 
     List<BankCard> findByBankCardNumber(String bankCardNumber);
 

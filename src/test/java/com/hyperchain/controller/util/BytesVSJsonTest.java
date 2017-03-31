@@ -1,9 +1,8 @@
 package com.hyperchain.controller.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.hyperchain.common.util.BytesVSJson;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by martin on 2017/3/27.

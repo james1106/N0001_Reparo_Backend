@@ -1,9 +1,8 @@
 package com.hyperchain.controller.util;
 
+import com.hyperchain.common.util.ParamsCheck;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by martin on 2017/3/21.

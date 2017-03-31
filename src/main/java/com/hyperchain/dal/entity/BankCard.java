@@ -1,5 +1,6 @@
 package com.hyperchain.dal.entity;
 
+import cn.hyperchain.sdk.rpc.account.Account;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.NotFound;

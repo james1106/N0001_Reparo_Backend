@@ -6,7 +6,7 @@ import com.hyperchain.common.constant.BaseConstant.Code;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.base.BaseController;
-import com.hyperchain.controller.util.ParamsCheck;
+import com.hyperchain.common.util.ParamsCheck;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.service.QueryUser;
 import com.wordnik.swagger.annotations.Api;

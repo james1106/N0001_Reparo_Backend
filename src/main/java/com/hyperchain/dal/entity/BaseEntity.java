@@ -1,19 +1,13 @@
 package com.hyperchain.dal.entity;
 
+import com.hyperchain.common.constant.BaseConstant;
+import com.hyperchain.common.util.CommonUtil;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
-import javax.persistence.Version;
-
-import com.wordnik.swagger.annotations.ApiModelProperty;
-import com.hyperchain.common.constant.BaseConstant;
-import com.hyperchain.common.util.CommonUtil;
 
 /**
  * 基础实体类
@@ -120,14 +114,14 @@ public abstract class BaseEntity implements Serializable {
     @PrePersist
     public void setInsertBefore() {
         Long temp = new Date().getTime();
-        if (CommonUtil.isEmpty(this.createTime)) {
+        /*if (CommonUtil.isEmpty(this.createTime)) {
 
             this.createTime = temp;
         }
         this.modifyTime = temp;
         if (status == null) {
-            this.status = BaseConstant.Status.valid;
-        }
+            　this.status = BaseConstant.Status.valid;
+        }*/
     }
 
     /**

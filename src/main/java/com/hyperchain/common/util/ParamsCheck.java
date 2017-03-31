@@ -1,4 +1,4 @@
-package com.hyperchain.controller.util;
+package com.hyperchain.common.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;

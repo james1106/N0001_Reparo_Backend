@@ -1,4 +1,4 @@
-package com.hyperchain.controller.util;
+package com.hyperchain.common.util;
 
 /**
  * Created by martin on 2017/3/27.

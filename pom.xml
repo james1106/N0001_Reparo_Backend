@@ -48,8 +48,8 @@
 			<groupId>common-utils</groupId>
 			<artifactId>common-utils</artifactId>
 			<scope>system</scope>
-			<version>1.0</version>
-			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/common-utils.jar</systemPath>
+			<version>1.1</version>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/common-utils1.1.jar</systemPath>
 		</dependency>
 
 		<dependency>
