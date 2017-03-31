@@ -4,7 +4,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.service.interfaces.QueryUser;
+import com.hyperchain.service.QueryUser;
 import org.springframework.stereotype.Service;
 
 /**

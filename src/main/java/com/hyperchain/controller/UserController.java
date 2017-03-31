@@ -8,8 +8,8 @@ import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.service.interfaces.AddUser;
-import com.hyperchain.service.interfaces.QueryUser;
+import com.hyperchain.service.AddUser;
+import com.hyperchain.service.QueryUser;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -33,6 +33,8 @@ public class UserController extends BaseController {
 
     @Autowired
     QueryUser queryUser;
+
+    @Autowired
     AddUser addUser;
 
     @LogInterceptor
@@ -60,10 +62,10 @@ public class UserController extends BaseController {
         contractParams[2] = password;
         contractParams[3] = phoneNum;
 
-        String[] resultParams = new String[1];
+//        String[] resultParams = new String[1];
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey,"addUser", contractParams, resultParams);
-        System.out.println("合约返回结果：" + contractResult.getValue());
+//        ContractResult contractResult = ContractUtil.invokeContract(contractKey,"addUser", contractParams, resultParams);
+//        System.out.println("合约返回结果：" + contractResult.getValue());
 
         // 调用合约查询账户，获取返回结果
         return addUser.invokeContract(contractKey, contractParams);
@@ -73,7 +75,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "查询用户", notes = "通用")
     @ResponseBody
     @RequestMapping(value = "queryUser",method = RequestMethod.GET)
-    public BaseResult<Object> addUser(
+    public BaseResult<Object> queryUser(
             @ApiParam(value = "ID", required = true) @RequestParam String id
     ) throws Exception {
 
@@ -90,11 +92,12 @@ public class UserController extends BaseController {
 
         String[] resultParams = new String[3];
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey,"queryUser", contractParams, resultParams);
-        System.out.println("合约返回结果：" + contractResult.getValue());
+        //ContractResult contractResult = ContractUtil.invokeContract(contractKey,"queryUser", contractParams, resultParams);
+        //System.out.println("合约返回结果：" + contractResult.getValue());
 
         // 调用合约查询账户，获取返回结果
         return queryUser.invokeContract(contractKey, contractParams);
+
     }
 }
 

@@ -6,6 +6,7 @@ import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.exception.ESDKException;
+import com.hyperchain.test.base.SpringBaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,11 +17,9 @@ import java.util.List;
 /**
  * by chenyufeng on 2017/3/31 .
  */
-public class CallContractTest {
+public class CallContractTest extends SpringBaseTest{
 
-    public static void main(String[] args) {
 
-    }
 
     @Test
     public void compileContract() throws IOException, ESDKException {
