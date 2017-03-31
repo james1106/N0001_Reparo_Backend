@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SpringBaseTest {
     @Test
     public void testDemo() throws Exception {
-        System.out.print("待补充，需要改为assert写法");
+        System.out.print("");
     }
 
 }

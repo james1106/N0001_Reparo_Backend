@@ -1,17 +1,17 @@
 package com.hyperchain.dal.entity;
 
-import cn.hyperchain.sdk.rpc.account.Account;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.persistence.*;
+
 /**
  * Created by chenxiaoyang on 2017/3/30.
  */
 @Entity
-@Table(name = "user")
-public class Demo_UserEntity {
+@Table(name = "user2")
+public class EntityDemo {
+
     private Long id;
     private String nick_name;
     private String password;
