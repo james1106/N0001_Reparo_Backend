@@ -4,22 +4,18 @@ import cn.hyperchain.sdk.rpc.Transaction.Transaction;
 import cn.hyperchain.sdk.rpc.returns.CompileReturn;
 import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.exception.ESDKException;
 import com.hyperchain.test.base.SpringBaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 
 /**
  * by chenyufeng on 2017/3/31 .
  */
-public class CallContractTest extends SpringBaseTest{
-
-
+public class ContractTestDemo extends SpringBaseTest{
 
     @Test
     public void compileContract() throws IOException, ESDKException {
