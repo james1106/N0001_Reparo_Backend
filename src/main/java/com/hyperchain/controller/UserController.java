@@ -49,7 +49,6 @@ public class UserController extends BaseController {
     ) throws Exception {
 
         List<String> keyInfos = ESDKUtil.newAccount();
-        String publicKey = keyInfos.get(0);
         String privateKey = keyInfos.get(1);
 
         // 合约的公私钥
@@ -61,11 +60,6 @@ public class UserController extends BaseController {
         contractParams[1] = nickName;
         contractParams[2] = password;
         contractParams[3] = phoneNum;
-
-//        String[] resultParams = new String[1];
-
-//        ContractResult contractResult = ContractUtil.invokeContract(contractKey,"addUser", contractParams, resultParams);
-//        System.out.println("合约返回结果：" + contractResult.getValue());
 
         // 调用合约查询账户，获取返回结果
         return addUser.invokeContract(contractKey, contractParams);
@@ -80,7 +74,6 @@ public class UserController extends BaseController {
     ) throws Exception {
 
         List<String> keyInfos = ESDKUtil.newAccount();
-        String publicKey = keyInfos.get(0);
         String privateKey = keyInfos.get(1);
 
         // 合约的公私钥
@@ -90,14 +83,8 @@ public class UserController extends BaseController {
         Object[] contractParams = new Object[1];
         contractParams[0] = id;
 
-        String[] resultParams = new String[3];
-
-        //ContractResult contractResult = ContractUtil.invokeContract(contractKey,"queryUser", contractParams, resultParams);
-        //System.out.println("合约返回结果：" + contractResult.getValue());
-
         // 调用合约查询账户，获取返回结果
         return queryUser.invokeContract(contractKey, contractParams);
-
     }
 }
 
