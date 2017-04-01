@@ -29,7 +29,7 @@ contract Reparo {
         return(0, user[_id].nickName, user[_id].password, user[_id].phoneNum);
     }
     
-    function queryUserArray() returns(uint[]) {
-        return users;
+    function queryUserArray() returns(uint, uint[]) {
+        return (0, users);
     }
 }

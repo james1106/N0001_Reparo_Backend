@@ -4,12 +4,11 @@ package com.hyperchain.controller;
 import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.contract.ContractKey;
-import com.hyperchain.contract.ContractResult;
-import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.service.AddUser;
 import com.hyperchain.service.QueryUser;
+import com.hyperchain.service.QueryUserList;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -36,6 +35,9 @@ public class UserController extends BaseController {
 
     @Autowired
     AddUser addUser;
+
+    @Autowired
+    QueryUserList queryUserList;
 
     @LogInterceptor
     @ApiOperation(value = "添加用户", notes = "通用")
@@ -85,6 +87,26 @@ public class UserController extends BaseController {
 
         // 调用合约查询账户，获取返回结果
         return queryUser.invokeContract(contractKey, contractParams);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询用户列表", notes = "通用")
+    @ResponseBody
+    @RequestMapping(value = "queryUserList",method = RequestMethod.GET)
+    public BaseResult<Object> queryUserList(
+    ) throws Exception {
+
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        // 合约方法参数（公钥，角色代码，物流交换码）
+        Object[] contractParams = new Object[0];
+
+        // 调用合约查询账户，获取返回结果
+        return queryUserList.invokeContract(contractKey, contractParams);
     }
 }
 
