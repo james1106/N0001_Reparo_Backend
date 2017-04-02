@@ -21,10 +21,10 @@ public class QueryUserDetailListImpl implements QueryUserDetailList {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns);
 
-        List<String> ids = (List<String>) contractResult.getValueMap().get("ids");
-        List<String> nicknames = (List<String>) contractResult.getValueMap().get("nickname");
-        List<String> passwords = (List<String>) contractResult.getValueMap().get("password");
-        List<String> phoneNum = (List<String>) contractResult.getValueMap().get("phoneNum");
+        List<String> ids = (List<String>) contractResult.getValueMap().get(contractMethodReturns[0]);
+        List<String> nicknames = (List<String>) contractResult.getValueMap().get(contractMethodReturns[1]);
+        List<String> passwords = (List<String>) contractResult.getValueMap().get(contractMethodReturns[2]);
+        List<String> phoneNum = (List<String>) contractResult.getValueMap().get(contractMethodReturns[3]);
 
         //组装合约返回的每个对象的详情
         List<User> userObj = new ArrayList<>();
@@ -32,7 +32,6 @@ public class QueryUserDetailListImpl implements QueryUserDetailList {
             User user = new User(ids.get(i), nicknames.get(i), passwords.get(i), phoneNum.get(i));
             userObj.add(user);
         }
-
         //重新构造返回的BaseResult
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.setCode(contractResult.getCode().getCode());
