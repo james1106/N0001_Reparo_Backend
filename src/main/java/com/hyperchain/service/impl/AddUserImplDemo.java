@@ -4,14 +4,14 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.service.AddUser;
+import com.hyperchain.service.AddUserDemo;
 import org.springframework.stereotype.Service;
 
 /**
  * by chenyufeng on 2017/3/31 .
  */
 @Service("AddUserService")
-public class AddUserImpl implements AddUser{
+public class AddUserImplDemo implements AddUserDemo {
     @Override
     public BaseResult<Object> invokeContract(ContractKey contractKey, Object[] contractMethodParams) throws Exception {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果

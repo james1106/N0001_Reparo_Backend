@@ -4,8 +4,8 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.entity.User;
-import com.hyperchain.service.QueryUserDetailList;
+import com.hyperchain.entity.UserDemo;
+import com.hyperchain.service.QueryUserDetailListDemo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
  * by chenyufeng on 2017/4/1 .
  */
 @Service("QueryUserDetailListService")
-public class QueryUserDetailListImpl implements QueryUserDetailList {
+public class QueryUserDetailListImplDemo implements QueryUserDetailListDemo {
     @Override
     public BaseResult<Object> invokeContract(ContractKey contractKey, Object[] contractMethodParams) throws Exception {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -27,9 +27,9 @@ public class QueryUserDetailListImpl implements QueryUserDetailList {
         List<String> phoneNum = (List<String>) contractResult.getValueMap().get(contractMethodReturns[3]);
 
         //组装合约返回的每个对象的详情
-        List<User> userObj = new ArrayList<>();
+        List<UserDemo> userObj = new ArrayList<>();
         for (int i = 0; i < ids.size(); i++) {
-            User user = new User(ids.get(i), nicknames.get(i), passwords.get(i), phoneNum.get(i));
+            UserDemo user = new UserDemo(ids.get(i), nicknames.get(i), passwords.get(i), phoneNum.get(i));
             userObj.add(user);
         }
         //重新构造返回的BaseResult

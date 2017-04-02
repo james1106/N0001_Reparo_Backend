@@ -3,14 +3,14 @@ package com.hyperchain.entity;
 /**
  * by chenyufeng on 2017/4/1 .
  */
-public class User {
+public class UserDemo {
 
     private String id;
     private String nickname;
     private String password;
     private String phoneNum;
 
-    public User(String id, String nickname, String password, String phoneNum) {
+    public UserDemo(String id, String nickname, String password, String phoneNum) {
         this.id = id;
         this.nickname = nickname;
         this.password = password;

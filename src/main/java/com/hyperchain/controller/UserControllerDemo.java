@@ -6,11 +6,10 @@ import com.hyperchain.ESDKUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.entity.User;
-import com.hyperchain.service.AddUser;
-import com.hyperchain.service.QueryUser;
-import com.hyperchain.service.QueryUserDetailList;
-import com.hyperchain.service.QueryUserList;
+import com.hyperchain.service.AddUserDemo;
+import com.hyperchain.service.QueryUserDemo;
+import com.hyperchain.service.QueryUserDetailListDemo;
+import com.hyperchain.service.QueryUserListDemo;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -30,19 +29,19 @@ import java.util.List;
 @Api(value = "Account", description = "用户账号", position = 10)
 @Controller
 @RequestMapping("/v1/account")
-public class UserController extends BaseController {
+public class UserControllerDemo extends BaseController {
 
     @Autowired
-    QueryUser queryUser;
+    QueryUserDemo queryUser;
 
     @Autowired
-    AddUser addUser;
+    AddUserDemo addUser;
 
     @Autowired
-    QueryUserList queryUserList;
+    QueryUserListDemo queryUserList;
 
     @Autowired
-    QueryUserDetailList queryUserDetailList;
+    QueryUserDetailListDemo queryUserDetailList;
 
     @LogInterceptor
     @ApiOperation(value = "添加用户", notes = "通用")

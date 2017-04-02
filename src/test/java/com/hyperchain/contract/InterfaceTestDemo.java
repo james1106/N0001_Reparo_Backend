@@ -17,7 +17,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class InterfaceTestDemo extends SpringWebBaseTest {
 
-    private String urlBase = "http://localhost:8080/reparo/v1/account";
+    private String urlBase = "http://localhost:8080/reparoDemo/v1/account";
 
     @Test
     public void addUserTest() throws UnsupportedEncodingException {
