@@ -118,7 +118,7 @@ public class UserController extends BaseController {
     @ApiOperation(value = "查询用户详情列表", notes = "通用")
     @ResponseBody
     @RequestMapping(value = "queryUserDetailList",method = RequestMethod.GET)
-    public List<User> queryUserDetailList(
+    public BaseResult<Object> queryUserDetailList(
     ) throws Exception {
 
         List<String> keyInfos = ESDKUtil.newAccount();
@@ -131,7 +131,7 @@ public class UserController extends BaseController {
         Object[] contractParams = new Object[0];
 
         // 调用合约查询账户，获取返回结果
-        return queryUserDetailList.callContract(contractKey, contractParams);
+        return queryUserDetailList.invokeContract(contractKey, contractParams);
     }
 }
 

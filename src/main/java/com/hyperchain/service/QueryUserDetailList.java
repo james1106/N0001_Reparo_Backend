@@ -12,6 +12,4 @@ import java.util.List;
 public interface QueryUserDetailList extends BaseInterface {
     String contractMethodName = "queryUserDetailList";
     String[] contractMethodReturns = new String[]{"ids", "nickname", "password", "phoneNum"};
-
-    List<User> callContract(ContractKey contractKey, Object[] contractMethodParams) throws Exception;
 }
