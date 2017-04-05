@@ -34,7 +34,10 @@ public class BaseConstant {
         INVALID_PASSWORD(17, "参数输入错误：密码password"),
         SIGNATURE_VALIDATION_ERROR(18, "签名验证错误"),
         SYSTEM_ERROR(19, "系统异常，请稍后重试"),
-        JSON_TRANSFER_ERROR(20, "JSON转化异常");
+        JSON_TRANSFER_ERROR(20, "JSON转化异常"),
+
+        ORDER_ALREDY_EXISTED(21,"订单已存在"),
+        ORDER_COMFIRM_ERR(22,"仅订单的供应商可进行确认操作");
         private int code;
         private String msg;
 

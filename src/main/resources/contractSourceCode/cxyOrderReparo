@@ -92,7 +92,7 @@ contract Reparo{
     // 用户公钥 => 所有应收款列表(包含现在持有和历史上曾经持有的)
     mapping( address => bytes32[]) allReceivableMap;
 
-   	//用户持有应收款列表, 用户address =>用户当前持有的应收款编号列表
+    //用户持有应收款列表, 用户address =>用户当前持有的应收款编号列表
     mapping(address => bytes32[]) holdingReceivables;
 
     //  用户公钥 => 待处理应收款列表
@@ -103,4 +103,90 @@ contract Reparo{
 
    //用户已兑付列表,用户公钥 => 已兑付应收款编号列表
     mapping(address => bytes32[]) cashedReceivables;
+
+    //买方新增待确认订单 test待补充入参校验
+    //卖方"0xca35b7d915458ef540ade6068dfe2f44e8fa733c" 买方"0x14723a09acff6d2a60dcdf7aa4aff308fddc160c"
+    //111,"0xca35b7d915458ef540ade6068dfe2f44e8fa733c","productname",100,100,10000,20170101
+    function addOrder (bytes32 orderId,
+                       address payeePubkey, //卖方公钥
+                       bytes32 productName,
+                       uint unitPrice,
+                       uint productNum,
+                       uint totalPrice,
+                       uint timeStamp) returns(uint, bool){
+       orderDetailMap[orderId].orderId = orderId;
+       orderDetailMap[orderId].payerPubkey = msg.sender; //买方公钥
+       orderDetailMap[orderId].payeePubkey = payeePubkey;//卖方公钥
+       orderDetailMap[orderId].productName = productName;
+       orderDetailMap[orderId].unitPrice = unitPrice;
+       orderDetailMap[orderId].productNum = productNum;
+       orderDetailMap[orderId].totalPrice = totalPrice;
+       orderDetailMap[orderId].timeStamp = timeStamp;
+       orderDetailMap[orderId].orderState = OrderState.UNCOMFIRMED;
+
+       allOrderMap[msg.sender].push(orderId);//买方的所有订单
+       allOrderMap[payeePubkey].push(orderId);//卖方的所有订单
+
+
+       //pendingOrederMap[msg.sender].push(orderId);//买方的待处理订单
+       pendingOrederMap[payeePubkey].push(orderId);//卖方的待处理订单
+
+       return (0,true);
+    }
+
+    function orderExists(bytes32 orderId) returns(uint,bool){
+       Order order = orderDetailMap[orderId];
+       if(order.orderId == 0 ) return(1,false);
+       return(0,true);
+    }
+
+     //根据订单id获取订单详情。--test 待补充判断订单是否存在
+    function queryOrderDetail(bytes32 orderId)  returns (uint,bytes32,address,address,bytes32,uint,uint,uint,uint,OrderState){
+       Order order = orderDetailMap[orderId];
+
+       return (0,
+              order.orderId,
+              order.payerPubkey,
+              order.payeePubkey,
+              order.productName,
+              order.unitPrice,
+              order.productNum,
+              order.totalPrice,
+              order.timeStamp,
+              order.orderState);
+       //return (0,true);
+    }
+
+    //查询用户的待处理订单列表
+    function getPendingOrederList(address pubkey) returns(uint,bytes32[]){
+       return (0,pendingOrederMap[pubkey]);
+    }
+
+    //卖方确认订单
+    function orderConfirm(bytes32 orderId) returns(uint,bool){
+        Order order = orderDetailMap[orderId];
+        if (order.payeePubkey != msg.sender) {return (22,false);}//仅订单的供应商可进行确认操作
+        orderDetailMap[orderId].orderState = OrderState.COMFIRMED;//修改订单详情map中的订单状态
+
+        //allOrderMap[msg.sender] = OrderState.UNCOMFIRMED;//将该订单从卖方待处理map中移除
+        deleteArrayElement(pendingOrederMap[msg.sender],orderId);
+        return (0,true);
+    }
+
+    //从数组中删除某个元素
+    function deleteArrayElement(bytes32[] storage a, bytes32 receivableNum) internal {
+        uint position;
+        for(uint i = 0; i < a.length; i++) {
+            if(a[i] == receivableNum) {
+                position = i;
+                break;
+            }
+            position++;
+        }
+        if(position != a.length) {
+            a[position] = a[a.length-1];
+            a.length = a.length-1;
+        }
+    }
+
 }
