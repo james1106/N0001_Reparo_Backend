@@ -8,18 +8,31 @@ contract Reparo{
     enum AccountState { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
     enum OrderState {UNCOMFIRMED, COMFIRMED} //UNCOMFIRMED-待卖方确认，COMFIRMED-卖方已确认
     enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-五
+    enum ReceivableState{RB000001 ,//已结清
+                         RB000002 ,//已作废
+                         RB000003,//签收拒绝
+                         RB020001,//承兑待签收
+                         RB020006,//承兑已签收
+                         RB030001,//已兑付
+                         RB030006,//已部分兑付
+                         RB030009,//兑付失败
+                         B070001,//贴现待签收
+                         RB070006,//贴现已签收
+                         RB070008,//已部分贴现
+                         RB070009//已全额贴现
+          }
 
     //应收款
     struct Receivable {
-        bytes32 receivableNum;//应收款id，由编号，子编号拼接而成
-        bytes32 payer; //付款人（签收人）
-        bytes32 payee; //收款人（签发人）
-        bytes32 Owner;//本手持有人
-        bytes32 nextOwner;//下手持有人
+        bytes32 receivableId;//应收款id，
+        address payerPubkey; //付款人（签收人）
+        address payeePubkey; //收款人（签发人）
+        address OwnerPubkey;//本手持有人
+        address nextOwnerPubkey;//下手持有人
         uint    isseAmt; //票面金额
         uint    cashedAmount;//已兑付金额
-        bytes32 status;//应收款状态
-        bytes32 lastStatus;//上一状态
+        ReceivableState status;//应收款状态
+        ReceivableState lastStatus;//上一状态
         uint    isseDat; //签发日
         uint    signInDat;//签收日，根据时间筛选的参照对象
         uint    expiryDate;//签收有效期
@@ -29,7 +42,7 @@ contract Reparo{
 
     //帐户信息
     struct Account{
-        bytes32     publicKey;//公钥
+        address     publicKey;//公钥
         bytes32     nickName;//用户名
         bytes32     companyName;//企业名称
         RoleCode    roleCode;//角色
@@ -39,8 +52,8 @@ contract Reparo{
     //订单
     struct Order{
         bytes32     orderId;//订单编号
-        bytes32     payerId;//买方id
-        bytes32     payeeId;//卖方（供应商id）
+        address     payerPubkey;//买方id
+        address     payeePubkey;//卖方（供应商id）
         bytes32     productName;//货品名称. -->test productName，unitPrice，productNum待确认是否需要使用数组，若需要的话addOrder中的参数如何传
         uint        unitPrice;//货品单价
         uint        productNum;//货品数量
@@ -49,12 +62,12 @@ contract Reparo{
         OrderState  orderState  ;//订单状态
     }
 
-    //操作记录，字段待确认
+    //操作记录
     struct ReceivableRecord {
         bytes32 receivableId;//应收款编号
         bytes32 serialNum;//流水号
-        bytes32 applicantId;//申请人账号
-        bytes32 replyerId;//回复人账号
+        address applicantPubkey;//申请人账号
+        address replyerPubkey;//回复人账号
         ResponseType responseType;//回复意见
         uint time;//时间戳
         bytes32 operateType; //操作类型 enum申请、确认
@@ -68,17 +81,20 @@ contract Reparo{
     mapping( bytes32 => Order ) orderDetailMap;
 
     // 账号 => 所有订单列表
-    mapping(bytes32 => bytes32[]) allOrderMap;
+    mapping(address => bytes32[]) allOrderMap;
 
     // 用户公钥 => 待处理订单编号列表
-    mapping( bytes32 => bytes32[]) pendingOrederMap;
+    mapping( address => bytes32[]) pendingOrederMap;
 
     // 应收款编号 => 应收款详情
     mapping( bytes32 => Receivable) receivableDetailMap;
 
     // 用户公钥 => 所有应收款列表
-    mapping( bytes32 => bytes32[]) allReceivablMap;
+    mapping( address => bytes32[]) allReceivablMap;
 
     //  用户公钥 => 待处理应收款列表
-    mapping( bytes32 => bytes32[]) pendingReceivables;
+    mapping( address => bytes32[]) pendingReceivables;
+
+    //操作记录流水号 => 操作记录详情
+    mapping(bytes32 => ReceivableRecord) recordDetailMap;
 }
