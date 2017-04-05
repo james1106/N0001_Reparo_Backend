@@ -45,7 +45,7 @@ public class chenyufeng_reparo_Test{
     }
 
     @Test
-    public void invokeDiscountApply() throws Exception {
+    public void discountApply() throws Exception {
 
         List<String> applyerKeyInfos = ESDKUtil.newAccount();
         applyerPublicKey = applyerKeyInfos.get(0);
@@ -67,33 +67,105 @@ public class chenyufeng_reparo_Test{
 
         String result = ESDKConnection.invokeContractMethod(transaction);
         Assert.assertNotNull(result);
-        System.out.println("invoke result: " + result);
 
         //返回值解码
         List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-        System.out.println("after decode result:" + retDecode);
+        System.out.println("贴现申请返回:" + retDecode);
     }
 
     @Test
-    public void invokeDiscountResponse() throws Exception {
+    public void discountResponse() throws Exception {
 
         String funcName = "discountResponse";
-        Object[] params = new Object[6];
+        Object[] params = new Object[5];
         params[0] = "10001";
-        params[1] = 1;
-        params[2] = 1;
-        params[3] = "12345678";
-        params[4] = "1480000000";
-        params[5] = "回复";
+        params[1] = 0;
+        params[2] = "87654321";
+        params[3] = "1480000000";
+        params[4] = "回复";
         Transaction transaction = ESDKUtil.getTxHash(receiverPublicKey, funcName, params);
         transaction.sign(receiverPrivateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
         Assert.assertNotNull(result);
-        System.out.println("invoke result: " + result);
 
         //返回值解码
         List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-        System.out.println("after decode result:" + retDecode);
+        System.out.println("贴现回复返回:" + retDecode);
+    }
+
+    @Test
+    public void queryPendingReceivables() throws Exception {
+
+        String funcName = "queryPendingReceivables";
+        Object[] params = new Object[0];
+        Transaction transaction = ESDKUtil.getTxHash(receiverPublicKey, funcName, params);
+        transaction.sign(receiverPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("查询待处理应收款返回:" + retDecode);
+    }
+
+    @Test
+    public void queryAllReceivablMap() throws Exception {
+
+        String funcName = "queryAllReceivablMap";
+        Object[] params = new Object[0];
+        Transaction transaction = ESDKUtil.getTxHash(applyerPublicKey, funcName, params);
+        transaction.sign(applyerPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("申请人:" + retDecode);
+
+        Transaction transaction1 = ESDKUtil.getTxHash(receiverPublicKey, funcName, params);
+        transaction1.sign(receiverPrivateKey, null);
+
+        String result1 = ESDKConnection.invokeContractMethod(transaction1);
+        Assert.assertNotNull(result1);
+        //返回值解码
+        List<Object> retDecode1 = ESDKUtil.retDecode(funcName, result1);
+        System.out.println("收款人:" + retDecode1);
+    }
+
+    @Test
+    public void queryRecordDetailMap() throws Exception {
+
+        String funcName = "queryRecordDetailMap";
+        Object[] params = new Object[1];
+        params[0] = "12345678";
+        Transaction transaction = ESDKUtil.getTxHash(receiverPublicKey, funcName, params);
+        transaction.sign(receiverPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("查询交易记录详情返回:" + retDecode);
+    }
+
+    @Test
+    public void queryReceivableDetailMap() throws Exception {
+
+        String funcName = "queryReceivableDetailMap";
+        Object[] params = new Object[1];
+        params[0] = "10001";
+        Transaction transaction = ESDKUtil.getTxHash(receiverPublicKey, funcName, params);
+        transaction.sign(receiverPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("查询应收款详情返回:" + retDecode);
     }
 }

@@ -8,8 +8,8 @@ contract Reparo{
     enum AccountState { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
     enum OrderState {UNCOMFIRMED, COMFIRMED} //UNCOMFIRMED-待卖方确认，COMFIRMED-卖方已确认
     enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-五
-    //应收款状态：已结清、已作废、签收拒绝、承兑待签收、承兑已签收、已兑付、已部分兑付、兑付失败、贴现待签收、贴现已签收
-    enum ReceivableState {RB000001, RB000002, RB000003, RB020001, RB020006, RB030001, RB030006, RB030009, RB070001, RB070006} 
+    //应收款状态：已结清、已作废、签收拒绝、承兑待签收、承兑已签收、已兑付、兑付失败、贴现待签收、贴现已签收
+    enum ReceivableState {Settled, Invalid, SignReject, AcceptNotSign, AcceptSigned, Cashed, CashFailed, DiscountNotSigned, DiscountSigned}
 
     //应收款
     struct Receivable {
@@ -53,7 +53,7 @@ contract Reparo{
 
     //操作记录，字段待确认
     struct ReceivableRecord {
-    	bytes32 serialNum;//流水号
+        bytes32 serialNum;//流水号
         bytes32 receivableId;//应收款编号
         address applicantId;//申请人账号
         address replyerId;//回复人账号
@@ -61,6 +61,7 @@ contract Reparo{
         uint time;//时间戳
         ReceivableState receivableState; //应收款状态
         uint dealAmount;//操作金额
+        bytes note;//备注
     }
 
     // 用户公钥 => 结构体Account
@@ -90,66 +91,67 @@ contract Reparo{
 
     //贴现申请
     //返回值13表示提交申请完成
-    function discountApply(address _replyerPublicKey, 
-    	bytes32 _receivableNum, 
-    	bytes32 _serialNum, 
-    	uint _time, 
-    	bytes _note) returns(uint) {
+    function discountApply(address _replyerPublicKey,
+        bytes32 _receivableNum,
+        bytes32 _serialNum,
+        uint _time,
+        bytes _note) returns(uint) {
 
         receivableDetailMap[_receivableNum].lastStatus = receivableDetailMap[_receivableNum].status;
-        receivableDetailMap[_receivableNum].status = ReceivableState.RB070001;
-    	pendingReceivables[_replyerPublicKey].push(_receivableNum);
+        receivableDetailMap[_receivableNum].status = ReceivableState.DiscountNotSigned;
+        pendingReceivables[_replyerPublicKey].push(_receivableNum);
 
-    	recordDetailMap[_serialNum].serialNum = _serialNum;
-    	recordDetailMap[_serialNum].receivableId = _receivableNum;
-    	recordDetailMap[_serialNum].applicantId = msg.sender;
-    	recordDetailMap[_serialNum].replyerId = _replyerPublicKey;
-    	recordDetailMap[_serialNum].time = _time;
-    	recordDetailMap[_serialNum].receivableState = ReceivableState.RB070001;
-    	return(13);
+        recordDetailMap[_serialNum].serialNum = _serialNum;
+        recordDetailMap[_serialNum].receivableId = _receivableNum;
+        recordDetailMap[_serialNum].applicantId = msg.sender;
+        recordDetailMap[_serialNum].replyerId = _replyerPublicKey;
+        recordDetailMap[_serialNum].time = _time;
+        recordDetailMap[_serialNum].receivableState = ReceivableState.DiscountNotSigned;
+        recordDetailMap[_serialNum].note = _note;
+        return(13);
     }
 
     //贴现回复:14表示贴现同意；15表示贴现拒绝
-    function discountResponse(bytes32 _receivableNum, 
-    	ResponseType _responseType,
-    	uint _response, 
-    	bytes32 _serialNum, 
-    	uint _time, 
-    	bytes _note) returns(uint) {
-    	
-    	//应收款的本手持有人
-    	address tempOwner = receivableDetailMap[_receivableNum].Owner;
+    function discountResponse(bytes32 _receivableNum,
+        ResponseType _responseType,
+        bytes32 _serialNum,
+        uint _time,
+        bytes _note) returns(uint) {
 
-    	recordDetailMap[_serialNum].serialNum = _serialNum;
-    	recordDetailMap[_serialNum].receivableId = _receivableNum;
-    	recordDetailMap[_serialNum].applicantId = tempOwner;
-    	recordDetailMap[_serialNum].replyerId = msg.sender;
-    	recordDetailMap[_serialNum].time = _time;
+        //应收款的本手持有人
+        address tempOwner = receivableDetailMap[_receivableNum].Owner;
 
-    	deleteArrayElement(pendingReceivables[msg.sender], _receivableNum);
-    	
-    	if(_responseType == ResponseType.YES) {
-    		//贴现同意
-    		recordDetailMap[_serialNum].receivableState = ReceivableState.RB070006;
-    		receivableDetailMap[_receivableNum].status = ReceivableState.RB070006;
+        recordDetailMap[_serialNum].serialNum = _serialNum;
+        recordDetailMap[_serialNum].receivableId = _receivableNum;
+        recordDetailMap[_serialNum].applicantId = tempOwner;
+        recordDetailMap[_serialNum].replyerId = msg.sender;
+        recordDetailMap[_serialNum].time = _time;
+        recordDetailMap[_serialNum].note = _note;
 
-    		//应收款从申请人中删除
-    		deleteArrayElement(allReceivablMap[tempOwner], _receivableNum);
+        deleteArrayElement(pendingReceivables[msg.sender], _receivableNum);
 
-    		//加入到收款人数组中
-    		allReceivablMap[tempOwner].push(_receivableNum);
+        if(_responseType == ResponseType.YES) {
+            //贴现同意
+            recordDetailMap[_serialNum].receivableState = ReceivableState.DiscountSigned;
+            receivableDetailMap[_receivableNum].status = ReceivableState.DiscountSigned;
+
+            //应收款从申请人中删除
+            deleteArrayElement(allReceivablMap[tempOwner], _receivableNum);
+
+            //加入到收款人数组中
+            allReceivablMap[tempOwner].push(_receivableNum);
 
             //修改应收款的本手持有人
             receivableDetailMap[_receivableNum].Owner = msg.sender;
 
-    		return (14);
-    	}
-    	else if(_responseType == ResponseType.NO){
-    		//贴现拒绝
-    		recordDetailMap[_serialNum].receivableState = ReceivableState.RB020006;
-    		receivableDetailMap[_receivableNum].status = receivableDetailMap[_receivableNum].lastStatus;
-    		return (15);
-    	}
+            return (14);
+        }
+        else if(_responseType == ResponseType.NO){
+            //贴现拒绝
+            recordDetailMap[_serialNum].receivableState = ReceivableState.AcceptSigned;
+            receivableDetailMap[_receivableNum].status = receivableDetailMap[_receivableNum].lastStatus;
+            return (15);
+        }
     }
 
     //从数组中删除某个元素
@@ -168,12 +170,42 @@ contract Reparo{
         }
     }
 
+    //查询用户的待处理应收款列表
+    function queryPendingReceivables() returns(address, bytes32[]) {
+        return (msg.sender, pendingReceivables[msg.sender]);
+    }
 
+    //查询用户的所有应收款列表
+    function queryAllReceivablMap() returns(bytes32[]) {
+        return allReceivablMap[msg.sender];
+    }
 
+    //查询操作记录详情（简化）
+    function queryRecordDetailMap(bytes32 _serialNum) returns(bytes32,
+        bytes32,
+        address,
+        address,
+        ResponseType,
+        ReceivableState) {
+        return (recordDetailMap[_serialNum].serialNum,
+            recordDetailMap[_serialNum].receivableId,
+            recordDetailMap[_serialNum].applicantId,
+            recordDetailMap[_serialNum].replyerId,
+            recordDetailMap[_serialNum].responseType,
+            recordDetailMap[_serialNum].receivableState);
+    }
 
-
-
-
+    //查询应收款记录详情（简化）
+    function queryReceivableDetailMap(bytes32 _receivableNum) returns(bytes32,
+        address,
+        ReceivableState,
+        ReceivableState) {
+        return (receivableDetailMap[_receivableNum].receivableNum,
+            receivableDetailMap[_receivableNum].Owner,
+            receivableDetailMap[_receivableNum].status,
+            receivableDetailMap[_receivableNum].lastStatus
+            );
+    }
 }
 
 
