@@ -90,11 +90,17 @@ contract Reparo{
     mapping( bytes32 => Receivable) receivableDetailMap;
 
     // 用户公钥 => 所有应收款列表
-    mapping( address => bytes32[]) allReceivablMap;
+    mapping( address => bytes32[]) allReceivableMap;
+
+   	//用户持有应收款列表, 用户acctId =>应收款编号列表
+    mapping(address => bytes32[]) holdingReceivables;
 
     //  用户公钥 => 待处理应收款列表
     mapping( address => bytes32[]) pendingReceivables;
 
     //操作记录流水号 => 操作记录详情
     mapping(bytes32 => ReceivableRecord) recordDetailMap;
+
+   //用户已兑付列表,用户公钥 => 已兑付应收款编号列表
+    mapping(address => bytes32[]) cashedReceivables;
 }

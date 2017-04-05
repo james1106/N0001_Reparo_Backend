@@ -30,14 +30,14 @@ public class ContractTestDemo extends SpringBaseTest{
         System.out.println("bin: " + binStr);
     }
 
-    @Test
+    /*@Test
     public void deployContract() throws Exception {
         List<String> keyInfos = ESDKUtil.newAccount("123");
         System.out.println(keyInfos);
         String contractAddress = ESDKConnection.deployContract(keyInfos.get(0), keyInfos.get(1), "123");
         Assert.assertNotNull(contractAddress);
         System.out.println("contractAddress: " + contractAddress);
-    }
+    }*/
 
     @Test
     public void invokeAddUser() throws Exception {
