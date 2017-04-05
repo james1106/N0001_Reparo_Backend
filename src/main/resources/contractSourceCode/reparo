@@ -27,7 +27,7 @@ contract Reparo{
         bytes32 receivableId;//应收款id，
         address payerPubkey; //付款人（签收人）
         address payeePubkey; //收款人（签发人）
-        address OwnerPubkey;//本手持有人
+        address ownerPubkey;//本手持有人
         address nextOwnerPubkey;//下手持有人
         uint    isseAmt; //票面金额
         uint    cashedAmount;//已兑付金额
@@ -93,14 +93,14 @@ contract Reparo{
     mapping( address => bytes32[]) allReceivableMap;
 
    	//用户持有应收款列表, 用户acctId =>应收款编号列表
-    mapping(address => bytes32[]) holdingReceivables;
+    mapping(address => bytes32[]) holdingReceivablesMap;
 
     //  用户公钥 => 待处理应收款列表
-    mapping( address => bytes32[]) pendingReceivables;
+    mapping( address => bytes32[]) pendingReceivablesMap;
 
     //操作记录流水号 => 操作记录详情
     mapping(bytes32 => ReceivableRecord) recordDetailMap;
 
    //用户已兑付列表,用户公钥 => 已兑付应收款编号列表
-    mapping(address => bytes32[]) cashedReceivables;
+    mapping(address => bytes32[]) cashedReceivablesMap;
 }
