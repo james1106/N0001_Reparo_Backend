@@ -10,98 +10,143 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
- * by chenyufeng on 2017/3/31 .
+ * by chenxiaoyang on 2017/4/5.
  */
-public class ContractTestDemo extends SpringBaseTest{
+public class OrderContractTest extends SpringBaseTest{
 
-    @Test
-    public void compileContract() throws IOException, ESDKException {
-        //从文件中读取合约
-        CompileReturn compileReturn = ESDKConnection.compileContract();
-        Assert.assertNotNull(compileReturn);
-        String abiStr = compileReturn.getAbi().get(0);
-        String binStr = compileReturn.getBin().get(0);
-        Assert.assertNotNull(abiStr);
-        System.out.println("abi: " + abiStr);
-        Assert.assertNotNull(binStr);
-        System.out.println("bin: " + binStr);
-    }
+    //买方公私钥
+    String payerPublicKey = "742ef389942f5c670337e35133dec96ed959fe7e";
+    String payerPrivateKey = "{\"address\":\"742ef389942f5c670337e35133dec96ed959fe7e\",\"encrypted\":\"ddeb9fb8471f7cd23d519e8bc2ad7436b36cc1ad0d48c89804a8d0dee7534051\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
 
-    /*@Test
-    public void deployContract() throws Exception {
-        List<String> keyInfos = ESDKUtil.newAccount("123");
-        System.out.println(keyInfos);
-        String contractAddress = ESDKConnection.deployContract(keyInfos.get(0), keyInfos.get(1), "123");
-        Assert.assertNotNull(contractAddress);
-        System.out.println("contractAddress: " + contractAddress);
-    }*/
+    //卖方公私钥
+    String payeePublicKey = "92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
+    String payeePrivateKey = "{\"address\":\"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e\",\"encrypted\":\"d19d6986f5b57e902768be3ebf7e1521fbc20b3fb19108848c4304c5fdb8216f\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
 
-    @Test
-    public void invokeAddUser() throws Exception {
-
-        List<String> keyInfos = ESDKUtil.newAccount();
+    /*List<String> keyInfos = ESDKUtil.newAccount();
         String publicKey = keyInfos.get(0);
         String privateKey = keyInfos.get(1);
+        System.out.println("publicKey:"+publicKey);
+        System.out.println("privateKey:"+privateKey);*/
 
-        String funcName = "addUser";
-        Object[] params = new Object[4];
-        params[0] = 2;
-        params[1] = "chenyufeng2";
-        params[2] = "123456";
-        params[3] = "110";
-        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params);
-        transaction.sign(privateKey, null);
+    @Test
+    public void addOrder() throws Exception {
+        long unitPrice=100;
+        long prodNum = 100;
+        long timeStamp =  System.currentTimeMillis();
+
+        java.util.Random random = new java.util.Random();
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");//设置日期格式
+        String orderId = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+
+        orderId = "20170405205903840";
+        String funcName = "addOrder";
+        Object[] params = new Object[7];
+        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
+        params[1] = "92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
+        params[2] = "product";
+        params[3] = unitPrice; //单价
+        params[4] = prodNum; //
+        params[5] = unitPrice * prodNum; //
+        params[6] = orderId; //
+
+        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
+        transaction.sign(payerPrivateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
         Assert.assertNotNull(result);
-        System.out.println("invoke result: " + result);
-    }
-
-    @Test
-    public void invokeQueryUser() throws Exception {
-
-        List<String> keyInfos = ESDKUtil.newAccount();
-        String publicKey = keyInfos.get(0);
-        String privateKey = keyInfos.get(1);
-
-        String funcName = "queryUser";
-        Object[] params = new Object[1];
-        params[0] = 2;
-        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params);
-        transaction.sign(privateKey, null);
-
-        String result = ESDKConnection.invokeContractMethod(transaction);
-        Assert.assertNotNull(result);
-        System.out.println("invoke result: " + result);
+        //System.out.println("==================invoke result:================== " + result);
 
         //返回值解码
         List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-        System.out.println("after decode result:" + retDecode);
+        System.out.println("==================after decode result:==================" + retDecode);
+
+        //System.out.println("===========addOrder 入参数 timeStamp:"+timeStamp +"===========");
+        //System.out.println("===========addOrder 入参数 date:"+date + random.nextInt() +"===========");
+
+        /*Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
+        transaction.sign(payerPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+        System.out.println("invoke result: " + result);*/
+
+        /*String contractMethodName = "addOrder";
+        String[] contractMethodReturns = new String[]{"result"};
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(payerPrivateKey);
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, params, contractMethodReturns);*/
     }
 
     @Test
-    public void invokeUserController() throws Exception {
+    public void queryOrderDetail() throws Exception {
+        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
 
-        List<String> keyInfos = ESDKUtil.newAccount();
-        String publicKey = keyInfos.get(0);
-        String privateKey = keyInfos.get(1);
+        String funcName = "queryOrderDetail";
+        Object[] params = new Object[1];
+        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
 
-        // 合约的公私钥
-        ContractKey contractKey = new ContractKey(privateKey);
 
-        // 合约方法参数
-        Object[] contractParams = new Object[4];
-        contractParams[0] = 1;
-        contractParams[1] = "Jack";
-        contractParams[2] = "123456";
-        contractParams[3] = "110";
+        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
+        transaction.sign(payerPrivateKey, null);
 
-        String[] resultParams = new String[1];
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+        //System.out.println("==================invoke result:================== " + result);
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "addUser", contractParams, resultParams);
-        System.out.println("contractResult:" + contractResult);
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("==================after decode result:==================" + retDecode);
+
+    }
+
+    @Test //由买方进行确认时会返回22-订单仅允许卖方进行确认
+    public void orderConfirm() throws Exception {
+        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
+
+        String funcName = "orderConfirm";
+        Object[] params = new Object[1];
+        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
+
+
+        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
+        transaction.sign(payerPrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+        //System.out.println("==================invoke result:================== " + result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("==================after decode result:==================" + retDecode);
+        Assert.assertEquals("22", retDecode.get(0));
+      }
+
+    @Test //由卖方进行确认时会返回0-成功
+    public void orderConfirm_2() throws Exception {
+        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
+
+        String funcName = "orderConfirm";
+        Object[] params = new Object[1];
+        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
+
+
+        Transaction transaction = ESDKUtil.getTxHash(payeePublicKey, funcName, params);
+        transaction.sign(payeePrivateKey, null);
+
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        Assert.assertNotNull(result);
+        //System.out.println("==================invoke result:================== " + result);
+
+        //返回值解码
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        System.out.println("==================after decode result:==================" + retDecode);
+        Assert.assertEquals("0", retDecode.get(0));
     }
 }
