@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,25 +57,25 @@ public class OrderController {
             @ApiParam(value = "货品单价", required = true) @RequestParam int productPrice,
             @ApiParam(value = "货品数量", required = true) @RequestParam int productNum,
             @ApiParam(value = "货品总价", required = true) @RequestParam int totalPrice,
-            @ApiParam(value = "付款银行", required = true) @RequestParam String payerBank,
+            @ApiParam(value = "付款人开户行", required = true) @RequestParam String payerBank,
             @ApiParam(value = "开户行别", required = true) @RequestParam String payerBankClss,
             @ApiParam(value = "付款账户", required = true) @RequestParam String payerBankAccount,
-            @ApiParam(value = "付款方式", required = true) @RequestParam int payingMethod,
-            @ApiParam(value = "生成订单时间", required = true) @RequestParam int timeStamp
+            @ApiParam(value = "付款方式", required = true) @RequestParam int payingMethod
     ) throws Exception {
 
         // 合约的公私钥
         ContractKey contractKey = new ContractKey(payerPrivateKey);
-        String orderId = "20170405205903002";
+        String orderId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        long timeStamp = System.currentTimeMillis();
 
         // 合约方法参数（公钥，角色代码，物流交换码）
         Object[] contractParams = new Object[11];
         contractParams[0] = orderId;
         contractParams[1] = payeeAccount;
         contractParams[2] = productName;
-        contractParams[3] = productPrice;
+        contractParams[3] = productPrice*100; //合约中单位是分
         contractParams[4] = productNum;
-        contractParams[5] = totalPrice;
+        contractParams[5] = totalPrice*100;
         contractParams[6] = payerBank;
         contractParams[7] = payerBankClss;
         contractParams[8] = payerBankAccount;

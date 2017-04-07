@@ -20,24 +20,32 @@ contract Reparo{
     UNCOMFIRMED,  //0, 待卖方确认
     COMFIRMED     //1, 卖方已确认
     }
+    enum WayBillState {
+    UNCOMFIRMED,  //0, 待卖方确认
+    COMFIRMED     //1, 卖方已确认
+    }
+    enum RepoCertState {
+    UNCOMFIRMED,  //0, 待卖方确认
+    COMFIRMED     //1, 卖方已确认
+    }
     enum ResponseType {
     YES,  //0, 同意
     NO,   //1, 拒绝
     NULL  //2, 无
     }
     enum ReceivableState{
-    RB000001,   //已结清
-    RB000002,   //已作废
-    RB000003,   //签收拒绝
-    RB020001,   //承兑待签收
-    RB020006,   //承兑已签收
-    RB030001,   //已兑付
-    RB030006,   //已部分兑付
-    RB030009,   //兑付失败
-    B070001,    //贴现待签收
-    RB070006,   //贴现已签收
-    RB070008,   //已部分贴现
-    RB070009    //已全额贴现
+    RB000001,   //1, 已结清
+    RB000002,   //2, 已作废
+    RB000003,   //3, 签收拒绝
+    RB020001,   //4, 承兑待签收
+    RB020006,   //5, 承兑已签收
+    RB030001,   //6, 已兑付
+    RB030006,   //7, 已部分兑付
+    RB030009,   //8, 兑付失败
+    B070001,    //9, 贴现待签收
+    RB070006,   //10, 贴现已签收
+    RB070008,   //11, 已部分贴现
+    RB070009    //12, 已全额贴现
     }
     enum PayingMethod {
     RECEIVABLE,   //0, 应收账款方式
@@ -48,6 +56,7 @@ contract Reparo{
     bytes32 receivableId;//应收款id，
     address payerPubkey; //付款人（签收人）
     address payeePubkey; //收款人（签发人）
+
     address OwnerPubkey;//本手持有人
     address nextOwnerPubkey;//下手持有人
     uint isseAmt; //票面金额
@@ -61,13 +70,20 @@ contract Reparo{
     bytes note;//备注
     }
 
+//订单相关状态
+    struct OrderRelativeState {
+    OrderState orderState;
+    RepoCertState repoCertState;
+    WayBillState wayBillState;
+    }
+
 //帐户信息
     struct Account{
     address publicKey;//公钥
     bytes32 accountName;//用户名
     bytes32 companyName;//企业名称
     RoleCode roleCode;//角色
-    AccountState accountState;//
+    AccountState accountState;
     }
 
 //订单
@@ -84,7 +100,7 @@ contract Reparo{
     bytes32 payerBankClss;//开户行别
     bytes32 payerBankAccount;//付款人开户行
     PayingMethod payingMethod;//付款方式
-    OrderState orderState;//订单状态
+    OrderRelativeState orderRelativeState;//订单状态
     }
 
 //操作记录
@@ -145,7 +161,7 @@ contract Reparo{
 //买方新建订单
     function createOrder (
     bytes32 orderId,                //订单编号
-    address payeeAccount,           //卖方ID
+    address payeeAccount,           //卖方地址
     bytes32 productName,            //货品名称
     uint productPrice,              //货品单价
     uint productNum,                //货品数量
@@ -170,7 +186,7 @@ contract Reparo{
         orderDetailMap[orderId].payerBankAccount = payerBankAccount;
         orderDetailMap[orderId].payingMethod = payingMethod;
         orderDetailMap[orderId].timeStamp = timeStamp;
-        orderDetailMap[orderId].orderState = OrderState.UNCOMFIRMED;
+        orderDetailMap[orderId].orderRelativeState.orderState = OrderState.UNCOMFIRMED;
 
         allPayerOrderMap[msg.sender].push(orderId);//买方的所有订单
         allPayeeOrderMap[payeeAccount].push(orderId);//卖方的所有订单
@@ -184,19 +200,19 @@ contract Reparo{
     }
 
 //根据订单id获取订单详情。--test 待补充判断订单是否存在
-    function queryOrderDetail(bytes32 orderId) returns(uint, address resultPayerAccount, address resultPayeeAccount, string resultStr, uint[] resultUint, PayingMethod resultMethod, OrderState resultState){
+    function queryOrderDetail(bytes32 orderId) returns(uint, address resultPayerAccount, address resultPayeeAccount, string resultStr, uint[] resultUint, PayingMethod resultMethod, OrderState orderState){
     //如果调用者账户无效，返回错误代码1（无效的用户）
         if (!isValidUser()) {
-            return (1, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, resultState);
+            return (1, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, orderState);
         }
         Order order = orderDetailMap[orderId];
     //如果订单不存在，返回错误代码101（订单不存在)************************************
         if(!orderExists(orderId)){
-            return (100, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, resultState);
+            return (100, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, orderState);
         }
     //如果订单与合约调用者无关，返回错误代码22（权限拒绝）
         if (order.payerAccount != msg.sender && order.payeeAccount != msg.sender) {
-            return (22, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, resultState);
+            return (22, resultPayerAccount, resultPayeeAccount, resultStr, resultUint, resultMethod, orderState);
         }
         bytes32[] memory value = new bytes32[](5);
         value = getReceivableValue(orderId);
@@ -206,7 +222,7 @@ contract Reparo{
         resultUint[1] = order.productNum;
         resultUint[2] = order.totalPrice;
         resultUint[3] = order.timeStamp;
-        return (0, order.payerAccount, order.payeeAccount, resultStr, resultUint, order.payingMethod, order.orderState);
+        return (0, order.payerAccount, order.payeeAccount, resultStr, resultUint, order.payingMethod, order.orderRelativeState.orderState);
     }
 
 //将需要返回的各bytes32参数转化为bytes32[]
@@ -271,7 +287,7 @@ contract Reparo{
     }
 
 //买方查询相关订单编号列表
-    function queryAllOrderListForPayer(bytes32 orderId) returns (uint, bytes32[] resultList){
+    function queryAllOrderListForPayer() returns (uint, bytes32[] resultList){
         if (!isValidUser()) {
             return (1, resultList);
         }
@@ -279,7 +295,7 @@ contract Reparo{
     }
 
 //买方查询相关订单编号列表
-    function queryAllOrderListForPayee(bytes32 orderId) returns (uint, bytes32[] resultList){
+    function queryAllOrderListForPayee() returns (uint, bytes32[] resultList){
         if (!isValidUser()) {
             return (1, resultList);
         }
@@ -292,7 +308,7 @@ contract Reparo{
         }
         Order order = orderDetailMap[orderId];
         if (order.payeeAccount != msg.sender) {return (22);}//仅订单的供应商可进行确认操作
-        orderDetailMap[orderId].orderState = OrderState.COMFIRMED;//修改订单详情map中的订单状态
+        orderDetailMap[orderId].orderRelativeState.orderState = OrderState.COMFIRMED;//修改订单详情map中的订单状态
         return (0);
     }
 
