@@ -1,6 +1,6 @@
 package com.hyperchain.common.exception.base;
 
-import com.hyperchain.common.constant.BaseConstant.Code;
+import com.hyperchain.common.constant.Code;
 import com.hyperchain.controller.vo.BaseResult;
 import org.apache.poi.ss.formula.functions.T;
 

@@ -28,7 +28,7 @@ import java.util.List;
 @SuppressWarnings({"JavaDoc", "SpringAutowiredFieldsWarningInspection"})
 @Api(value = "Account", description = "用户账号", position = 10)
 @Controller
-@RequestMapping("/v1/account")
+@RequestMapping("/v1/account-demo")
 public class UserControllerDemo extends BaseController {
 
     @Autowired

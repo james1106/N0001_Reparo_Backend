@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.hyperchain.common.constant.BaseConstant;
-import com.hyperchain.common.constant.BaseConstant.Role;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -35,18 +34,5 @@ public class ParamsCheck {
         if(!version.equals("1.0"))return false;
 
         return true;
-    }
-
-    public static boolean checkPartyFunctionCode(String partyFunctionCode) {
-        for (Role role : Role.values()) {
-            if (partyFunctionCode.equals(role.toString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean checkStatus(String status) {
-        return Arrays.asList(BaseConstant.Status).contains(status);
     }
 }

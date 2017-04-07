@@ -2,7 +2,8 @@ package com.hyperchain.contract;
 
 import cn.hyperchain.common.log.LogUtil;
 import cn.hyperchain.sdk.crypto.DESKeyJSON;
-import com.hyperchain.common.constant.BaseConstant.Code;
+import com.hyperchain.common.constant.BaseConstant;
+import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 
 /**
@@ -10,7 +11,7 @@ import com.hyperchain.common.exception.PrivateKeyIllegalParam;
  */
 public class ContractKey {
     String privateKey;
-    String password = "123";
+    String password = BaseConstant.PRIVATE_KEY_PASSWORD;
     String publicKey;
 
     public ContractKey(String privateKey, String password) throws PrivateKeyIllegalParam {

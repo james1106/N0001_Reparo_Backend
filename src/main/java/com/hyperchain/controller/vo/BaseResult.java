@@ -1,10 +1,7 @@
 package com.hyperchain.controller.vo;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.hyperchain.common.constant.Code;
 import com.wordnik.swagger.annotations.ApiModelProperty;
-import com.hyperchain.common.constant.BaseConstant.Code;
 
 /**
  * 接口返回结果类
@@ -94,6 +91,16 @@ public class BaseResult<T> {
 
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseResult{" +
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                ", signature='" + signature + '\'' +
+                '}';
     }
 }
 
