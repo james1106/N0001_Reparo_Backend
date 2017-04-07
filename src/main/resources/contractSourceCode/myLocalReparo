@@ -32,7 +32,7 @@ contract Reparo{
         bytes32     publicKey;//公钥
         bytes32     nickName;//用户名
         bytes32     companyName;//企业名称
-        RoleCode    roleCode;//角色
+        RoleCode    code;//角色
         AccountState accountState;//
     }
 

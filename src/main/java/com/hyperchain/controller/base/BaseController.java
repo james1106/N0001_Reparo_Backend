@@ -1,7 +1,7 @@
 package com.hyperchain.controller.base;
 
 import cn.hyperchain.common.log.LogUtil;
-import com.hyperchain.common.constant.BaseConstant.Code;
+import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.*;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.http.converter.HttpMessageNotWritableException;

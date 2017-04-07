@@ -1,6 +1,6 @@
 package com.hyperchain.contract;
 
-import com.hyperchain.common.constant.BaseConstant.Code;
+import com.hyperchain.common.constant.Code;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -4,7 +4,7 @@ import cn.hyperchain.common.log.LogUtil;
 import cn.hyperchain.sdk.rpc.Transaction.Transaction;
 import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
-import com.hyperchain.common.constant.BaseConstant.Code;
+import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
