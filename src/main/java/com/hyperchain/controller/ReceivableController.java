@@ -47,8 +47,8 @@ public class ReceivableController {
     ) throws Exception {
 
         long receivableGenerateTime = System.currentTimeMillis();
-        String receivableNo = "020" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        String serialNo = "021" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        String receivableNo = "120" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
         List<String> list= new ArrayList<>();
         list.add(contractNo);
         list.add(invoiceNo);

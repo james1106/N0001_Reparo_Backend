@@ -171,28 +171,28 @@ contract chain{
     //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
     function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, bytes32 serialNo, uint time) returns(uint code){
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
-            return (17);
+            return (3);
         }
         if(judgeRepetitiveSerialNo(serialNo)){
-            return (32);
+            return (1032);
         }
         if(isseAmt <= 0){
-            return (19);
+            return (1019);
         }
         if(judgeAccount(msg.sender)){
-            return (1);
+            return (2);
         }
         if(judgeAcctIdMatchAddress(signer, msg.sender)){
-            return (7);
+            return (1007);
         }
         if(judgeReplyerAddressEmpty(accptr)){
-            return (4);
+            return (1004);
         }
         if(judgeReplyerAccount(accptr)){
-            return (31);
+            return (1031);
         }
         if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
-            return (30);
+            return (1030);
         }
 
         allReceivableNos.push(receivableNo);
@@ -230,27 +230,27 @@ contract chain{
     //签发回复
     function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time) returns (bytes32){
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
-            return (17);
+            return (3);
         }
         if(judgeRepetitiveSerialNo(serialNo)){
-            return (32);
+            return (1032);
         }
         if(response != ResponseType.NO && response != ResponseType.YES){
-            return (20);
+            return (1020);
         }
         if(judgeAccount(msg.sender)){
-            return (2);
+            return (1002);
         }
         if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
-            return (7);
+            return (1007);
         }
 
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.status != "020001"){
-            return (6);
+            return (1006);
         }
         if(replyerAcctId != receivable.accptr){
-            return (27);
+            return (1027);
         }
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
@@ -273,22 +273,22 @@ contract chain{
     //贴现申请
     function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time) returns(uint) {
          if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
-            return (17);
+            return (3);
          }
          if(judgeRepetitiveSerialNo(serialNo)){
-            return (32);
+            return (1032);
          }
          if(judgeAccount(msg.sender)){
-              return(1);
+              return(2);
          }
          if(judgeAcctIdMatchAddress(applicantAcctId, msg.sender)){
-              return (7);
+              return (1007);
          }
          if(judgeReplyerAddressEmpty(replyerAcctId)){
-              return (4);
+              return (1004);
          }
          if(judgeReplyerAccount(replyerAcctId)){
-             return (31);
+             return (1031);
          }
 
         Receivable receivable = receivableDetailMap[receivableNo];
@@ -304,19 +304,19 @@ contract chain{
     //贴现回复
     function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time) returns(uint) {
          if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
-            return (17);
+            return (3);
          }
         if(responseType != ResponseType.NO && responseType != ResponseType.YES){
-            return (20);
+            return (1020);
         }
          if(judgeRepetitiveSerialNo(serialNo)){
-            return (32);
+            return (1032);
          }
          if(judgeAccount(msg.sender)){
-              return(1);
+              return(2);
          }
          if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
-              return (7);
+              return (1007);
          }
         Receivable receivable = receivableDetailMap[receivableNo];
         if(responseType == ResponseType.YES) {
@@ -353,24 +353,24 @@ contract chain{
     //兑付
 	function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo)returns(uint){
         if(receivableNo == "" || serialNo == ""){
-            return (17);
+            return (3);
         }
         if(judgeRepetitiveSerialNo(serialNo)){
-            return (32);
+            return (1032);
         }
         if(cashedAmount <= 0){
-            return (16);
+            return (1016);
         }
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.receivableNo == 0x0) {
-            return(5);
+            return(1005);
         }
         if(receivable.status != "020006" && receivable.status != "070006"){
-            return(6);
+            return(1006);
         }
         //到期日才能兑付
         if(time < receivable.dueDt){
-            return(10);
+            return(1010);
         }
 
         receivable.lastStatus = receivable.status;
@@ -378,7 +378,7 @@ contract chain{
         receivable.status = "000001";
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount);
-        return(0);
+        return (0);
 	}
 
     //根据应收款编号查询单张应收款具体信息
@@ -391,7 +391,7 @@ contract chain{
          bytes32[] memory bytesInfo1 = new bytes32[](13);
          bytes32[] memory bytesInfo2 = new bytes32[](4);
          if(judgeAccount(msg.sender)){
-            return (1,
+            return (2,
                  bytesInfo1,
                  bytesInfo2,
                  uintInfo
@@ -399,7 +399,7 @@ contract chain{
          }
 
          if(receivableNo == ""){
-            return (17,
+            return (3,
                  bytesInfo1,
                  bytesInfo2,
                  uintInfo
@@ -407,7 +407,7 @@ contract chain{
          }
 
          if(receivable.receivableNo == 0x0) {
-             return(5,
+             return(1005,
                  bytesInfo1,
                  bytesInfo2,
                  uintInfo
@@ -416,7 +416,7 @@ contract chain{
 
 
          if(receivable.signer != acctId && receivable.accptr != acctId) {
-             return(28,
+             return(1028,
                  bytesInfo1,
                  bytesInfo2,
                  uintInfo
@@ -554,7 +554,7 @@ contract chain{
         Account account = accountMap[msg.sender];
         ReceivableRecord receivableRecord = receivableRecordMap[serialNo];
         if(serialNo == ""){
-            return (17,
+            return (3,
                 serialNm,
                 receivableNo,
                 applicantAcctId,
@@ -566,7 +566,7 @@ contract chain{
         }
 
         if(receivableRecord.serialNo == 0x0) {
-            return(13,
+            return(1013,
                 serialNm,
                 receivableNo,
                 applicantAcctId,

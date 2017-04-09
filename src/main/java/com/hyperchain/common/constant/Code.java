@@ -30,6 +30,9 @@ public enum Code {
     ACCOUNT_STATUS_LOCK(5006, "用户已锁定，请稍后重试"),
     ERROR_PASSWORD(5007, "密码错误，请重新输入密码");
 
+    //应收款部分
+
+
 
     private int code;
     private String msg;
