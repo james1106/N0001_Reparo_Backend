@@ -17,8 +17,7 @@ contract chain{
         uint signInDt;//签收日
         uint dueDt; //到期日
         bytes32 rate;//利率
-        bytes32 contractNo;//合同号
-        bytes32 invoiceNo;//发票号
+        bytes32 contractAndInvoiceNo;//合同号+发票号
     }
 
     //操作记录
@@ -163,7 +162,7 @@ contract chain{
     }
 
     //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
-    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer,bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32 contractNo, bytes32 invoiceNo, bytes32 serialNo, uint time) returns(uint code){
+    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer,bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32 contractAndInvoiceNo, bytes32 serialNo, uint time) returns(uint code){
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
             return (17);
         }
@@ -190,7 +189,7 @@ contract chain{
         }
 
         allReceivableNos.push(receivableNo);
-        giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, time);
+        giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
 
         newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
@@ -203,7 +202,7 @@ contract chain{
         return (0);
     }
 
-    function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, uint time) internal {
+    function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32 contractAndInvoiceNo, uint time) internal {
           Receivable receivable = receivableDetailMap[receivableNo];
           receivable.receivableNo = receivableNo;
           receivable.orderNo = orderNo;
@@ -217,6 +216,7 @@ contract chain{
           receivable.dueDt = dueDt;
           receivable.rate = rate;
           receivable.status = "020001";
+          receivable.contractAndInvoiceNo = contractAndInvoiceNo;
     }
 
     //签发回复
@@ -421,14 +421,14 @@ contract chain{
      }
 
      function getReceivableMostInfo(bytes32 receivableNo) returns(string){
-        bytes32[] memory value = new bytes32[](13);
+        bytes32[] memory value = new bytes32[](12);
         value = getReceivableValue(receivableNo);
         return SewingBytes32ArrayToString(value);
      }
 
      function getReceivableValue(bytes32 receivableNo) returns(bytes32[]){
         Receivable receivable = receivableDetailMap[receivableNo];
-        bytes32[] memory value = new bytes32[](13);
+        bytes32[] memory value = new bytes32[](12);
 
         value[0] = receivableNo;
         value[1] = receivable.orderNo;
@@ -441,8 +441,7 @@ contract chain{
         value[8] = receivable.status;
         value[9] = receivable.lastStatus;
         value[10] = receivable.rate;
-        value[11] = receivable.contractNo;
-        value[12] = receivable.invoiceNo;
+        value[11] = receivable.contractAndInvoiceNo;
         return value;
      }
 
