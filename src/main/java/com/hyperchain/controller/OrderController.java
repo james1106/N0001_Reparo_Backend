@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liangyue on 2017/4/7.
@@ -38,9 +35,6 @@ public class OrderController {
     ConfirmOrderService confirmOrderService;
 
     @Autowired
-    QueryOrderDetailService queryOrderDetailService;
-
-    @Autowired
     QueryAllOrderListForPayeeService queryAllOrderListForPayeeService;
 
     @Autowired
@@ -55,9 +49,9 @@ public class OrderController {
             @ApiParam(value = "买方私钥地址", required = true) @RequestParam String payerPrivateKey,
             @ApiParam(value = "卖方公钥地址", required = true) @RequestParam String payeeAccount,
             @ApiParam(value = "货品名称", required = true) @RequestParam String productName,
-            @ApiParam(value = "货品单价", required = true) @RequestParam int productUnitPrice,
-            @ApiParam(value = "货品数量", required = true) @RequestParam int productQuantity,
-            @ApiParam(value = "货品总价", required = true) @RequestParam int productTotalPrice,
+            @ApiParam(value = "货品单价", required = true) @RequestParam long productUnitPrice,
+            @ApiParam(value = "货品数量", required = true) @RequestParam long productQuantity,
+            @ApiParam(value = "货品总价", required = true) @RequestParam long productTotalPrice,
             @ApiParam(value = "付款人申请仓储公司", required = true) @RequestParam String payerRepo,
             @ApiParam(value = "付款人开户行", required = true) @RequestParam String payerBank,
             @ApiParam(value = "开户行别", required = true) @RequestParam String payerBankClss,
@@ -66,8 +60,8 @@ public class OrderController {
     ) throws Exception {
 
         long orderGenerateTime = System.currentTimeMillis();
-        String orderId = "000" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        String repoBusinessNo = "010" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        String orderId = "000" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
+        String repoBusinessNo = "030" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         List<String> list= new ArrayList<>();
         list.add(orderId);
         list.add(productName);
@@ -82,11 +76,11 @@ public class OrderController {
 
         Object[] params = new Object[7];
         params[0] = payeeAccount;
-        params[1] = productUnitPrice; //单价
+        params[1] = productUnitPrice*100; //单价
         params[2] = productQuantity; //
-        params[3] = productTotalPrice; //
+        params[3] = productTotalPrice*100; //
         params[4] = list;
-        params[5] = 0;
+        params[5] = payingMethod;
         params[6] = orderGenerateTime;
         // 调用合约查询账户，获取返回结果
         return orderService.createOrder(contractKey, params, orderId);
@@ -124,17 +118,7 @@ public class OrderController {
 
         Object[] contractParams = new Object[1];
         contractParams[0] = orderId;
-//         调用合约确认订单，获取返回结果
-
-
-
-//        Map<String, Object> resultMap = new HashedMap();
-//        BaseResult<Object> result = new BaseResult<>();
-//        resultMap.put("orderId", orderId);
-//        result.setData(resultMap);
-//        return result;
-
-        return queryOrderDetailService.invokeContract(contractKey, contractParams);
+        return orderService.queryOrderDetail(contractKey, contractParams);
     }
 
     @LogInterceptor

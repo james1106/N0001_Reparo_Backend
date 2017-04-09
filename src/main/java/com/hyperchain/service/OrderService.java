@@ -9,5 +9,6 @@ import com.hyperchain.controller.vo.BaseResult;
 public interface OrderService {
     BaseResult<Object> createOrder(ContractKey contractKey, Object[] contractParams, String orderId);
     BaseResult<Object> queryOrderDetail(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> queryOrderList(ContractKey contractKey, Object[] contractParams, int role);
 
 }
