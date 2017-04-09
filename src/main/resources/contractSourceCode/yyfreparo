@@ -17,17 +17,16 @@ contract chain{
         uint signInDt;//签收日
         uint dueDt; //到期日
         bytes32 rate;//利率
-        bytes32 contractNum;//合同号，暂时不用
-        bytes32 wayBillNum;//运单号，暂时不用
-        bytes note;//备注,暂时不用
+        bytes32 contractNo;//合同号
+        bytes32 invoiceNo;//发票号
     }
 
     //操作记录
     struct ReceivableRecord {
         bytes32 receivableNo;//应收款编号
         bytes32 serialNo;//流水号
-        address applicantAcctId;//申请人账号
-        address replyerAcctId;//回复人账号
+        bytes32 applicantAcctId;//申请人账号
+        bytes32 replyerAcctId;//回复人账号
         ResponseType responseType;//回复意见
         uint time;//时间戳
         bytes32 operateType; //操作类型
@@ -57,19 +56,19 @@ contract chain{
     mapping(bytes32 => Receivable) receivableDetailMap;
 
     //账号acctId -> 公钥
-    mapping(bytes32 => address[]) acctIdToAddressMap;
+    mapping(bytes32 => address) acctIdToAddressMap;
 
-    //付款人 -> 应收款编号
-    mapping(address => address[]) pyerToReceivableMap;
+    //付款人账号pyer -> 应收款编号
+    mapping(bytes32 => bytes32[]) pyerToReceivableMap;
 
-    //收款人pyee -> 应收款编号
-    mapping(address => address[]) pyeeToReceivableMap;
+    //收款人账号pyee -> 应收款编号
+    mapping(bytes32 => bytes32[]) pyeeToReceivableMap;
 
-    //承兑人accptr -> 应收款编号
-    mapping(address => address[]) accptrToReceivableMap;
+    //承兑人账号accptr -> 应收款编号
+    mapping(bytes32 => bytes32[]) accptrToReceivableMap;
 
-    //签发人signer -> 应收款编号
-    mapping(address => address[]) signerToReceivableMap;
+    //签发人账号signer -> 应收款编号
+    mapping(bytes32 => bytes32[]) signerToReceivableMap;
 
 
     //订单编号 -> 应收款编号
@@ -164,11 +163,11 @@ contract chain{
     }
 
     //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
-    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes pyer,bytes pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32 serialNo, uint time) returns(uint code){
+    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer,bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32 contractNo, bytes32 invoiceNo, bytes32 serialNo, uint time) returns(uint code){
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
             return (17);
         }
-        if(judgeRepetitiveserialNo(serialNo)){
+        if(judgeRepetitiveSerialNo(serialNo)){
             return (32);
         }
         if(isseAmt <= 0){
@@ -197,7 +196,7 @@ contract chain{
 
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
-        orderNoToReceivableNoMap[orderNo].push(receivableNo);
+        orderNoToReceivableNoMap[orderNo] = receivableNo;
 
         receivableTransferHistoryMap[receivableNo].push(serialNo);
 
@@ -225,7 +224,7 @@ contract chain{
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (17);
         }
-        if(judgeRepetitiveserialNo(serialNo)){
+        if(judgeRepetitiveSerialNo(serialNo)){
             return (32);
         }
         if(response != ResponseType.NO && response != ResponseType.YES){
@@ -268,7 +267,7 @@ contract chain{
          if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (17);
          }
-         if(judgeRepetitiveserialNo(serialNo)){
+         if(judgeRepetitiveSerialNo(serialNo)){
             return (32);
          }
          if(judgeAccount(msg.sender)){
@@ -299,10 +298,10 @@ contract chain{
          if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (17);
          }
-        if(response != ResponseType.NO && response != ResponseType.YES){
+        if(responseType != ResponseType.NO && responseType != ResponseType.YES){
             return (20);
         }
-         if(judgeRepetitiveserialNo(serialNo)){
+         if(judgeRepetitiveSerialNo(serialNo)){
             return (32);
          }
          if(judgeAccount(msg.sender)){
@@ -344,11 +343,11 @@ contract chain{
     }
 
     //兑付
-	function cash(bytes32 receivableNo, uint time,bytes32 serialNo)returns(uint){
+	function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (17);
         }
-        if(judgeRepetitiveserialNo(serialNo)){
+        if(judgeRepetitiveSerialNo(serialNo)){
             return (32);
         }
         if(cashedAmount <= 0){
@@ -371,12 +370,11 @@ contract chain{
         receivable.status = "000001";
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount);
-        receivable.note = getNotes(receivableNo, note);
         return(0);
 	}
 
     //根据应收款编号查询单张应收款具体信息
-    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, string, uint[], bytes pyerInfo, bytes pyeeInfo, bytes note){
+    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, string, uint[]){
          Account account = accountMap[msg.sender];
          Receivable receivable = receivableDetailMap[receivableNo];
 
@@ -384,38 +382,30 @@ contract chain{
          if(judgeAccount(msg.sender)){
             return (1,
                  "",
-                 uintInfo,
-                 pyerInfo,
-                 pyeeInfo,
-                 note);
+                 uintInfo
+                 );
          }
 
          if(receivableNo == ""){
             return (17,
                  "",
-                 uintInfo,
-                 pyerInfo,
-                 pyeeInfo,
-                 note);
+                 uintInfo
+                 );
          }
 
          if(receivable.receivableNo == 0x0) {
              return(5,
                  "",
-                 uintInfo,
-                 pyerInfo,
-                 pyeeInfo,
-                 note);
+                 uintInfo
+                 );
          }
 
 
          if(receivable.signer != acctId && receivable.accptr != acctId) {
              return(28,
                  "",
-                 uintInfo,
-                 pyerInfo,
-                 pyeeInfo,
-                 note);
+                 uintInfo
+                 );
          }
 
          uintInfo[0] = receivable.isseAmt;
@@ -426,24 +416,22 @@ contract chain{
 
          return (0,
                  getReceivableMostInfo(receivableNo),
-                 uintInfo,
-                 receivable.pyerInfo,
-                 receivable.pyeeInfo,
-                 receivable.note);
+                 uintInfo
+                 );
      }
 
      function getReceivableMostInfo(bytes32 receivableNo) returns(string){
-        bytes32[] memory value = new bytes32[](12);
+        bytes32[] memory value = new bytes32[](13);
         value = getReceivableValue(receivableNo);
         return SewingBytes32ArrayToString(value);
      }
 
      function getReceivableValue(bytes32 receivableNo) returns(bytes32[]){
         Receivable receivable = receivableDetailMap[receivableNo];
-        bytes32[] memory value = new bytes32[](12);
+        bytes32[] memory value = new bytes32[](13);
 
         value[0] = receivableNo;
-        value[1] = receivable.orderNum;
+        value[1] = receivable.orderNo;
         value[2] = receivable.signer;
         value[3] = receivable.accptr;
         value[4] = receivable.pyer;
@@ -453,9 +441,8 @@ contract chain{
         value[8] = receivable.status;
         value[9] = receivable.lastStatus;
         value[10] = receivable.rate;
-        // value[9] = receivable.interest;
-        // value[10] = receivable.contractNum;
-        // value[11] = receivable.wayBillNum;
+        value[11] = receivable.contractNo;
+        value[12] = receivable.invoiceNo;
         return value;
      }
 
