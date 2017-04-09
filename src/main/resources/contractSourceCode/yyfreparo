@@ -446,14 +446,16 @@ contract chain{
         value[1] = receivable.orderNum;
         value[2] = receivable.signer;
         value[3] = receivable.accptr;
-        value[4] = receivable.firstOwner;
-        value[5] = receivable.secondOwner;
-        value[6] = receivable.status;
-        value[7] = receivable.lastStatus;
-        value[8] = receivable.rate;
-        value[9] = receivable.interest;
-        value[10] = receivable.contractNum;
-        value[11] = receivable.wayBillNum;
+        value[4] = receivable.pyer;
+        value[5] = receivable.pyee;
+        value[6] = receivable.firstOwner;
+        value[7] = receivable.secondOwner;
+        value[8] = receivable.status;
+        value[9] = receivable.lastStatus;
+        value[10] = receivable.rate;
+        // value[9] = receivable.interest;
+        // value[10] = receivable.contractNum;
+        // value[11] = receivable.wayBillNum;
         return value;
      }
 
