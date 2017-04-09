@@ -17,7 +17,11 @@ public enum Code {
     SYSTEM_ERROR(19, "系统异常，请稍后重试"),
     JSON_TRANSFER_ERROR(20, "JSON转化异常"),
 
-    //账户管理部分
+    //订单管理部分
+    ORDER_NOT_EXIST(2001, "账单不存在"),
+    QEURY_ORDER_PERMISSION_DENIED(2002, "无权限查询该账单"),
+
+    //    //账户管理部分
     PHONE_ALREADY_EXIST(5001, "手机号码已注册"),
     ACCOUNT_ALREADY_EXIST(5002, "账户已存在"),
     INVALID_SECURITY_CODE(5003, "验证码失效，请重新获取验证码"),
@@ -60,5 +64,18 @@ public enum Code {
 
     public void setCode(int code) {
         this.code = code;
+    }
+
+    public static Code fromInt(int code) {
+        switch (code) {
+            case 0:
+                return SUCCESS;
+            case 2001:
+                return ORDER_NOT_EXIST;
+            case 2002:
+                return ORDER_NOT_EXIST;
+            default:
+                return SUCCESS;
+        }
     }
 }
