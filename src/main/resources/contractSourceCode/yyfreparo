@@ -239,7 +239,7 @@ contract chain{
             return (1020);
         }
         if(judgeAccount(msg.sender)){
-            return (1002);
+            return (2);
         }
         if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
             return (1007);
@@ -250,7 +250,7 @@ contract chain{
             return (1006);
         }
         if(replyerAcctId != receivable.accptr){
-            return (1027);
+            return (1);
         }
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
@@ -318,7 +318,11 @@ contract chain{
          if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
               return (1007);
          }
+
         Receivable receivable = receivableDetailMap[receivableNo];
+        if(receivable.secondOwner != replyerAcctId){
+            return (1);
+        }
         if(responseType == ResponseType.YES) {
             receivable.lastStatus = receivable.status;
             receivable.status = "070006";//贴现已签收
@@ -415,8 +419,8 @@ contract chain{
          }
 
 
-         if(receivable.signer != acctId && receivable.accptr != acctId) {
-             return(1028,
+         if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
+             return(1,
                  bytesInfo1,
                  bytesInfo2,
                  uintInfo
