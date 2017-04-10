@@ -49,6 +49,10 @@ public class UserEntityRepositoryTest extends SpringBaseTest{
         Assert.assertEquals(userEntity2.getAddress(), "address" + randomString);
         System.out.println(userEntity2.toString());
 
+        UserEntity userEntity3 = userEntityRepository.findByAddress("address" + randomString);
+        Assert.assertEquals(userEntity3.getAddress(), "address" + randomString);
+        System.out.println(userEntity3.toString());
+
         //更新
         userEntity2.setPassword("111" + randomString);
         UserEntity updatedUserEntity = userEntityRepository.save(userEntity2);

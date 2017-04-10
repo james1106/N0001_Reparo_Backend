@@ -11,6 +11,7 @@ import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -32,7 +33,7 @@ public class AuthFilter implements javax.servlet.Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext()); //在filter中使能spring bean自动注入
     }
 
     @Override
@@ -40,8 +41,7 @@ public class AuthFilter implements javax.servlet.Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        //不对swagger拦截
-//        http://localhost:8080/reparo/docs/index.html
+        //不对swagger目录下的所有页面、登录接口、登录页面拦截
         if (httpServletRequest.getRequestURL().indexOf("docs") > 0 || isNoFilterUrl(httpServletRequest.getRequestURL().toString())) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
@@ -66,6 +66,9 @@ public class AuthFilter implements javax.servlet.Filter {
                         Long timestamp = Long.parseLong(jsonObject.getString("timestamp")); //时间戳
                         String address = jsonObject.getString("address"); //用户地址
                         int roleCode = Integer.parseInt(jsonObject.getString("roleCode")); //角色code
+                        LogUtil.info("用户地址：" + address);
+                        LogUtil.info("角色code：" + roleCode);
+                        LogUtil.info("时间戳：" + timestamp);
 
                         //TODO 判断token是否过期
                         //TODO 判断角色权限
@@ -103,8 +106,9 @@ public class AuthFilter implements javax.servlet.Filter {
     //重定向到登录页面
     //TODO 确定登录页面url
     private void redirectToLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
-        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
+//        String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
+//        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
+        httpServletResponse.sendRedirect("http://localhost:8080/reparo/docs/index.html");
     }
 
     //不需要过滤的url

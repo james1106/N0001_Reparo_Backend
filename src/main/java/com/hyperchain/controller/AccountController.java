@@ -5,6 +5,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.service.AccountService;
 import com.wordnik.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -95,6 +97,20 @@ public class AccountController {
             @ApiParam(value = "验证码id", required = true) @RequestParam("security_code_id") String securityCodeId) {
         //TODO 找回密码controller
         return null;
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "测试从cookie获取address", notes = "测试从cookie获取address")
+    @ResponseBody
+    @RequestMapping(value = "/test", method = RequestMethod.PUT)
+    public BaseResult<Object> testLogin(HttpServletRequest request) {
+        System.out.println("进入");
+        String address = TokenUtil.getAddressFromCookie(request);
+        System.out.println("拿到地址：" + address);
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.setCode(0);
+        baseResult.setMessage("获取address成功");
+        return baseResult;
     }
 
 }
