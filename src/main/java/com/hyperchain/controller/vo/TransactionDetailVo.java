@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
  * Created by liangyue on 2017/4/9.
  */
 @Component
-public class OrderDetailVo {
+public class TransactionDetailVo {
 
     private String orderId;
     private String productName;
@@ -38,7 +38,16 @@ public class OrderDetailVo {
     }
 
     private String orderState;
-    private String orderGenerateTime;
+
+    public long getOrderGenerateTime() {
+        return orderGenerateTime;
+    }
+
+    public void setOrderGenerateTime(long orderGenerateTime) {
+        this.orderGenerateTime = orderGenerateTime;
+    }
+
+    private long orderGenerateTime;
 
 
 
@@ -149,13 +158,6 @@ public class OrderDetailVo {
         this.payingMethod = payingMethod;
     }
 
-    public String getOrderGenerateTime() {
-        return orderGenerateTime;
-    }
-
-    public void setOrderGenerateTime(String orderGenerateTime) {
-        this.orderGenerateTime = orderGenerateTime;
-    }
     public long getProductUnitPrice() {
         return productUnitPrice;
     }
