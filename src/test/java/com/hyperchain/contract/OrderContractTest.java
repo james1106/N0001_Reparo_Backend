@@ -25,10 +25,10 @@ import java.util.*;
  */
 public class OrderContractTest extends SpringBaseTest{
 
-//    payerPublicKey:9ddeaa4bda4e252b7cd88385f73b4fbf79a7d4e3
-//    payerPrivateKey:{"address":"9ddeaa4bda4e252b7cd88385f73b4fbf79a7d4e3","encrypted":"b8542e510b365c41edab2f1578e5784b5364334a969752bc5456c9b4b54ff1eb","version":"2.0","algo":"0x03"}
-//    payeePublicKey:3ebc9f7cfa20950b8b35524e491c56705c067400
-//    payeePrivateKey:{"address":"3ebc9f7cfa20950b8b35524e491c56705c067400","encrypted":"941e2c8c97ef9fa8f6f2a98fdce94880be938813b5e1fbb48d7c5a5bcea0341e","version":"2.0","algo":"0x03"}
+//    payerPublicKey:9f5650152700b609d8010ca0a7a717d58648aa52
+//    payerPrivateKey:{"encrypted":"351197dfdadabe068072880a6c050c690118374fa98de53c1491abdf2ad16520","algo":"0x03","address":"9f5650152700b609d8010ca0a7a717d58648aa52","version":"2.0"}
+//    payeePublicKey:9362e5b4b61c04ccdb99a8b14a5c7cb290b37fd7
+//    payeePrivateKey:{"encrypted":"a9954bd3f73189eae0f8bd4dde4b94948b0dad382385e1b8a1e336df09f8239b","algo":"0x03","address":"9362e5b4b61c04ccdb99a8b14a5c7cb290b37fd7","version":"2.0"}
 
 
 

@@ -36,19 +36,19 @@ public class ReceivableController {
     @RequestMapping(value = "sign",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutApply(
             @ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
-            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人
-            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人
+            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
+            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
             @ApiParam(value = "票面金额", required = true) @RequestParam int isseAmt,
             @ApiParam(value = "到期日", required = true) @RequestParam int dueDt,
-            @ApiParam(value = "带息利率", required = true) @RequestParam int rate,
+            @ApiParam(value = "带息利率", required = true) @RequestParam String rate,
             @ApiParam(value = "合同编号", required = true) @RequestParam String contractNo,
             @ApiParam(value = "发票号", required = true) @RequestParam String invoiceNo
     ) throws Exception {
 
         long receivableGenerateTime = System.currentTimeMillis();
-        String receivableNo = "120" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+        String receivableNo = "120" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//应收款编号
+        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//流水号
         List<String> list= new ArrayList<>();
         list.add(contractNo);
         list.add(invoiceNo);
@@ -72,6 +72,88 @@ public class ReceivableController {
 
         // 调用合约查询账户，获取返回结果
         return receivableService.signOutApply(contractKey, params, receivableNo);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "签发回复——承兑", notes = "签发回复")
+    @ResponseBody
+    @RequestMapping(value = "accept",method = RequestMethod.POST)//路径
+    public BaseResult<Object> signOutReply(
+            @ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
+            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,
+            @ApiParam(value = "回复意见", required = true) @RequestParam String response
+    ) throws Exception {
+
+        long operateTime = System.currentTimeMillis();
+        String serialNo = "122" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//签发回复流水号
+
+        ContractKey contractKey = new ContractKey(replyerAddress);
+
+        Object[] params = new Object[5];
+        params[0] = receivableNo;
+        params[1] = replyerAcctId;
+        params[2] = response;
+        params[3] = serialNo;
+        params[4] = operateTime;
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.signOutReply(contractKey, params);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "根据应收款编号查应收款详情", notes = "根据应收款编号查应收款详情")
+    @ResponseBody
+    @RequestMapping(value = "receivableInfo",method = RequestMethod.POST)//路径
+    public BaseResult<Object> signOutReply(
+            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
+            @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId
+    ) throws Exception {
+        ContractKey contractKey = new ContractKey(operatorAddress);
+        Object[] params = new Object[2];
+        params[0] = receivableNo;
+        params[1] = operatorAcctId;
+
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.getReceivableAllInfo(contractKey, params);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "用户根据流水号查交易记录详情", notes = "用户根据流水号查交易记录详情")
+    @ResponseBody
+    @RequestMapping(value = "recordInfo",method = RequestMethod.POST)//路径
+    public BaseResult<Object> getRecordBySerialNo(
+            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "流水号", required = true) @RequestParam String serialNo
+    ) throws Exception {
+
+        ContractKey contractKey = new ContractKey(operatorAddress);
+
+        Object[] params = new Object[1];
+        params[0] = serialNo;
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.getRecordBySerialNo(contractKey, params);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "应收款操作流水号", notes = "应收款操作流水号")
+    @ResponseBody
+    @RequestMapping(value = "historySerialNo",method = RequestMethod.POST)//路径
+    public BaseResult<Object> getReceivableHistorySerialNo(
+            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo
+    ) throws Exception {
+
+        ContractKey contractKey = new ContractKey(operatorAddress);
+
+        Object[] params = new Object[1];
+        params[0] = receivableNo;
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.getReceivableHistorySerialNo(contractKey, params);
     }
 
 }
