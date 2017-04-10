@@ -26,13 +26,6 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
-    @Autowired
-    QueryAllOrderListForPayeeService queryAllOrderListForPayeeService;
-
-    @Autowired
-    QueryAllOrderListForPayerService queryAllOrderListForPayerService;
-
-
     @LogInterceptor
     @ApiOperation(value = "添加订单", notes = "添加订单")
     @ResponseBody
@@ -138,19 +131,6 @@ public class OrderController {
         return orderService.queryAllOrderOverViewInfoList(contractKey, contractParams);
     }
 
-    @LogInterceptor
-    @ApiOperation(value = "卖方查询订单编号列表", notes = "卖方查询订单编号列表")
-    @ResponseBody
-    @RequestMapping(value = "payee/order_list",method = RequestMethod.GET)
-    public BaseResult<Object> queryAllOrderListForPayee(
-            @ApiParam(value = "买方私钥地址", required = true) @RequestParam String payeePrivateKey
-    ) throws Exception {
-
-        ContractKey contractKey = new ContractKey(payeePrivateKey);
-        Object[] contractParams = new Object[0];
-        // 调用合约确认订单，获取返回结果
-        return queryAllOrderListForPayeeService.invokeContract(contractKey, contractParams);
-    }
 }
 
 
