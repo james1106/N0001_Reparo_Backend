@@ -28,7 +28,22 @@ public enum Code {
     NON_EXIST_SECURITY_CODE(5004, "验证码不存在，请获取验证码"),
     WRONG_SECURITY_CODE(5005, "验证码错误，还可以尝试："),
     ACCOUNT_STATUS_LOCK(5006, "用户已锁定，请稍后重试"),
-    ERROR_PASSWORD(5007, "密码错误，请重新输入密码");
+    ERROR_PASSWORD(5007, "密码错误，请重新输入密码"),
+
+    //应收款部分
+    SERIALNO_EXIST(1032, "流水号已存在"),
+    ISSEAMT_ERROR(1019, "票面金额为负值或0"),
+    ACCTID_ADDRESS_ERROR(1007,"账号与操作者不匹配"),
+    REPLYER_ACCOUNT_ERROR(1004,"回复人账户不存在"),
+    REPLYER_ACCOUNT_INVALID(1031,"回复人账户无效"),
+    RECEIVABLENO_EXITS(1030,"应收款编号已经存在"),
+    RESPONSETYPE_ERROR(1020,"回复意见不是同意或拒绝"),
+    RECCEIVABLE_STATUS_ERROR(1006,"应收款状态错误"),
+    CASHEDAMOUNT_ERROR(1016,"已兑付金额为负值或0"),
+    RECEIVABLE_NOT_EXITS(1005,"应收款不存在"),
+    CASH_TIME_ERROR(1010,"兑付时应收款还未到期"),
+    RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录");
+
 
 
     private int code;
