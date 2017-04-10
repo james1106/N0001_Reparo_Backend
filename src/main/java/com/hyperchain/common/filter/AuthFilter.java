@@ -42,7 +42,7 @@ public class AuthFilter implements javax.servlet.Filter {
 
         //不对swagger拦截
 //        http://localhost:8080/reparo/docs/index.html
-        if (httpServletRequest.getRequestURL().indexOf("docs") > 0) {
+        if (httpServletRequest.getRequestURL().indexOf("docs") > 0 || isNoFilterUrl(httpServletRequest.getRequestURL().toString())) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
@@ -104,7 +104,19 @@ public class AuthFilter implements javax.servlet.Filter {
     //TODO 确定登录页面url
     private void redirectToLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
-//        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
+        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
+    }
+
+    //不需要过滤的url
+    private boolean isNoFilterUrl(String url) {
+        switch (url) {
+            case "http://localhost:8080/reparo/v1/account/user":
+                return true;
+            case "http://localhost:8080/reparo/v1/account/login":
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
