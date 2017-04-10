@@ -28,7 +28,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         try {
             ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
-            Code code = contractResult.getCode();
+            Code code = contractResult.getCode();//拿到合约返回的第一个code
             result.returnWithValue(code, receivableNo);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -50,7 +50,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         try {
             ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
-            Code code = contractResult.getCode();//第一个code
+            Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfo";
-        String[] resultMapKey = new String[]{"address1", "address2", "string", "uint[]", "int", "int"};
+        String[] resultMapKey = new String[]{"receivable[]", "name[]", "uint[]"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -86,16 +86,28 @@ public class ReceivableServiceImpl implements ReceivableService{
 //         将合约结果转化为接口返回数据
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
-        if(code == Code.ORDER_NOT_EXIST){
+        if(code == Code.INVALID_USER){
             result.returnWithoutValue(code);
             return result;
         }
 
-        if(code == Code.QEURY_ORDER_PERMISSION_DENIED){
+        if(code == Code.PARAMETER_EMPTY){
             result.returnWithoutValue(code);
             return result;
         }
-        String  payerAddress =  (String)contractResult.getValueMap().get(resultMapKey[0]);
+
+        if(code == Code.RECEIVABLE_NOT_EXITS){
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.PERMISSION_DENIED){
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+
+        String  payerAddress =  (String)contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况
         String  payeeAddress =  (String)contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
         List<String> partParams2 = (List<String>) contractResult.getValueMap().get(resultMapKey[3]);

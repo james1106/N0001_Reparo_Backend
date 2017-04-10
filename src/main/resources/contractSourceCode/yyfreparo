@@ -31,6 +31,7 @@ contract chain{
         uint time;//时间戳
         bytes32 operateType; //操作类型
         uint dealAmount;//操作金额
+        bytes32 receivableStatus;//应收款状态
     }
 
     //帐户信息
@@ -157,7 +158,7 @@ contract chain{
     }
 
     //记录操作详情
-    function newReceivableRecord(bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType response, uint time, bytes32 operateType, uint dealAmount) internal {
+    function newReceivableRecord(bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType response, uint time, bytes32 operateType, uint dealAmount, bytes32 receivableStatus) internal {
         receivableRecordMap[serialNo].serialNo = serialNo;
         receivableRecordMap[serialNo].receivableNo = receivableNo;
         receivableRecordMap[serialNo].applicantAcctId = applicantAcctId;
@@ -166,6 +167,7 @@ contract chain{
         receivableRecordMap[serialNo].time = time;
         receivableRecordMap[serialNo].operateType = operateType;
         receivableRecordMap[serialNo].dealAmount = dealAmount;
+        receivableRecordMap[serialNo].receivableStatus = receivableStatus;
     }
 
     //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
@@ -198,7 +200,7 @@ contract chain{
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
 
-        newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
+        //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
@@ -225,6 +227,7 @@ contract chain{
           receivable.status = "020001";
           receivable.contractNo = contractAndInvoiceNo[0];
           receivable.invoiceNo = contractAndInvoiceNo[1];
+          newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
     }
 
     //签发回复
@@ -265,7 +268,7 @@ contract chain{
         accptrToReceivableMap[receivable.accptr].push(receivableNo);
         signerToReceivableMap[receivable.signer].push(receivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
-        newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt);
+        newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return (0);
     }
@@ -295,7 +298,7 @@ contract chain{
         receivable.lastStatus = receivable.status;
         receivable.status = "070001";
         receivable.secondOwner = replyerAcctId;
-        newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", receivable.isseAmt);
+        newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", receivable.isseAmt, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return(0);
@@ -333,7 +336,7 @@ contract chain{
         }
         holdingReceivablesMap[replyerAcctId].push(receivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
-        newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", receivable.isseAmt);
+        newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return (0);
     }
@@ -381,7 +384,7 @@ contract chain{
         receivable.cashedAmount = cashedAmount;
         receivable.status = "000001";
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
-        newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount);
+        newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
         return (0);
 	}
 
@@ -553,8 +556,13 @@ contract chain{
     }
 */
 
+    //查找应收款的交易历史，返回流水号
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (bytes32[]){
+        return receivableTransferHistoryMap[receivableNo];
+    }
+
     //流水号查询，自己查自己
-    function getRecordByserialNo(bytes32 serialNo) returns(uint, bytes32 serialNm, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint){
+    function getRecordByserialNo(bytes32 serialNo) returns(uint, bytes32 serialNm, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, bytes32 receivableStatus){
         Account account = accountMap[msg.sender];
         ReceivableRecord receivableRecord = receivableRecordMap[serialNo];
         if(serialNo == ""){
@@ -566,7 +574,8 @@ contract chain{
                 ResponseType.NULL,
                 0,
                 operateType,
-                0);
+                0,
+                receivableStatus);
         }
 
         if(receivableRecord.serialNo == 0x0) {
@@ -578,7 +587,8 @@ contract chain{
                 ResponseType.NULL,
                 0,
                 operateType,
-                0);
+                0,
+                receivableStatus);
         }
         return(0,
             receivableRecord.serialNo,
@@ -588,7 +598,8 @@ contract chain{
             receivableRecord.responseType,
             receivableRecord.time,
             receivableRecord.operateType,
-            receivableRecord.dealAmount);
+            receivableRecord.dealAmount,
+            receivableRecord.receivableStatus);
 
     }
 
