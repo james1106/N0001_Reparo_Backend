@@ -8,7 +8,6 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.controller.vo.OrderDetailVo;
 import com.hyperchain.controller.vo.ReceivableDetailVo;
 import com.hyperchain.controller.vo.ReceivableRecordDetailVo;
 import com.hyperchain.service.ReceivableService;

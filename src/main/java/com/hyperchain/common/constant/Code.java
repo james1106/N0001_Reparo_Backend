@@ -29,6 +29,7 @@ public enum Code {
     WRONG_SECURITY_CODE(5005, "验证码错误，还可以尝试："),
     ACCOUNT_STATUS_LOCK(5006, "用户已锁定，请稍后重试"),
     ERROR_PASSWORD(5007, "密码错误，请重新输入密码"),
+    INVALID_TOKEN(5008, "token无效"),
 
     //应收款部分
     SERIALNO_EXIST(1032, "流水号已存在"),
@@ -85,12 +86,19 @@ public enum Code {
         switch (code) {
             case 0:
                 return SUCCESS;
-            case 2001:
-                return ORDER_NOT_EXIST;
-            case 2002:
-                return ORDER_NOT_EXIST;
+            case 1:
+                return PERMISSION_DENIED;
+            case 2:
+                return INVALID_USER;
+            case 3:
+                return PARAMETER_EMPTY;
+
+            case 5002:
+                return ACCOUNT_ALREADY_EXIST;
+
             default:
                 return SUCCESS;
         }
     }
+
 }

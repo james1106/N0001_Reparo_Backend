@@ -8,12 +8,12 @@ import javax.persistence.*;
  * Created by ldy on 2017/4/5.
  */
 @Entity
-@Table(name = "user")
+@Table(name = "user11")
 public class UserEntity {
     @ApiModelProperty(value = "用户id")
     private Long id;
     @ApiModelProperty(value = "用户名")
-    private String account;
+    private String accountName;
     @ApiModelProperty(value = "登录密码（MD5)")
     private String password;
     @ApiModelProperty(value = "私钥")
@@ -51,12 +51,12 @@ public class UserEntity {
     }
 
     @Column(nullable = false, length = 50, unique = true)
-    public String getAccount() {
-        return account;
+    public String getAccountName() {
+        return accountName;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     @Column(nullable = false, length = 50)
@@ -86,7 +86,7 @@ public class UserEntity {
         this.address = address;
     }
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     public String getCompanyName() {
         return companyName;
     }
@@ -95,7 +95,7 @@ public class UserEntity {
         this.companyName = companyName;
     }
 
-    @Column(nullable = false, length = 15, unique = true)
+    @Column(nullable = false, length = 50, unique = true)
     public String getPhone() {
         return phone;
     }
@@ -144,7 +144,7 @@ public class UserEntity {
     public String toString() {
         return "UserEntity{" +
                 "id=" + id +
-                ", account='" + account + '\'' +
+                ", accountName='" + accountName + '\'' +
                 ", password='" + password + '\'' +
                 ", privateKey='" + privateKey + '\'' +
                 ", address='" + address + '\'' +
@@ -153,7 +153,7 @@ public class UserEntity {
                 ", roleCode=" + roleCode +
                 ", errorPasswordCount=" + errorPasswordCount +
                 ", userStatus=" + userStatus +
-                ", lockTime='" + lockTime + '\'' +
+                ", lockTime=" + lockTime +
                 '}';
     }
 }

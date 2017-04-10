@@ -1,20 +1,15 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
-import com.hyperchain.ESDKUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.service.*;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -30,16 +25,6 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
-
-    @Autowired
-    ConfirmOrderService confirmOrderService;
-
-    @Autowired
-    QueryAllOrderListForPayeeService queryAllOrderListForPayeeService;
-
-    @Autowired
-    QueryAllOrderListForPayerService queryAllOrderListForPayerService;
-
 
     @LogInterceptor
     @ApiOperation(value = "添加订单", notes = "添加订单")
@@ -60,8 +45,9 @@ public class OrderController {
     ) throws Exception {
 
         long orderGenerateTime = System.currentTimeMillis();
-        String orderId = "000" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
-        String repoBusinessNo = "030" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
+        String orderId = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
+        String txSerialNo = orderId + 00;
+        String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         List<String> list= new ArrayList<>();
         list.add(orderId);
         list.add(productName);
@@ -70,6 +56,7 @@ public class OrderController {
         list.add(payerBank);
         list.add(payerBankClss);
         list.add(payerAccount);
+        list.add(txSerialNo);
 
         ContractKey contractKey = new ContractKey(payerPrivateKey);
 
@@ -93,15 +80,22 @@ public class OrderController {
     @RequestMapping(value = "confirmation",method = RequestMethod.POST)
     public BaseResult<Object> confirmOrder(
             @ApiParam(value = "卖方私钥地址", required = true) @RequestParam String payeePrivateKey,
-            @ApiParam(value = "订单编号", required = true) @RequestParam String orderId
+            @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
+            @ApiParam(value = "仓储公司", required = true) @RequestParam String payeeRepo,
+            @ApiParam(value = "仓单编号", required = true) @RequestParam String payeeRepoCertNo
     ) throws Exception {
 
         ContractKey contractKey = new ContractKey(payeePrivateKey);
-
+        long txConfirmTime = System.currentTimeMillis();
+        String txSerialNo = orderNo + "01";
         Object[] contractParams = new Object[1];
-        contractParams[0] = orderId;
+        contractParams[0] = orderNo;
+        contractParams[1] = payeeRepo;
+        contractParams[2] = payeeRepoCertNo;
+        contractParams[3] = txSerialNo;
+        contractParams[4] = txConfirmTime;
         // 调用合约确认订单，获取返回结果
-        return confirmOrderService.invokeContract(contractKey, contractParams);
+        return orderService.confirmOrder(contractKey, contractParams);
     }
 
 
@@ -111,43 +105,32 @@ public class OrderController {
     @RequestMapping(value = "detail",method = RequestMethod.GET)
     public BaseResult<Object> queryOrderDetail(
             @ApiParam(value = "用户地址", required = true) @RequestParam String account,
-            @ApiParam(value = "订单编号", required = true) @RequestParam String orderId
+            @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo
     ) throws Exception {
 
         ContractKey contractKey = new ContractKey(account);
-
         Object[] contractParams = new Object[1];
-        contractParams[0] = orderId;
+        contractParams[0] = orderNo;
+
         return orderService.queryOrderDetail(contractKey, contractParams);
     }
 
     @LogInterceptor
-    @ApiOperation(value = "买方查询订单编号列表", notes = "买方查询订单编号列表")
+    @ApiOperation(value = "用户查询订单编号列表", notes = "用户查询订单编号列表")
     @ResponseBody
-    @RequestMapping(value = "payer/order_list",method = RequestMethod.GET)
-    public BaseResult<Object> queryAllOrderListForPayer(
-            @ApiParam(value = "买方私钥地址", required = true) @RequestParam String payeePrivateKey
+    @RequestMapping(value = "order_list/{role}",method = RequestMethod.GET)
+    public BaseResult<Object> queryAllOrderList(
+            @ApiParam(value = "买方私钥地址", required = true) @RequestParam String payeePrivateKey,
+            @ApiParam(value = "公司角色", required = true) @PathVariable(value = "role") int companyRole
     ) throws Exception {
 
         ContractKey contractKey = new ContractKey(payeePrivateKey);
-        Object[] contractParams = new Object[0];
+        Object[] contractParams = new Object[1];
+        contractParams[0] = companyRole;
         // 调用合约确认订单，获取返回结果
-        return queryAllOrderListForPayerService.invokeContract(contractKey, contractParams);
+        return orderService.queryAllOrderOverViewInfoList(contractKey, contractParams);
     }
 
-    @LogInterceptor
-    @ApiOperation(value = "卖方查询订单编号列表", notes = "卖方查询订单编号列表")
-    @ResponseBody
-    @RequestMapping(value = "payee/order_list",method = RequestMethod.GET)
-    public BaseResult<Object> queryAllOrderListForPayee(
-            @ApiParam(value = "买方私钥地址", required = true) @RequestParam String payeePrivateKey
-    ) throws Exception {
-
-        ContractKey contractKey = new ContractKey(payeePrivateKey);
-        Object[] contractParams = new Object[0];
-        // 调用合约确认订单，获取返回结果
-        return queryAllOrderListForPayeeService.invokeContract(contractKey, contractParams);
-    }
 }
 
 

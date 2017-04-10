@@ -17,6 +17,7 @@ public class AddUserImplDemo implements AddUserDemo {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns);
         // 将合约结果转化为接口返回数据
+        //处理
         return ContractUtil.convert2BaseResult(contractResult);
     }
 }

@@ -17,53 +17,35 @@ public class SecurityCodeEntityRepositoryTest extends SpringBaseTest {
     SecurityCodeEntityRepository securityCodeEntityRepository;
 
     @Test
-    public void insert() throws Exception {
+    public void testSecurityCode() throws Exception {
+        //插入
         SecurityCodeEntity securityCodeEntity = new SecurityCodeEntity();
         securityCodeEntity.setPhone("188188188");
         securityCodeEntity.setCreateTime(new Long(10000));
         securityCodeEntity.setErrorCodeCount(0);
         securityCodeEntity.setSecurityCode("663366");
-        securityCodeEntityRepository.save(securityCodeEntity);
+        SecurityCodeEntity insertedSecurityCodeEntity = securityCodeEntityRepository.save(securityCodeEntity);
 
-        SecurityCodeEntity securityCodeEntity1 = securityCodeEntityRepository.findById(new Long(1));
-        System.out.println(securityCodeEntity1.toString());
+        //查询
+        long insertedId = insertedSecurityCodeEntity.getId();
+        SecurityCodeEntity securityCodeEntity1 = securityCodeEntityRepository.findById(insertedId);
+        System.out.println("更新前：" + securityCodeEntity1.toString());
         Assert.assertEquals("188188188", securityCodeEntity1.getPhone());
 
+        //更新
+        int pre = securityCodeEntity1.getErrorCodeCount();
+        securityCodeEntity1.setErrorCodeCount( pre+ 1);
+        SecurityCodeEntity savedSecurityCodeEntity = securityCodeEntityRepository.save(securityCodeEntity1);
+        int after = savedSecurityCodeEntity.getErrorCodeCount();
+        System.out.println("更新后：" + savedSecurityCodeEntity.toString());
+        Assert.assertEquals(pre + 1, after);
+
+
+        //删除
+        long id = savedSecurityCodeEntity.getId();
+        securityCodeEntityRepository.delete(savedSecurityCodeEntity);
+        SecurityCodeEntity deleted = securityCodeEntityRepository.findById(id);
+        Assert.assertEquals(null, deleted);
     }
 
-    @Test
-    public void update() {
-        SecurityCodeEntity securityCodeEntity0 = new SecurityCodeEntity();
-        securityCodeEntity0.setPhone("188188188");
-        securityCodeEntity0.setCreateTime(new Long(10000));
-        securityCodeEntity0.setErrorCodeCount(0);
-        securityCodeEntity0.setSecurityCode("663366");
-        securityCodeEntityRepository.save(securityCodeEntity0);
-
-        SecurityCodeEntity securityCodeEntity = securityCodeEntityRepository.findById(securityCodeEntity0.getId());
-        System.out.println("更新前：" + securityCodeEntity.toString());
-        securityCodeEntity.setErrorCodeCount(securityCodeEntity.getErrorCodeCount() + 1);
-        SecurityCodeEntity securityCodeEntity1 = securityCodeEntityRepository.save(securityCodeEntity);
-        System.out.println("更新后：" + securityCodeEntity1.toString());
-        Assert.assertNotEquals(securityCodeEntity.getErrorCodeCount(), securityCodeEntity1.getErrorCodeCount());
-    }
-
-    @Test
-    public void delete() {
-        SecurityCodeEntity securityCodeEntity0 = new SecurityCodeEntity();
-        securityCodeEntity0.setPhone("188188188");
-        securityCodeEntity0.setCreateTime(new Long(10000));
-        securityCodeEntity0.setErrorCodeCount(0);
-        securityCodeEntity0.setSecurityCode("663366");
-        SecurityCodeEntity securityCodeEntity1 = securityCodeEntityRepository.save(securityCodeEntity0);
-        System.out.println("插入： " + securityCodeEntity1.toString());
-
-        long id = securityCodeEntity1.getId();
-        securityCodeEntityRepository.delete(securityCodeEntity1);
-        SecurityCodeEntity securityCodeEntity2 = securityCodeEntityRepository.findById(id);
-        Assert.assertEquals(securityCodeEntity2, null);
-        if (securityCodeEntity2 == null) {
-            System.out.println("删除成功！");
-        }
-    }
 }

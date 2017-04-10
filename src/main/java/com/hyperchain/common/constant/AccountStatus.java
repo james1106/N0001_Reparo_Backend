@@ -6,6 +6,7 @@ package com.hyperchain.common.constant;
 public enum AccountStatus {
     VALID(0, "有效"),
     INVALID(1, "无效"),
+    FROZEN(1, "无效"),
     LOCK(2, "锁定");
 
     private int code;

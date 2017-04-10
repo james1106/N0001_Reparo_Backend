@@ -26,7 +26,7 @@ import java.util.List;
  * @Modify 16/11/2 上午1:01
  */
 @SuppressWarnings({"JavaDoc", "SpringAutowiredFieldsWarningInspection"})
-@Api(value = "Account", description = "用户账号", position = 10)
+@Api(value = "AccountDemo", description = "用户账号", position = 10)
 @Controller
 @RequestMapping("/v1/account-demo")
 public class UserControllerDemo extends BaseController {

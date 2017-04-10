@@ -4,6 +4,7 @@ import com.hyperchain.dal.entity.EntityDemo;
 import com.hyperchain.dal.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.Entity;
 
@@ -16,7 +17,11 @@ public interface UserEntityRepository extends
 
     UserEntity save(UserEntity userEntity);
 
-    UserEntity findByAccount(String account);
+    UserEntity findByAccountName(String accountName);
+
+    UserEntity findByAddress(String address);
 
     UserEntity findByPhone(String phone);
+
+    UserEntity findByCompanyName(String companyName);
 }

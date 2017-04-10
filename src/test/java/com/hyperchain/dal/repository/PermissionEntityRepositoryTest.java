@@ -20,11 +20,13 @@ public class PermissionEntityRepositoryTest extends SpringBaseTest {
 
     @Test
     public void save() throws Exception {
+        //插入
         PermissionEntity permissionEntity = new PermissionEntity();
         permissionEntity.setUrl("http://1111");
         permissionEntity.setRoleCode(0);
         permissionEntityRepository.save(permissionEntity);
 
+        //查询
         List<PermissionEntity> permissionEntityList1 = permissionEntityRepository.findByRoleCode(0);
         Assert.assertEquals("http://1111", permissionEntityList1.get(0).getUrl());
         System.out.println(permissionEntityList1.get(0).toString());
