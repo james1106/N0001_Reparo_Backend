@@ -14,7 +14,7 @@ public class ContractResult {
 
     private Code code;
 
-    private List<Object> value=new ArrayList<>();
+    private List<Object> value = new ArrayList<>();
 
     private Map<String, Object> valueMap = new HashMap();
 

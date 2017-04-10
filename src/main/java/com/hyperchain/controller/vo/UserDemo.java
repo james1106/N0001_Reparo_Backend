@@ -1,4 +1,4 @@
-package com.hyperchain.entity;
+package com.hyperchain.controller.vo;
 
 /**
  * by chenyufeng on 2017/4/1 .

@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 /**
@@ -43,6 +45,16 @@ public class TestUtil {
         }
 
         System.out.println(list);
+    }
+
+    /**
+     *
+     * @return 4个字节长的随机字符串
+     */
+    public static String getRandomString() {
+        SecureRandom random = new SecureRandom();
+        String randomString = new BigInteger(32, random).toString(32);
+        return randomString;
     }
 
 }

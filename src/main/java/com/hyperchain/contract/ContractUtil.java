@@ -59,7 +59,8 @@ public class ContractUtil {
         } else {
             // 将返回的整数转化为枚举类型Code
             int codeInt = Integer.parseInt(lists.get(0).toString());
-            Code code = Code.values()[codeInt];
+//            Code code = Code.values()[codeInt];
+            Code code = Code.fromInt(codeInt);
             // 如果返回结果只有结果代码Code,返回Code
             if (lists.size() == 1) {
                 return new ContractResult(code);
