@@ -22,9 +22,9 @@ import java.util.Random;
  */
 
 @SuppressWarnings({"JavaDoc", "SpringAutowiredFieldsWarningInspection"})
-@Api(value = "Order", description = "订单", position = 1)
+@Api(value = "Repository", description = "仓储管理", position = 1)
 @Controller
-@RequestMapping("/v1/order")
+@RequestMapping("/v1/Repository")
 public class RepositoryController {
 
     @Autowired
