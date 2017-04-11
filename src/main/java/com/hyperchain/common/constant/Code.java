@@ -21,7 +21,7 @@ public enum Code {
     ORDER_NOT_EXIST(2001, "账单不存在"),
     QEURY_ORDER_PERMISSION_DENIED(2002, "无权限查询该账单"),
 
-    //    //账户管理部分
+    //账户管理部分
     PHONE_ALREADY_EXIST(5001, "手机号码已注册"),
     ACCOUNT_ALREADY_EXIST(5002, "账户已存在"),
     INVALID_SECURITY_CODE(5003, "验证码失效，请重新获取验证码"),
@@ -30,6 +30,9 @@ public enum Code {
     ACCOUNT_STATUS_LOCK(5006, "用户已锁定，请稍后重试"),
     ERROR_PASSWORD(5007, "密码错误，请重新输入密码"),
     INVALID_TOKEN(5008, "token无效"),
+
+    //运单部分
+    WAY_BILL_ALREADY_EXIST(3000, "订单已经存在"),
 
     //应收款部分
     SERIALNO_EXIST(1032, "流水号已存在"),
@@ -44,8 +47,6 @@ public enum Code {
     RECEIVABLE_NOT_EXITS(1005,"应收款不存在"),
     CASH_TIME_ERROR(1010,"兑付时应收款还未到期"),
     RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录");
-
-
 
     private int code;
     private String msg;
