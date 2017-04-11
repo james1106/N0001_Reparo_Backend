@@ -17,7 +17,10 @@ public class BaseConstant {
 
     public static int ACCOUNT_LOCK_SECOND = -300; //用户连续输错三次密码后的锁定时间（秒）：300秒 （设为非final：方便测试用例）
 
-    public static final String CONTRACT_NAME_ACCOUNT = "ReparoAccount";
-    public static final String CONTRACT_NAME_WAYBILL = "ReparoWayBill";
+    public static final String CONTRACT_NAME_ACCOUNT = "AccountContract";
+    public static final String CONTRACT_NAME_WAYBILL = "WayBillContract";
+    public static final String CONTRACT_NAME_RECEIVABLE = "ReceivableContract";
+    public static final String CONTRACT_NAME_REPOSITORY = "RepositoryContract";
+    public static final String CONTRACT_NAME_ORDER = "OrderContract";
 
 }
