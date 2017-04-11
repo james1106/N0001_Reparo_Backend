@@ -22,10 +22,10 @@ public class AccountEntityRepositoryTest extends SpringBaseTest{
         //插入
         AccountEntity accountEntity = new AccountEntity();
         String randomString = TestUtil.getRandomString();
-        accountEntity.setAddress("12345678");
+        accountEntity.setAddress("12345678" + randomString);
         accountEntity.setAcctSvcrName("svcrname");
         accountEntity.setAcctSvcr("svcr");
-        accountEntity.setAcctId("acctId");
+        accountEntity.setAcctId("xxxacctId" + randomString);
         accountEntity.setCertNo("111111");
         accountEntity.setCertType("身份证");
         accountEntity.setSvcrClass("112233");
@@ -34,7 +34,7 @@ public class AccountEntityRepositoryTest extends SpringBaseTest{
         Assert.assertEquals("身份证", accountEntityResult.getCertType());
 
         //查询
-        AccountEntity accountEntity1 = accountEntityRepository.findByAddress("12345678").get(0);
+        AccountEntity accountEntity1 = accountEntityRepository.findByAddress("12345678" + randomString).get(0);
         System.out.println("查询结果：" + accountEntity1.toString());
 
         //更新
@@ -45,7 +45,7 @@ public class AccountEntityRepositoryTest extends SpringBaseTest{
 
         //删除
         accountEntityRepository.delete(accountEntityUpdatedResult);
-        List<AccountEntity> deleted = accountEntityRepository.findByAddress("12345678");
+        List<AccountEntity> deleted = accountEntityRepository.findByAddress("12345678" + randomString);
         Assert.assertEquals(0, deleted.size());
     }
 

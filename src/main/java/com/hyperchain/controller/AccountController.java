@@ -73,7 +73,7 @@ public class AccountController {
 //        String svcrClassMock = "123";
 //        String acctSvcrMock = "123456";
 //        String acctSvcrNameMock = "中国银行";
-        return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName);
+        return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName, request, response);
     }
 
     @LogInterceptor

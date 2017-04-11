@@ -31,7 +31,9 @@ public interface AccountService {
             String acctIds,
             String svcrClass,
             String acctSvcr,
-            String acctSvcrName)
+            String acctSvcrName,
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws PasswordIllegalParam,
             GeneralSecurityException,
             PrivateKeyIllegalParam,

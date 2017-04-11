@@ -1,9 +1,6 @@
 package com.hyperchain.service.impl;
 
 import cn.hyperchain.common.log.LogUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
@@ -12,8 +9,6 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
-import com.hyperchain.common.util.CommonUtil;
-import com.hyperchain.common.util.DesUtils;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -38,9 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ldy on 2017/4/5.
@@ -104,7 +97,9 @@ public class AccountServiceImpl implements AccountService {
                                        String acctIds,
                                        String svcrClass,
                                        String acctSvcr,
-                                       String acctSvcrName)
+                                       String acctSvcrName,
+                                       HttpServletRequest request,
+                                       HttpServletResponse response)
             throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
         //判断用户名 或 手机号 或 企业名称是否存在
         if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName)) {
@@ -126,8 +121,7 @@ public class AccountServiceImpl implements AccountService {
         String[] acctIdList = new String[1];
         acctIdList[0] = acctIds;
         ContractResult contractResult = saveAccount(accountName, password, enterpriseName, phone, roleCode, certType, certNo, acctIdList, svcrClass, acctSvcr, acctSvcrName);
-        BaseResult<Object> baseResult = new BaseResult<>();
-        baseResult.returnWithoutValue(contractResult.getCode());
+        BaseResult<Object> baseResult = login(accountName, password, request, response);
         return baseResult;
     }
 
@@ -429,9 +423,9 @@ public class AccountServiceImpl implements AccountService {
     /**
      * 判断密码是否正确
      *
-     * @param userEntity userEntity
-     * @param accountName    用户名
-     * @param password   明文密码
+     * @param userEntity  userEntity
+     * @param accountName 用户名
+     * @param password    明文密码
      * @return
      */
     private Code checkPassword(UserEntity userEntity, String accountName, String password) {
