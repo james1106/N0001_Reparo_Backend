@@ -13,16 +13,13 @@ public class TransactionDetailVo {
     private String payerAddress;
     private String payeeAddress;
     private String payerBank;
-
     private String payerBankClss;
     private String payerAccount;
-
-
-
+    private long orderGenerateTime;
+    private long orderConfirmTime;
     private long productUnitPrice;
     private long productQuantity;
     private long productTotalPrice;
-
     private String payerRepo;
     private String payeeRepo;
     private String repoCertNo;
@@ -47,19 +44,6 @@ public class TransactionDetailVo {
         this.orderGenerateTime = orderGenerateTime;
     }
 
-    private long orderGenerateTime;
-
-
-
-
-
-//        List<String> partParams1 = (List<String>) contractResult.getValueMap().get(contractParams[2]);
-//        List<String> partParams2 = (List<String>) contractResult.getValueMap().get(contractParams[3]);
-//        String payingMethod = (String)contractResult.getValueMap().get(contractParams[4]);
-//        String orderState = (String)contractResult.getValueMap().get(contractParams[5]);
-//
-//        String timeStamp = partParams2.get(3);
-//
 
     public String getOrderId() {
         return orderId;
@@ -183,4 +167,11 @@ public class TransactionDetailVo {
         this.productTotalPrice = productTotalPrice;
     }
 
+    public long getOrderConfirmTime() {
+        return orderConfirmTime;
+    }
+
+    public void setOrderConfirmTime(long orderConfirmTime) {
+        this.orderConfirmTime = orderConfirmTime;
+    }
 }

@@ -260,7 +260,6 @@ contract Repository{
         return string(c);
     }
 }
-
 contract order_reparo{
     address owner;
     function Reparo(){
@@ -537,26 +536,26 @@ contract order_reparo{
 
 /*******************************根据订单编号获取订单详情***********************************/
 
-    function queryOrderDetail(bytes32 orderNo) returns(uint, address resultPayerAccount, address resultPayeeAccount, bytes32[] resultBytes32, uint[] resultUint, PayingMethod resultMethod, TransactionState txState){
+    function queryOrderDetail(bytes32 orderNo) returns(uint, address[] resultAccount, bytes32[] resultBytes32, uint[] resultUint, PayingMethod resultMethod, TransactionState txState){
     //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         if (!isValidUser()) {
-            return (2, resultPayerAccount, resultPayeeAccount, resultBytes32, resultUint, resultMethod, txState);
+            return (2, resultAccount, resultBytes32, resultUint, resultMethod, txState);
         }
 
     //如果用户不是融资企业，返回"权限拒绝"
         if(accountMap[msg.sender].roleCode != RoleCode.RC00){
-            return (1, resultPayerAccount, resultPayeeAccount, resultBytes32, resultUint, resultMethod, txState);
+            return (1, resultAccount, resultBytes32, resultUint, resultMethod, txState);
         }
         Order order = orderDetailMap[orderNo];
 
     //如果订单不存在，返回"订单不存在"
         if(!orderExists(orderNo)){
-            return (2001, resultPayerAccount, resultPayeeAccount, resultBytes32, resultUint, resultMethod, txState);
+            return (2001, resultAccount, resultBytes32, resultUint, resultMethod, txState);
         }
 
     //如果订单与合约调用者无关，"权限拒绝"
         if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
-            return (2005, resultPayerAccount, resultPayeeAccount, resultBytes32, resultUint, resultMethod, txState);
+            return (2005, resultAccount, resultBytes32, resultUint, resultMethod, txState);
         }
     //取出应收账款概要信息
     //param1:receNo, receivingSide, payingSide, dueDate
@@ -566,6 +565,10 @@ contract order_reparo{
         (paramPart1, paramPart2) = searchReceGeneInfo(orderNo);
         resultUint = new uint[](16);
         resultBytes32 = new bytes32[](19);
+        resultAccount = new address[](2);
+
+        resultAccount[0] = order.payerAddress;
+        resultAccount[1] = order.payeeAddress;
     //交易信息
         resultBytes32[0] = order.orderNo;
         resultBytes32[1] = order.productName;
@@ -582,10 +585,10 @@ contract order_reparo{
         resultUint[2] = order.productTotalPrice;
         resultUint[3] = order.orderGenerateTime;
         if(txSerialNoList[orderNo].length == 2){
-            resultUint[4] = txRecordDetailMap[txSerialNoList[orderNo][2]].time;
+            resultUint[4] = txRecordDetailMap[txSerialNoList[orderNo][1]].time;
         }
         else{
-            resultUint[4] = 5555;
+            resultUint[4] = 0;
         }
     //应收账款信息bytes32
         resultBytes32[9] = paramPart1[0];
@@ -619,7 +622,7 @@ contract order_reparo{
         resultUint[13] = paramPart2[8];
         resultUint[14] = paramPart2[9];
         resultUint[15] = paramPart2[10];
-        return (0, order.payerAddress, order.payeeAddress, resultBytes32, resultUint, order.payingMethod, order.orderState.txState);
+        return (0, resultAccount, resultBytes32, resultUint, order.payingMethod, order.orderState.txState);
     }
     function queryAllOrderOverViewInfoList(uint role)returns(
     uint,
