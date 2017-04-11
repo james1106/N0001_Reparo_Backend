@@ -56,7 +56,8 @@ public class OrderController {
         Code code;
 
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "44a717df16edea93f511e7bbf1ab076a7873350f";
+        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
+
         UserEntity payerUserEntity = userEntityRepository.findByAddress(payerAddress);
         if(CommonUtil.isEmpty(payerUserEntity)){
             code = Code.INVALID_USER;
@@ -113,7 +114,7 @@ public class OrderController {
             @ApiParam(value = "仓单编号", required = true) @RequestParam String payeeRepoCertNo
     ) throws Exception {
         String payeeAddress1 = "3ebc9f7cfa20950b8b35524e491c56705c067400";
-        String payeeAddress =  "f05a71878134d7abd410053ff0c3e9205eda6e1a";
+        String payeeAddress =  "d5911f79bb94b23b018e505add48c0748f510eac";
         UserEntity payeeUserEntity = userEntityRepository.findByAddress(payeeAddress);
         String payeePrivateKey = payeeUserEntity.getPrivateKey();
 
@@ -139,7 +140,7 @@ public class OrderController {
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo
     ) throws Exception {
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "44a717df16edea93f511e7bbf1ab076a7873350f";
+        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
         UserEntity payerUserEntity = userEntityRepository.findByAddress(payerAddress);
 
         String payerPrivateKey = payerUserEntity.getPrivateKey();
@@ -159,7 +160,7 @@ public class OrderController {
             @ApiParam(value = "公司角色", required = true) @PathVariable(value = "role") int companyRole
     ) throws Exception {
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "44a717df16edea93f511e7bbf1ab076a7873350f";
+        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
         UserEntity payeeUserEntity = userEntityRepository.findByAddress(payerAddress);
 
         String payerPrivateKey = payeeUserEntity.getPrivateKey();
