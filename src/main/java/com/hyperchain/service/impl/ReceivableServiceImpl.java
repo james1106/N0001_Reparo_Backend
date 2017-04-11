@@ -27,7 +27,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -92,7 +92,83 @@ public class ReceivableServiceImpl implements ReceivableService{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
+            Code code = contractResult.getCode();
+            result.returnWithoutValue(code);
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+        return result;//这个result是返回给前端的
+
+    }
+
+    @Override
+    public BaseResult<Object> discountApply(ContractKey contractKey, Object[] contractParams, String receivableNo) {//第二个参数是给合约的参数
+        String methodName = "discountApply";
+        String[] resultMapKey = new String[]{};
+
+        ContractResult contractResult = null;
+        try {
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        BaseResult<Object> result = new BaseResult<>();
+//         将合约结果转化为接口返回数据
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+        if(code == Code.INVALID_USER){//2
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.PARAMETER_EMPTY){//3
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.SERIALNO_EXIST){//1032
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.ACCTID_ADDRESS_ERROR){//1007
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.REPLYER_ACCOUNT_ERROR){//1004
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.REPLYER_ACCOUNT_INVALID){//1031
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        result.returnWithValue(code, receivableNo);
+        return result;//这个result是返回给前端的
+
+    }
+
+    @Override
+    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "discountReply";
+        String[] resultMapKey = new String[]{};
+        BaseResult result = new BaseResult();
+
+        try {
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -109,13 +185,13 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfo";
-        String[] resultMapKey = new String[]{"receivable[]", "name[]", "uint[]"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"receivable[]", "name[]", "uint[]", "discounted", "note"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -153,6 +229,8 @@ public class ReceivableServiceImpl implements ReceivableService{
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+        int discounted = (int)contractResult.getValueMap().get(resultMapKey[3]);
+        String note = (String) contractResult.getValueMap().get(resultMapKey[4]);
 
         String receivableNo = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -178,7 +256,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         long isseDt = Long.parseLong(partParams2.get(2));
         long signInDt = (partParams2.get(3).equals(""))? 0L:Long.parseLong(partParams2.get(3));
         long dueDt = Long.parseLong(partParams2.get(4));
-
+        long discountInHandAmount = (partParams2.get(5).equals(""))? 0L:Long.parseLong(partParams2.get(5));
 
         ReceivableDetailVo receivableDetailVo = new ReceivableDetailVo();
 
@@ -204,6 +282,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setIsseDt(isseDt);
         receivableDetailVo.setSignInDt(signInDt);
         receivableDetailVo.setDueDt(dueDt);
+        receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
+        receivableDetailVo.setDiscounted(discounted);
+        receivableDetailVo.setNote(note);
 
         result.returnWithValue(code, receivableDetailVo);
         return result;
@@ -218,7 +299,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -273,7 +354,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     @Override
     public BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams) {
-        System.out.println("=====+++++++ooooo");
+//        System.out.println("=====+++++++ooooo");
         String contractMethodName = "getReceivableHistorySerialNo";
         String[] resultMapKey = new String[]{"transferHistorySerialNo[]"};//给返回值取了个名称
 
@@ -281,7 +362,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
