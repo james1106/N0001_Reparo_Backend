@@ -274,13 +274,14 @@ contract chain{
     }
 
     //贴现申请
-    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time) returns(uint) {
+    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount) returns(uint) {
          if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
          }
          if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
          }
+/*
          if(judgeAccount(msg.sender)){
               return(2);
          }
@@ -293,7 +294,7 @@ contract chain{
          if(judgeReplyerAccount(replyerAcctId)){
              return (1031);
          }
-
+*/
         Receivable receivable = receivableDetailMap[receivableNo];
         receivable.lastStatus = receivable.status;
         receivable.status = "070001";
@@ -305,7 +306,7 @@ contract chain{
     }
 
     //贴现回复
-    function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time) returns(uint) {
+    function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, bytes32 discountApplySerialNo) returns(uint) {
          if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
          }
@@ -315,17 +316,19 @@ contract chain{
          if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
          }
+/*
          if(judgeAccount(msg.sender)){
               return(2);
          }
          if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
               return (1007);
          }
-
+*/
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.secondOwner != replyerAcctId){
             return (1);
         }
+/*
         if(responseType == ResponseType.YES) {
             receivable.lastStatus = receivable.status;
             receivable.status = "070006";//贴现已签收
@@ -334,12 +337,64 @@ contract chain{
         }else if(responseType == ResponseType.NO){
             receivable.status = receivable.lastStatus;
         }
-        holdingReceivablesMap[replyerAcctId].push(receivableNo);
+*/
+        holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return (0);
     }
+
+    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo, uint discountApplyAmount) internal {
+        Receivable receivable = receivableMap[receivableNum];
+        uint oriAmount = receivable.isseAmt;
+        if(response == ResponseType.NO){
+            receivable.status = receivable.lastStatus;
+        }else{
+            if(judgeOperateOption(receivableNum, discountApplyAmount)){
+                copyValue(receivableNum, receivableNum1);
+                Receivable subReceivable = receivableMap[receivableNum1];
+                subReceivable.receivableNum = receivableNum1;
+                receivable.lastStatus = receivable.status;
+                receivable.status = "070009";
+                receivable.discounted = DiscountState.YES;
+                receivable.signInDt = time;
+                subReceivable.lastStatus = "070001";
+                subReceivable.status = "070006";//贴现已签收
+                subReceivable.signInDt = time;
+                subReceivable.firstOwner = receivable.secondOwner;
+                subReceivable.secondOwner = "";
+                subReceivable.discounted = DiscountState.YES;
+                subReceivable.signInDt = time;
+                subReceivable.isseAmt = discountApplyAmount;
+                holdingReceivables[receivable.secondOwner].push(receivableNum1);
+
+            }else{
+                copyValue(receivableNum, receivableNum1);
+                Receivable subReceivable1 = receivableMap[receivableNum1];
+                subReceivable1.receivableNum = receivableNum1;
+
+                subReceivable1.lastStatus = subReceivable1.status;
+                subReceivable1.status = "070006";//贴现已签收
+                subReceivable1.isseAmt = discountApplyAmount;
+                subReceivable1.firstOwner = receivable.secondOwner;
+                subReceivable1.secondOwner = "";
+                subReceivable1.discounted = DiscountState.YES;
+                subReceivable1.signInDt = time;
+
+                receivable.lastStatus = receivable.status;
+                receivable.status = "070008";//已部分贴现
+                receivable.isseAmt = oriAmount - discountApplyAmount;
+                receivable.signInDt = time;
+                receivable.firstOwner = receivable.firstOwner;
+                //receivable.secondOwner = "";
+                holdingReceivables[receivable.secondOwner].push(receivableNum1);
+
+            }
+
+        }
+    }
+
 
     //从数组中删除某个元素
     function deleteArrayElement(bytes32[] storage a, bytes32 receivableNo) internal {
@@ -397,7 +452,7 @@ contract chain{
          uint[] memory uintInfo = new uint[](5);
          bytes32[] memory bytesInfo1 = new bytes32[](13);
          bytes32[] memory bytesInfo2 = new bytes32[](4);
-         /*
+/*
          if(judgeAccount(msg.sender)){
             return (2,
                  bytesInfo1,
@@ -405,7 +460,7 @@ contract chain{
                  uintInfo
                  );
          }
-
+*/
          if(receivableNo == ""){
             return (3,
                  bytesInfo1,
@@ -422,7 +477,7 @@ contract chain{
                  );
          }
 
-
+/*
          if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
              return(1,
                  bytesInfo1,
