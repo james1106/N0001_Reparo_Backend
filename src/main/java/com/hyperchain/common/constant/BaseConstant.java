@@ -11,10 +11,7 @@ import java.util.List;
 @SuppressWarnings("JavaDoc")
 public class BaseConstant {
 
-    public static final String SIGNATURE_KEY = "signature";
-
-    public static final String PRIVATE_KEY_PASSWORD = "123"; //加密私钥的密码
-
+    public static final String DEFAULT_PRIVATE_KEY_PASSWORD = "123"; //默认加密私钥的密码
     public static final String SALT_FOR_PASSWORD = "qdqfesg12312dsdsdee21aas"; //密码盐值
     public static final String SALT_FOR_PRIVATE_KEY = "fsas1231238uu2sjkfnsdfcs"; //私钥盐值
 
