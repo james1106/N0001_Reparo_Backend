@@ -502,15 +502,15 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivable.receivableNo == 0x0) {
             return(1005);
         }
-/*
-        if(receivable.status != "020006" && receivable.status != "070006"){
-            return(1006);
-        }
-        //到期日才能兑付
-        if(time < receivable.dueDt){
-            return(1010);
-        }
-*/
+        /*
+         if(receivable.status != "020006" && receivable.status != "070006"){
+         return(1006);
+         }
+         //到期日才能兑付
+         if(time < receivable.dueDt){
+         return(1010);
+         }
+         */
 
         receivable.lastStatus = receivable.status;
         receivable.cashedAmount = cashedAmount;
@@ -619,16 +619,16 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         bytesInfo[3] = pyeeAcctSvcrName;
         return bytesInfo;
     }
-/*
-    function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
-        Receivable receivable = receivableDetailMap[receivableNo];
-        Account account = accountMap[receivable.py];
-        bytesInfo1[13] = account.lastStatus;
-        bytesInfo1[14] = account.rate;
-        bytesInfo1[15] = account.contractNo;
-        bytesInfo1[16] = account.invoiceNo;
-    }
-*/
+    /*
+     function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
+     Receivable receivable = receivableDetailMap[receivableNo];
+     Account account = accountMap[receivable.py];
+     bytesInfo1[13] = account.lastStatus;
+     bytesInfo1[14] = account.rate;
+     bytesInfo1[15] = account.contractNo;
+     bytesInfo1[16] = account.invoiceNo;
+     }
+     */
     /*
      function getReceivableMostInfo(bytes32 receivableNo) returns(string){
      bytes32[] memory value = new bytes32[](12);
@@ -905,7 +905,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     }
 
     //出库申请-企业
-    function outcomeApply(bytes32 repoCertNo,       //  仓储业务编号
+    function outcomeApply(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
         bytes32 operateOperateTime   //  操作时间(时间戳)
@@ -1633,4 +1633,3 @@ enum PayingMethod {
         }
     }
 }
-
