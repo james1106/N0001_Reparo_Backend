@@ -488,7 +488,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
     //兑付
-    function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo, ResponseType responseType)returns(uint){
+    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (3);
         }

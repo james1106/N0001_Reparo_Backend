@@ -36,11 +36,11 @@ public class ReceivableController {
     @RequestMapping(value = "sign",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutApply(
             @ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
-            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
-            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
-            @ApiParam(value = "票面金额", required = true) @RequestParam int isseAmt,
-            @ApiParam(value = "到期日", required = true) @RequestParam int dueDt,
+            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
+            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
+            @ApiParam(value = "票面金额", required = true) @RequestParam long isseAmt,
+            @ApiParam(value = "到期日", required = true) @RequestParam long dueDt,
             @ApiParam(value = "带息利率", required = true) @RequestParam String rate,
             @ApiParam(value = "合同编号", required = true) @RequestParam String contractNo,
             @ApiParam(value = "发票号", required = true) @RequestParam String invoiceNo
@@ -82,7 +82,7 @@ public class ReceivableController {
             @ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,
-            @ApiParam(value = "回复意见", required = true) @RequestParam String response
+            @ApiParam(value = "回复意见", required = true) @RequestParam int response
     ) throws Exception {
 
         long signOutReplyTime = System.currentTimeMillis();
@@ -110,7 +110,7 @@ public class ReceivableController {
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
-            @ApiParam(value = "申请贴现金额", required = true) @RequestParam String discountApplyAmount//申请贴现金额
+            @ApiParam(value = "申请贴现金额", required = true) @RequestParam long discountApplyAmount//申请贴现金额
     ) throws Exception {
 
         long discountApplyTime = System.currentTimeMillis();
