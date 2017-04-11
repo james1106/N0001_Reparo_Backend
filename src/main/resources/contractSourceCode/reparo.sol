@@ -107,7 +107,7 @@ contract receivableContract{
 enum RoleCode { RC00, RC01,RC02,RC03 } //RC00融资企业, RC01物流公司,RC02仓储公司,RC03金融机构
 enum AccountStatus { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
 enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-无
-enum DiscountedStatus {NO, YES, NULL} //贴现标志位
+enum DiscountedStatus {NO, YES} //贴现标志位
 
     //记录所有应收款编号数组
     bytes32[] allReceivableNos;
@@ -488,7 +488,7 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
     }
 
     //兑付
-    function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo)returns(uint){
+    function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo, ResponseType responseType)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (3);
         }
@@ -502,6 +502,7 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
         if(receivable.receivableNo == 0x0) {
             return(1005);
         }
+/*
         if(receivable.status != "020006" && receivable.status != "070006"){
             return(1006);
         }
@@ -509,6 +510,7 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
         if(time < receivable.dueDt){
             return(1010);
         }
+*/
 
         receivable.lastStatus = receivable.status;
         receivable.cashedAmount = cashedAmount;
@@ -590,7 +592,6 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
         bytesInfo1[11] = receivable.contractNo;
         bytesInfo1[12] = receivable.invoiceNo;
 
-
         return (0,
                 bytesInfo1,
                 acctSvcrNameAndEnterpriseName(receivableNo),
@@ -618,7 +619,16 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
         bytesInfo[3] = pyeeAcctSvcrName;
         return bytesInfo;
     }
-
+/*
+    function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
+        Receivable receivable = receivableDetailMap[receivableNo];
+        Account account = accountMap[receivable.py];
+        bytesInfo1[13] = account.lastStatus;
+        bytesInfo1[14] = account.rate;
+        bytesInfo1[15] = account.contractNo;
+        bytesInfo1[16] = account.invoiceNo;
+    }
+*/
     /*
      function getReceivableMostInfo(bytes32 receivableNo) returns(string){
      bytes32[] memory value = new bytes32[](12);
@@ -707,7 +717,7 @@ enum DiscountedStatus {NO, YES, NULL} //贴现标志位
     function getRecordBySerialNo(bytes32 serialNm) returns(uint, bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, bytes32 receivableStatus){
         Account account = accountMap[msg.sender];
         ReceivableRecord receivableRecord = receivableRecordMap[serialNm];
-        if(serialNo == ""){
+        if(serialNm == ""){
             return (3,
                 serialNo,
                 receivableNo,
