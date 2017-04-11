@@ -175,7 +175,7 @@ contract chain{
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
             return (3);
         }
-        if(judgeRepetitiveSerialNo(serialNo)){
+/*        if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
         if(isseAmt <= 0){
@@ -196,9 +196,9 @@ contract chain{
         if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
             return (1030);
         }
-
+*/
         allReceivableNos.push(receivableNo);
-        giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
+        giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
 
         //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
@@ -211,7 +211,7 @@ contract chain{
         return (0);
     }
 
-    function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
+    function giveReceivableInfo(bytes32 receivableNo, bytes32 serialNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
           Receivable receivable = receivableDetailMap[receivableNo];
           receivable.receivableNo = receivableNo;
           receivable.orderNo = orderNo;
@@ -232,7 +232,7 @@ contract chain{
 
     //签发回复
     function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time) returns (bytes32){
-        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
+/*        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
         if(judgeRepetitiveSerialNo(serialNo)){
@@ -247,14 +247,14 @@ contract chain{
         if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
             return (1007);
         }
-
+*/
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.status != "020001"){
             return (1006);
         }
-        if(replyerAcctId != receivable.accptr){
+/*        if(replyerAcctId != receivable.accptr){
             return (1);
-        }
+        }*/
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
             receivable.status = "000003";
@@ -397,6 +397,7 @@ contract chain{
          uint[] memory uintInfo = new uint[](5);
          bytes32[] memory bytesInfo1 = new bytes32[](13);
          bytes32[] memory bytesInfo2 = new bytes32[](4);
+         /*
          if(judgeAccount(msg.sender)){
             return (2,
                  bytesInfo1,
@@ -429,7 +430,7 @@ contract chain{
                  uintInfo
                  );
          }
-
+*/
          uintInfo[0] = receivable.isseAmt;
          uintInfo[1] = receivable.cashedAmount;
          uintInfo[2] = receivable.isseDt;
@@ -557,17 +558,17 @@ contract chain{
 */
 
     //查找应收款的交易历史，返回流水号
-    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (bytes32[]){
-        return receivableTransferHistoryMap[receivableNo];
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
+        return (0, receivableTransferHistoryMap[receivableNo]);
     }
 
     //流水号查询，自己查自己
-    function getRecordByserialNo(bytes32 serialNo) returns(uint, bytes32 serialNm, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, bytes32 receivableStatus){
+    function getRecordBySerialNo(bytes32 serialNm) returns(uint, bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, bytes32 receivableStatus){
         Account account = accountMap[msg.sender];
-        ReceivableRecord receivableRecord = receivableRecordMap[serialNo];
+        ReceivableRecord receivableRecord = receivableRecordMap[serialNm];
         if(serialNo == ""){
             return (3,
-                serialNm,
+                serialNo,
                 receivableNo,
                 applicantAcctId,
                 replyerAcctId,
@@ -580,7 +581,7 @@ contract chain{
 
         if(receivableRecord.serialNo == 0x0) {
             return(1013,
-                serialNm,
+                serialNo,
                 receivableNo,
                 applicantAcctId,
                 replyerAcctId,

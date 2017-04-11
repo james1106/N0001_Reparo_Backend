@@ -81,7 +81,8 @@ public class TransactionDetailVo {
         return payerAddress;
     }
 
-    public void setPayerAddress(String payerAddress) {
+    public void
+    setPayerAddress(String payerAddress) {
         this.payerAddress = payerAddress;
     }
 
