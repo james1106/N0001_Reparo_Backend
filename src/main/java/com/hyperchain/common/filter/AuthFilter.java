@@ -30,7 +30,6 @@ public class AuthFilter implements javax.servlet.Filter {
     @Autowired
     private UserEntityRepository userEntityRepository;
 
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext()); //在filter中使能spring bean自动注入
