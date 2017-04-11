@@ -63,6 +63,7 @@ public class AccountController {
             @ApiParam(value = "开户行别", required = false) @RequestParam("svcrClass") String svcrClass,
             @ApiParam(value = "开户行行号", required = false) @RequestParam("acctSvcr") String acctSvcr,
             @ApiParam(value = "开户行名称", required = false) @RequestParam("acctSvcrName") String acctSvcrName,
+            HttpServletRequest request,
             HttpServletResponse response) throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
 //        String securityCodeMock = "1111";
 //        String securityCodeIdMock = "12";
@@ -72,7 +73,7 @@ public class AccountController {
 //        String svcrClassMock = "123";
 //        String acctSvcrMock = "123456";
 //        String acctSvcrNameMock = "中国银行";
-        return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName);
+        return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName, request, response);
     }
 
     @LogInterceptor
@@ -82,8 +83,9 @@ public class AccountController {
     public BaseResult<Object> login(
             @ApiParam(value = "用户名", required = true) @RequestParam("accountName") String accountName,
             @ApiParam(value = "密码", required = true) @RequestParam("password") String password,
+            HttpServletRequest request,
             HttpServletResponse response) {
-        return accountService.login(accountName, password, response);
+        return accountService.login(accountName, password,request , response);
     }
 
     @LogInterceptor

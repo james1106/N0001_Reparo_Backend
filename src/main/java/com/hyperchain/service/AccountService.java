@@ -6,6 +6,7 @@ import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.controller.vo.BaseResult;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -30,14 +31,16 @@ public interface AccountService {
             String acctIds,
             String svcrClass,
             String acctSvcr,
-            String acctSvcrName)
+            String acctSvcrName,
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws PasswordIllegalParam,
             GeneralSecurityException,
             PrivateKeyIllegalParam,
             ContractInvokeFailException,
             IOException, ValueNullException;
 
-    BaseResult<Object> login(String accountName, String password, HttpServletResponse response);
+    BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response);
 
     BaseResult<Object> forgetPassword(String phone, String newPassword, String securityCode, String securityCodeId);
 }

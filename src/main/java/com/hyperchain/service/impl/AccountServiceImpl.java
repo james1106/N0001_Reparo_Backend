@@ -1,7 +1,6 @@
 package com.hyperchain.service.impl;
 
 import cn.hyperchain.common.log.LogUtil;
-import com.alibaba.fastjson.JSON;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
@@ -10,7 +9,6 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
-import com.hyperchain.common.util.DesUtils;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -30,13 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ldy on 2017/4/5.
@@ -100,7 +97,9 @@ public class AccountServiceImpl implements AccountService {
                                        String acctIds,
                                        String svcrClass,
                                        String acctSvcr,
-                                       String acctSvcrName)
+                                       String acctSvcrName,
+                                       HttpServletRequest request,
+                                       HttpServletResponse response)
             throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
         //判断用户名 或 手机号 或 企业名称是否存在
         if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName)) {
@@ -122,13 +121,12 @@ public class AccountServiceImpl implements AccountService {
         String[] acctIdList = new String[1];
         acctIdList[0] = acctIds;
         ContractResult contractResult = saveAccount(accountName, password, enterpriseName, phone, roleCode, certType, certNo, acctIdList, svcrClass, acctSvcr, acctSvcrName);
-        BaseResult<Object> baseResult = new BaseResult<>();
-        baseResult.returnWithoutValue(contractResult.getCode());
+        BaseResult<Object> baseResult = login(accountName, password, request, response);
         return baseResult;
     }
 
     @Override
-    public BaseResult<Object> login(String accountName, String password, HttpServletResponse response) {
+    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) {
         UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
 
         //用户不存在
@@ -187,13 +185,8 @@ public class AccountServiceImpl implements AccountService {
             baseResult.returnWithoutValue(resultCode);
             return baseResult;
         } else { //密码正确：生成token
-            String address = userEntity.getAddress();
-            String token = TokenUtil.generateToken(address, userEntity.getRoleCode());
-            LogUtil.info("生成token：" + token);
             //把token存到cookie中
-            Cookie cookie = new Cookie("token", token);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+            setTokenToCookie(userEntity.getAddress(), userEntity.getRoleCode(), request, response);
             //返回成功状态和用户信息
             UserVo userVo = new UserVo(userEntity, accountEntity);
             BaseResult<Object> baseResult = new BaseResult<>();
@@ -402,12 +395,37 @@ public class AccountServiceImpl implements AccountService {
         return contractResult;
     }
 
+    private void setTokenToCookie(String address, int roleCode, HttpServletRequest request, HttpServletResponse response) {
+        boolean isSet = false; //toke是否已经设置
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = TokenUtil.generateToken(address, roleCode);
+                    LogUtil.info("生成token：" + token);
+                    cookie.setValue(token);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                    isSet = true;
+                }
+            }
+        }
+        if (isSet == false) {
+            String token = TokenUtil.generateToken(address, roleCode);
+            LogUtil.info("生成token：" + token);
+            Cookie cookie = new Cookie("token", token);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
+    }
+
     /**
      * 判断密码是否正确
      *
-     * @param userEntity userEntity
-     * @param accountName    用户名
-     * @param password   明文密码
+     * @param userEntity  userEntity
+     * @param accountName 用户名
+     * @param password    明文密码
      * @return
      */
     private Code checkPassword(UserEntity userEntity, String accountName, String password) {

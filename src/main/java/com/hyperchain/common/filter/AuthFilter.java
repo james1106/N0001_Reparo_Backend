@@ -51,6 +51,7 @@ public class AuthFilter implements javax.servlet.Filter {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
+                    LogUtil.info("用户raw token：" + token);
                     String tokenInfo = DesUtils.decryptToken(token);
 
                     //token为空
@@ -82,10 +83,12 @@ public class AuthFilter implements javax.servlet.Filter {
                             LogUtil.info("token验证通过");
                             //重设cookie中的token时间戳
                             String newToken = TokenUtil.generateToken(address, roleCode);
-                            Cookie newCookie = new Cookie("token", newToken);
+//                            Cookie newCookie = new Cookie("token", newToken); //错误做法，更新cookie时不能每次都new Cookie（会生成多个同名cookie），只能找到cookie并修改
                             LogUtil.info("新的token：" + newToken);
+                            cookie.setValue(newToken);
                             cookie.setPath("/");
-                            httpServletResponse.addCookie(newCookie);
+                            httpServletResponse.addCookie(cookie);
+//                            httpServletResponse.addCookie(newCookie);
                             filterChain.doFilter(servletRequest, servletResponse);
                             return;
                         }
