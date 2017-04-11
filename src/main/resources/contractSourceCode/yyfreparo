@@ -1,4 +1,4 @@
-contract chain{
+contract receivableContract{
     //应收款
     struct Receivable {
         bytes32 receivableNo;//应收款编号
@@ -332,16 +332,6 @@ contract chain{
         if(receivable.secondOwner != replyerAcctId){
             return (1);
         }
-/*
-        if(responseType == ResponseType.YES) {
-            receivable.lastStatus = receivable.status;
-            receivable.status = "070006";//贴现已签收
-            bytes32 receivableFirstOwner = receivable.firstOwner;
-            receivable.firstOwner = replyerAcctId;
-        }else if(responseType == ResponseType.NO){
-            receivable.status = receivable.lastStatus;
-        }
-*/
         receivable.discountInHandAmount = discountInHandAmount;
         subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo, discountApplySerialNo);
         holdingReceivablesMap[replyerAcctId].push(newReceivableNo);

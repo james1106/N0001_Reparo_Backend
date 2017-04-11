@@ -48,7 +48,7 @@ public class ReceivableController {
 
         long receivableGenerateTime = System.currentTimeMillis();
         String receivableNo = "120" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//应收款编号
-        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//流水号
+        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//签发申请流水号121
         List<String> list= new ArrayList<>();
         list.add(contractNo);
         list.add(invoiceNo);
@@ -85,8 +85,8 @@ public class ReceivableController {
             @ApiParam(value = "回复意见", required = true) @RequestParam String response
     ) throws Exception {
 
-        long operateTime = System.currentTimeMillis();
-        String serialNo = "122" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//签发回复流水号
+        long signOutReplyTime = System.currentTimeMillis();
+        String serialNo = "122" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//签发回复流水号122
 
         ContractKey contractKey = new ContractKey(replyerAddress);
 
@@ -95,11 +95,69 @@ public class ReceivableController {
         params[1] = replyerAcctId;
         params[2] = response;
         params[3] = serialNo;
-        params[4] = operateTime;
+        params[4] = signOutReplyTime;
 
         // 调用合约查询账户，获取返回结果
         return receivableService.signOutReply(contractKey, params);
     }
+
+    @LogInterceptor
+    @ApiOperation(value = "贴现申请", notes = "贴现申请")
+    @ResponseBody
+    @RequestMapping(value = "discountApply",method = RequestMethod.POST)//路径
+    public BaseResult<Object> discountApply(
+            @ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
+            @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
+            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
+            @ApiParam(value = "申请贴现金额", required = true) @RequestParam String discountApplyAmount//申请贴现金额
+    ) throws Exception {
+
+        long discountApplyTime = System.currentTimeMillis();
+        String serialNo = "123" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//贴现申请流水号123
+
+        ContractKey contractKey = new ContractKey(applicantAddress);
+
+        Object[] params = new Object[6];
+        params[0] = receivableNo;
+        params[1] = applicantAcctId;
+        params[2] = replyerAcctId;
+        params[3] = serialNo;
+        params[4] = discountApplyTime;
+        params[5] = discountApplyAmount;
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.discountApply(contractKey, params, receivableNo);
+    }
+
+//    @LogInterceptor
+//    @ApiOperation(value = "贴现回复", notes = "贴现回复")
+//    @ResponseBody
+//    @RequestMapping(value = "discountReply",method = RequestMethod.POST)//路径
+//    public BaseResult<Object> discountReply(
+//            @ApiParam(value = "回复人私钥", required = true) @RequestParam String ReplyerAddress,
+//            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
+//            @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
+//            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
+//            @ApiParam(value = "申请贴现金额", required = true) @RequestParam String discountApplyAmount//申请贴现金额
+//    ) throws Exception {
+//
+//        long discountApplyTime = System.currentTimeMillis();
+//        String serialNo = "123" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//贴现申请流水号123
+//
+//        ContractKey contractKey = new ContractKey(applicantAddress);
+//
+//        Object[] params = new Object[6];
+//        params[0] = receivableNo;
+//        params[1] = applicantAcctId;
+//        params[2] = replyerAcctId;
+//        params[3] = serialNo;
+//        params[4] = discountApplyTime;
+//        params[5] = discountApplyAmount;
+//
+//        // 调用合约查询账户，获取返回结果
+//        return receivableService.discountApply(contractKey, params, receivableNo);
+//    }
 
     @LogInterceptor
     @ApiOperation(value = "根据应收款编号查应收款详情", notes = "根据应收款编号查应收款详情")
@@ -139,7 +197,7 @@ public class ReceivableController {
     }
 
     @LogInterceptor
-    @ApiOperation(value = "应收款操作流水号", notes = "应收款操作流水号")
+    @ApiOperation(value = "应收款历史操作流水号", notes = "应收款历史操作流水号")
     @ResponseBody
     @RequestMapping(value = "historySerialNo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableHistorySerialNo(

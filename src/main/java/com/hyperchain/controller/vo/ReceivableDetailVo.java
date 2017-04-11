@@ -31,9 +31,37 @@ public class ReceivableDetailVo {
     private long isseDt;
     private long signInDt;
     private long dueDt;
+    private long discountInHandAmount;
+
+    private int discounted;
+    private String note;
+
+    public long getDiscountInHandAmount() {
+        return discountInHandAmount;
+    }
+
+    public void setDiscountInHandAmount(long discountInHandAmount) {
+        this.discountInHandAmount = discountInHandAmount;
+    }
 
     public String getReceivableNo() {
         return receivableNo;
+    }
+
+    public int getDiscounted() {
+        return discounted;
+    }
+
+    public void setDiscounted(int discounted) {
+        this.discounted = discounted;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public void setReceivableNo(String receivableNo) {
