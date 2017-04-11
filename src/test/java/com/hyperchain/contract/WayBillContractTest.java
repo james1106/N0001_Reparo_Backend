@@ -1,5 +1,6 @@
 package com.hyperchain.contract;
 
+import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
@@ -13,6 +14,8 @@ import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
+import com.hyperchain.exception.PropertiesLoadException;
+import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import com.hyperchain.test.TestUtil;
 import com.hyperchain.test.base.SpringBaseTest;
@@ -2843,12 +2846,17 @@ public class WayBillContractTest extends SpringBaseTest {
     }
 
     @Test
-    public void testWayBill() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public void testWayBill() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException {
+
+        String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
+        String receivableContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+        String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
         //卖家企业发货申请，生成未完善运单
         ContractKey requestContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
         String requestContractMethodName = "generateUnConfirmedWayBill";
-        Object[] requestContractMethodParams = new Object[3];
+        Object[] requestContractMethodParams = new Object[5];
         String random = TestUtil.getRandomString();
         Long[] requestLongs = new Long[3];
         requestLongs[0] = new Date().getTime(); //requestTime
@@ -2866,9 +2874,11 @@ public class WayBillContractTest extends SpringBaseTest {
         requestStrs[2] = "senderRepoCertNo"; //senderRepoCertNo
         requestStrs[3] = "receiverRepoBusinessNo"; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
-        requestContractMethodParams[1] = requestLongs;
-        requestContractMethodParams[2] = requestSddrs;
-        requestContractMethodParams[3] = requestStrs;
+        requestContractMethodParams[0] = requestLongs;
+        requestContractMethodParams[1] = requestSddrs;
+        requestContractMethodParams[2] = requestStrs;
+        requestContractMethodParams[3] = accountContractAddr;
+        requestContractMethodParams[4] = receivableContractAddr;
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2878,11 +2888,12 @@ public class WayBillContractTest extends SpringBaseTest {
         //物流确认发货，生成完整运单
         ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String confirmContractMethodName = "generateWayBill";
-        Object[] confirmContractMethodParams = new Object[4];
+        Object[] confirmContractMethodParams = new Object[5];
         confirmContractMethodParams[0] = "123订单" + random; //orderNo
         confirmContractMethodParams[1] = "123订单" + random + WayBillStatus.SENDING.getCode(); //statusTransId: orderNo + WayBillStatus
         confirmContractMethodParams[2] = "123运单" + random; //wayBillNo
         confirmContractMethodParams[3] = new Date().getTime(); //sendTime
+        confirmContractMethodParams[4] = accountContractAddr; //accountContractAddr
         String[] confirmResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2892,10 +2903,13 @@ public class WayBillContractTest extends SpringBaseTest {
         //更新运单状态为已送达
         ContractKey updateToReceivedContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String updateToReceivedMethodName = "updateWayBillStatusToReceived";
-        Object[] updateToReceivedMethodParams = new Object[3];
+        Object[] updateToReceivedMethodParams = new Object[6];
         updateToReceivedMethodParams[0] = "123订单" + random; //orderNo
         updateToReceivedMethodParams[1] = "123订单" + random + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
         updateToReceivedMethodParams[2] = new Date().getTime(); //operateTime
+        updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
+        updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
+        updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
         String[] updateToReceivedResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2905,11 +2919,8 @@ public class WayBillContractTest extends SpringBaseTest {
         //获取所有用户相关运单的订单号列表
         ContractKey listOrderNoContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String listOrderNoContractMethodName = "listWayBillOrderNo";
-        Object[] listOrderNoContractMethodParams = new Object[4];
-        listOrderNoContractMethodParams[0] = "123订单" + random; //orderNo
-        listOrderNoContractMethodParams[1] = "123订单" + random + WayBillStatus.SENDING.getCode(); //statusTransId: orderNo + WayBillStatus
-        listOrderNoContractMethodParams[2] = "123运单" + random; //wayBillNo
-        listOrderNoContractMethodParams[3] = new Date().getTime(); //sendTime
+        Object[] listOrderNoContractMethodParams = new Object[1];
+        listOrderNoContractMethodParams[0] = accountContractAddr; //accountContractAddr
         String[] listOrderNoResultMapKey = new String[]{"orderNoList"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2924,8 +2935,9 @@ public class WayBillContractTest extends SpringBaseTest {
         //获取最后一个运单信息
         ContractKey waybillContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String waybillContractMethodName = "getWayBill";
-        Object[] waybillContractMethodParams = new Object[1];
+        Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = "123订单" + random; //orderNo
+        waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
         String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
