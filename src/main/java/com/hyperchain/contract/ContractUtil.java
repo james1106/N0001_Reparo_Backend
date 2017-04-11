@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by yangjiexie on 2017/3/15.
+ * modify by chenxiaoyang 使用esdk-3.0 部署，编译，调用多合约,使用合约名+方法名调用合约
  */
 public class ContractUtil {
 
@@ -29,17 +30,18 @@ public class ContractUtil {
      * @return 合约结果（结果代码、返回值）
      * @throws Exception
      */
-    public static ContractResult invokeContract(ContractKey contractKey, String methodName, Object[] params, String[] resultMapKey) throws ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public static ContractResult invokeContract(ContractKey contractKey, String methodName, Object[] params, String[] resultMapKey,String contractName) throws ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         List<Object> lists;
         try {
+
             // 利用（公钥，方法名，方法参数）发起交易
-            Transaction transaction = ESDKUtil.getTxHash(contractKey.getPublicKey(), methodName, params);
+            Transaction transaction = ESDKUtil.getTxHash(contractKey.getPublicKey(), methodName, params,contractName);
             // 对交易进行签名
             transaction.sign(contractKey.getPrivateKey(), contractKey.getPassword());
             // 调用合约方法
             String contractRet = ESDKConnection.invokeContractMethod(transaction);
             // 获取合约方法结果
-            lists = ESDKUtil.retDecode(methodName, contractRet);
+            lists = ESDKUtil.retDecode(methodName, contractRet,contractName);
             for(Object object:lists){
                 LogUtil.info(object.toString());
             }

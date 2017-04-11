@@ -16,6 +16,9 @@ import java.util.List;
  * by chenyufeng on 2017/3/31 .
  */
 public class ContractTestDemo extends SpringBaseTest{
+    String Reparo = "Reparo";
+    String contract1 = "contract1";
+    String testContract = "testContract";
 
     @Test
     public void compileContract() throws IOException, ESDKException {
@@ -52,7 +55,7 @@ public class ContractTestDemo extends SpringBaseTest{
         params[1] = "chenyufeng2";
         params[2] = "123456";
         params[3] = "110";
-        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params);
+        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params,Reparo);
         transaction.sign(privateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
@@ -70,7 +73,7 @@ public class ContractTestDemo extends SpringBaseTest{
         String funcName = "queryUser";
         Object[] params = new Object[1];
         params[0] = 2;
-        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params);
+        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params,Reparo);
         transaction.sign(privateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
@@ -78,7 +81,7 @@ public class ContractTestDemo extends SpringBaseTest{
         System.out.println("invoke result: " + result);
 
         //返回值解码
-        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result,Reparo);
         System.out.println("after decode result:" + retDecode);
     }
 
@@ -101,7 +104,112 @@ public class ContractTestDemo extends SpringBaseTest{
 
         String[] resultParams = new String[1];
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "addUser", contractParams, resultParams);
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "addUser", contractParams, resultParams,Reparo);
         System.out.println("contractResult:" + contractResult);
     }
+
+    @Test
+    public void callContractByName() throws Exception {
+
+        String contractAddress = ESDKUtil.getHyperchainInfo("contract1");
+        Assert.assertNotNull(contractAddress);
+        System.out.println("==address of contract1:"+contractAddress);
+
+        String contractAddress2 = ESDKUtil.getHyperchainInfo("testContract");
+        Assert.assertNotNull(contractAddress2);
+        System.out.println("==address of testContract:"+contractAddress2);
+    }
+
+    @Test
+    public void setMap() throws Exception {
+        String testContract = "testContract";
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        // 合约方法参数
+        Object[] contractParams = new Object[2];
+        contractParams[0] = "1";
+        contractParams[1] = "111";
+
+
+        String[] resultParams = new String[1];
+
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "setMap", contractParams, resultParams,testContract);
+        System.out.println("contractResult:" + contractResult);
+        //合约的方法名，参数以及顺序都需要与编写合约的同学约定
+   /*     String funcName = "setMap";
+        String contractName = "testContract";
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+        Object[] params = new Object[2];
+        params[0] = 1;
+        params[1] = 1111;
+       // params[2] = 1;
+//获取transaction对象后就可以进行签名了
+        Transaction transaction = ESDKUtil.getTxHash(publicKey, funcName, params,contractName);
+        transaction.sign(privateKey, null);
+//准备工作做好后调用合约方法会返回一个hash，你百分之九十需要使用ESDK的解码方法对它进行解码，但这里我假设你知道
+        String result = ESDKConnection.invokeContractMethod(transaction);
+        System.out.println("invoke result: " + result);*/
+
+    }
+
+    @Test
+    public void callOthenContract() throws Exception {
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        String testContractAddress = ESDKUtil.getHyperchainInfo("testContract");
+        Assert.assertNotNull(testContractAddress);
+        //System.out.println("==address of testContract:"+contractAddress2);
+
+        // 合约方法参数
+        Object[] contractParams = new Object[2];
+
+        contractParams[0] = testContractAddress;
+        contractParams[1] = 1;
+
+
+        String[] resultParams = new String[1];
+
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "callOthersContract2", contractParams, resultParams,"contract1");
+        System.out.println("contractResult:" + contractResult);
+
+
+
+    }
+
+    @Test
+    public void setv() throws Exception {
+        String testContract = "testContract";
+        List<String> keyInfos = ESDKUtil.newAccount();
+        String publicKey = keyInfos.get(0);
+        String privateKey = keyInfos.get(1);
+
+        // 合约的公私钥
+        ContractKey contractKey = new ContractKey(privateKey);
+
+        // 合约方法参数
+        Object[] contractParams = new Object[1];
+        contractParams[0] = 123456;
+        //contractParams[1] = "111";
+
+
+        String[] resultParams = new String[1];
+
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, "setV", contractParams, resultParams,testContract);
+        System.out.println("contractResult:" + contractResult);
+
+    }
+
+
 }

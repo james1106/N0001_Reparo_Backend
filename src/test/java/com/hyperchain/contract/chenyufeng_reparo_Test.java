@@ -22,7 +22,7 @@ public class chenyufeng_reparo_Test{
     private static String receiverPublicKey = "a4c3137e463f0830b2691e1642d7bbb59e5d5850";
     private static String receiverPrivateKey = "{\"address\":\"a4c3137e463f0830b2691e1642d7bbb59e5d5850\",\"encrypted\":\"1acfea0fdba9d1efa1e289856c3e426f9bfebcdb9d5b9f014478fdb7fbcb644f\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
 
-    @Test
+    /*@Test
     public void compileContract() throws IOException, ESDKException {
         //从文件中读取合约
         CompileReturn compileReturn = ESDKConnection.compileContract();
@@ -167,5 +167,5 @@ public class chenyufeng_reparo_Test{
         //返回值解码
         List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
         System.out.println("查询应收款详情返回:" + retDecode);
-    }
+    }*/
 }

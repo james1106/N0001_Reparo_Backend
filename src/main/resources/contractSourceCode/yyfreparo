@@ -19,6 +19,9 @@ contract chain{
         bytes32 rate;//利率
         bytes32 contractNo;//合同号
         bytes32 invoiceNo;//发票号
+        DiscountedStatus discounted;//是否贴现标志
+        uint discountInHandAmount;//贴现回复时的到手金额
+        bytes note;//备注，暂时不用
     }
 
     //操作记录
@@ -52,6 +55,7 @@ contract chain{
     enum RoleCode { RC00, RC01,RC02,RC03 } //RC00融资企业, RC01物流公司,RC02仓储公司,RC03金融机构
     enum AccountStatus { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
     enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-无
+    enum DiscountedStatus {NO, YES, NULL} //贴现标志位
 
     //记录所有应收款编号数组
     bytes32[] allReceivableNos;
@@ -274,13 +278,14 @@ contract chain{
     }
 
     //贴现申请
-    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time) returns(uint) {
+    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount) returns(uint) {
          if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
          }
          if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
          }
+/*
          if(judgeAccount(msg.sender)){
               return(2);
          }
@@ -293,19 +298,19 @@ contract chain{
          if(judgeReplyerAccount(replyerAcctId)){
              return (1031);
          }
-
+*/
         Receivable receivable = receivableDetailMap[receivableNo];
         receivable.lastStatus = receivable.status;
         receivable.status = "070001";
         receivable.secondOwner = replyerAcctId;
-        newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", receivable.isseAmt, receivable.status);
+        newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return(0);
     }
 
     //贴现回复
-    function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time) returns(uint) {
+    function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, bytes32 discountApplySerialNo) returns(uint) {
          if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
          }
@@ -315,17 +320,19 @@ contract chain{
          if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
          }
+/*
          if(judgeAccount(msg.sender)){
               return(2);
          }
          if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
               return (1007);
          }
-
+*/
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.secondOwner != replyerAcctId){
             return (1);
         }
+/*
         if(responseType == ResponseType.YES) {
             receivable.lastStatus = receivable.status;
             receivable.status = "070006";//贴现已签收
@@ -334,11 +341,92 @@ contract chain{
         }else if(responseType == ResponseType.NO){
             receivable.status = receivable.lastStatus;
         }
-        holdingReceivablesMap[replyerAcctId].push(receivableNo);
+*/
+        receivable.discountInHandAmount = discountInHandAmount;
+        subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo, discountApplySerialNo);
+        holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
-        newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", receivable.isseAmt, receivable.status);
+        newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return (0);
+    }
+
+    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo, bytes32 discountApplySerialNo) internal {
+        Receivable receivable = receivableDetailMap[receivableNo];
+        ReceivableRecord receivableRecord = receivableRecordMap[discountApplySerialNo];
+        uint discountApplyAmount = receivableRecord.dealAmount;
+        uint oriAmount = receivable.isseAmt;
+        if(responseType == ResponseType.NO){
+            receivable.status = receivable.lastStatus;
+        }else{
+            Receivable newReceivable = receivableDetailMap[newReceivableNo];
+            if(judgeOperateOption(receivableNo, discountApplyAmount)){
+                copyValue(receivableNo, newReceivableNo);
+                newReceivable.receivableNo = newReceivableNo;
+                receivable.lastStatus = receivable.status;
+                receivable.status = "070009";//已全额贴现
+                receivable.discounted = DiscountedStatus.YES;
+                receivable.signInDt = time;
+                newReceivable.lastStatus = "070001";
+                newReceivable.status = "070006";//贴现已签收
+                newReceivable.signInDt = time;
+                newReceivable.firstOwner = receivable.secondOwner;
+                newReceivable.secondOwner = "";
+                newReceivable.discounted = DiscountedStatus.YES;
+                newReceivable.signInDt = time;
+                newReceivable.isseAmt = discountApplyAmount;
+            }else{
+                copyValue(receivableNo, newReceivableNo);
+                newReceivable.receivableNo = newReceivableNo;
+                newReceivable.lastStatus = newReceivable.status;
+                newReceivable.status = "070006";//贴现已签收
+                newReceivable.isseAmt = discountApplyAmount;
+                newReceivable.firstOwner = receivable.secondOwner;
+                newReceivable.secondOwner = "";
+                newReceivable.discounted = DiscountedStatus.YES;
+                newReceivable.signInDt = time;
+
+                receivable.lastStatus = receivable.status;
+                receivable.status = "070008";//已部分贴现
+                receivable.isseAmt = oriAmount - discountApplyAmount;
+                receivable.signInDt = time;
+                receivable.firstOwner = receivable.firstOwner;
+                //receivable.secondOwner = "";
+            }
+
+        }
+    }
+
+    //判断全额 或 部分
+    function judgeOperateOption(bytes32 receivableNum, uint dealAmount) internal returns (bool){
+        Receivable receivable = receivableDetailMap[receivableNum];
+        if(dealAmount < receivable.isseAmt){
+            return false;  //部分
+        }
+        return true;   //全额
+    }
+
+    function copyValue(bytes32 originReceivableNum, bytes32 subReceivableNum) internal {
+        Receivable oriReceivable = receivableDetailMap[originReceivableNum];
+        Receivable subReceivable = receivableDetailMap[subReceivableNum];
+        subReceivable.orderNo = oriReceivable.orderNo;
+        subReceivable.signer = oriReceivable.signer;
+        subReceivable.accptr = oriReceivable.accptr;
+        subReceivable.pyer = oriReceivable.pyer;
+        subReceivable.pyee = oriReceivable.pyee;
+        subReceivable.firstOwner = oriReceivable.firstOwner;
+        subReceivable.secondOwner = oriReceivable.secondOwner;
+        subReceivable.isseAmt = oriReceivable.isseAmt;
+        subReceivable.cashedAmount = oriReceivable.cashedAmount;
+        subReceivable.status = oriReceivable.status;
+        subReceivable.lastStatus = oriReceivable.lastStatus;
+        subReceivable.isseDt = oriReceivable.isseDt;
+        subReceivable.signInDt = oriReceivable.signInDt;
+        subReceivable.dueDt = oriReceivable.dueDt;
+        subReceivable.rate = oriReceivable.rate;
+        subReceivable.contractNo = oriReceivable.contractNo;
+        subReceivable.invoiceNo = oriReceivable.invoiceNo;
+        subReceivable.note = oriReceivable.note;
     }
 
     //从数组中删除某个元素
@@ -390,27 +478,31 @@ contract chain{
 
     //根据应收款编号查询单张应收款具体信息
     //根据应收款编号查询单张应收款具体信息
-    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], bytes32[], uint[]){
+    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], bytes32[], uint[], DiscountedStatus discounted, bytes note){
          Account account = accountMap[msg.sender];
          Receivable receivable = receivableDetailMap[receivableNo];
 
-         uint[] memory uintInfo = new uint[](5);
+         uint[] memory uintInfo = new uint[](6);
          bytes32[] memory bytesInfo1 = new bytes32[](13);
          bytes32[] memory bytesInfo2 = new bytes32[](4);
-         /*
+/*
          if(judgeAccount(msg.sender)){
             return (2,
                  bytesInfo1,
                  bytesInfo2,
-                 uintInfo
+                 uintInfo,
+                 discounted,
+                 note
                  );
          }
-
+*/
          if(receivableNo == ""){
             return (3,
                  bytesInfo1,
                  bytesInfo2,
-                 uintInfo
+                 uintInfo,
+                 discounted,
+                 note
                  );
          }
 
@@ -418,16 +510,20 @@ contract chain{
              return(1005,
                  bytesInfo1,
                  bytesInfo2,
-                 uintInfo
+                 uintInfo,
+                 discounted,
+                 note
                  );
          }
 
-
+/*
          if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
              return(1,
                  bytesInfo1,
                  bytesInfo2,
-                 uintInfo
+                 uintInfo,
+                 discounted,
+                 note
                  );
          }
 */
@@ -436,6 +532,7 @@ contract chain{
          uintInfo[2] = receivable.isseDt;
          uintInfo[3] = receivable.signInDt;
          uintInfo[4] = receivable.dueDt;
+         uintInfo[5] = receivable.discountInHandAmount;
 
         bytesInfo1[0] = receivableNo;
         bytesInfo1[1] = receivable.orderNo;
@@ -455,7 +552,9 @@ contract chain{
          return (0,
                  bytesInfo1,
                  acctSvcrNameAndEnterpriseName(receivableNo),
-                 uintInfo
+                 uintInfo,
+                 discounted,
+                 note
                  );
      }
 

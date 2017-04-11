@@ -105,7 +105,7 @@ public class ReceivableController {
     @ApiOperation(value = "根据应收款编号查应收款详情", notes = "根据应收款编号查应收款详情")
     @ResponseBody
     @RequestMapping(value = "receivableInfo",method = RequestMethod.POST)//路径
-    public BaseResult<Object> signOutReply(
+    public BaseResult<Object> getReceivableAllInfo(
             @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId
