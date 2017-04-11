@@ -17,4 +17,6 @@ public interface AccountEntityRepository extends
     AccountEntity save(AccountEntity accountEntity);
 
     List<AccountEntity> findByAddress(String address);
+
+    AccountEntity findByAcctId(String acctId);
 }

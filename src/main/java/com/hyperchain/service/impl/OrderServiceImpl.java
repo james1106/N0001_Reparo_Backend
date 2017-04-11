@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "order_reparo");
             Code code = contractResult.getCode();
             result.returnWithValue(code, orderId);
         } catch (ContractInvokeFailException e) {
@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "order_reparo");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService{
         String[] resultMapKey = new String[]{"partList1", "partList2", "partList3", "methodList"};
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "order_reparo");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -215,7 +215,7 @@ public class OrderServiceImpl implements OrderService{
         String[] resultMapKey = new String[]{};
         BaseResult result = new BaseResult();
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "order_reparo");
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {

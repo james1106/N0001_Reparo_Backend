@@ -97,7 +97,7 @@ public class OrderContractTest extends SpringBaseTest{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, "order_reparo");
             Code code = contractResult.getCode();
             result.returnWithValue(code, orderId);
         } catch (ContractInvokeFailException e) {
@@ -151,7 +151,7 @@ public class OrderContractTest extends SpringBaseTest{
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = orderId;
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns);
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, "order_reparo");
         BaseResult<Object> result = new BaseResult<>();
 //         将合约结果转化为接口返回数据
         int resultCode = contractResult.getCode().getCode();
@@ -219,7 +219,7 @@ public class OrderContractTest extends SpringBaseTest{
         String funcName = "queryAllOrderListForPayer";
         Object[] params = new Object[0];
 
-        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
+        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params, "order_reparo");
         transaction.sign(payerPrivateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
@@ -227,7 +227,7 @@ public class OrderContractTest extends SpringBaseTest{
         //System.out.println("==================invoke result:================== " + result);
 
         //返回值解码
-        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result, "order_reparo");
         System.out.println("==================after decode result:==================" + retDecode);
 
     }
@@ -241,7 +241,7 @@ public class OrderContractTest extends SpringBaseTest{
         Object[] params = new Object[0];
         //params[0] = orderId;
 
-        Transaction transaction = ESDKUtil.getTxHash(payeePublicKey, funcName, params);
+        Transaction transaction = ESDKUtil.getTxHash(payeePublicKey, funcName, params, "order_reparo");
         transaction.sign(payeePrivateKey, null);
 
         String result = ESDKConnection.invokeContractMethod(transaction);
@@ -249,7 +249,7 @@ public class OrderContractTest extends SpringBaseTest{
         //System.out.println("==================invoke result:================== " + result);
 
         //返回值解码
-        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
+        List<Object> retDecode = ESDKUtil.retDecode(funcName, result, "order_reparo");
         System.out.println("==================after decode result:==================" + retDecode);
 
     }

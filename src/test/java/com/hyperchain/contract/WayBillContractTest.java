@@ -201,7 +201,7 @@ public class WayBillContractTest extends SpringBaseTest {
         requestContractMethodParams[3] = requestStrs;
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey);
+        ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约generateUnConfirmedWayBill返回code：" + requestContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, requestContractResult.getCode());
 
@@ -215,7 +215,7 @@ public class WayBillContractTest extends SpringBaseTest {
         confirmContractMethodParams[3] = new Date().getTime(); //sendTime
         String[] confirmResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey);
+        ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
 
@@ -229,7 +229,7 @@ public class WayBillContractTest extends SpringBaseTest {
         listOrderNoContractMethodParams[3] = new Date().getTime(); //sendTime
         String[] listOrderNoResultMapKey = new String[]{"orderNoList"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey);
+        ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约listWayBillOrderNo返回code：" + listOrderNoContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, listOrderNoContractResult.getCode());
         Map<String, Object> listOrderNoResultValueMap = listOrderNoContractResult.getValueMap();

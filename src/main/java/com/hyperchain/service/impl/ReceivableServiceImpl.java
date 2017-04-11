@@ -27,7 +27,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -92,7 +92,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "receivableContract");
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -115,7 +115,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -218,7 +218,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -281,7 +281,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey);
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "receivableContract");
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {

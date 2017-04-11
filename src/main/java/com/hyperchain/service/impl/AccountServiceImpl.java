@@ -2,6 +2,8 @@ package com.hyperchain.service.impl;
 
 import cn.hyperchain.common.log.LogUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
@@ -10,6 +12,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.DesUtils;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
@@ -30,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -128,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BaseResult<Object> login(String accountName, String password, HttpServletResponse response) {
+    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) {
         UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
 
         //用户不存在
@@ -187,13 +191,8 @@ public class AccountServiceImpl implements AccountService {
             baseResult.returnWithoutValue(resultCode);
             return baseResult;
         } else { //密码正确：生成token
-            String address = userEntity.getAddress();
-            String token = TokenUtil.generateToken(address, userEntity.getRoleCode());
-            LogUtil.info("生成token：" + token);
             //把token存到cookie中
-            Cookie cookie = new Cookie("token", token);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+            setTokenToCookie(userEntity.getAddress(), userEntity.getRoleCode(), request, response);
             //返回成功状态和用户信息
             UserVo userVo = new UserVo(userEntity, accountEntity);
             BaseResult<Object> baseResult = new BaseResult<>();
@@ -400,6 +399,31 @@ public class AccountServiceImpl implements AccountService {
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, "ReparoAccount");
         LogUtil.info("调用合约newAccount返回code：" + contractResult.getCode());
         return contractResult;
+    }
+
+    private void setTokenToCookie(String address, int roleCode, HttpServletRequest request, HttpServletResponse response) {
+        boolean isSet = false; //toke是否已经设置
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = TokenUtil.generateToken(address, roleCode);
+                    LogUtil.info("生成token：" + token);
+                    cookie.setValue(token);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                    isSet = true;
+                }
+            }
+        }
+        if (isSet == false) {
+            String token = TokenUtil.generateToken(address, roleCode);
+            LogUtil.info("生成token：" + token);
+            Cookie cookie = new Cookie("token", token);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
     }
 
     /**

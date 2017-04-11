@@ -15,7 +15,7 @@ public class SignOutReplyServiceImpl implements SignOutReplyService{
     @Override
     public BaseResult<Object> invokeContract(ContractKey contractKey, Object[] contractMethodParams) throws Exception {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns);
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, "receivableContract");
         // 将合约结果转化为接口返回数据
         return ContractUtil.convert2BaseResult(contractResult);
     }
