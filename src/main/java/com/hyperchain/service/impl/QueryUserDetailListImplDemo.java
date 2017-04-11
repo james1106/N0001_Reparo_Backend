@@ -19,7 +19,7 @@ public class QueryUserDetailListImplDemo implements QueryUserDetailListDemo {
     @Override
     public BaseResult<Object> invokeContract(ContractKey contractKey, Object[] contractMethodParams) throws Exception {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns);
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns,"contractName");
 
         List<String> ids = (List<String>) contractResult.getValueMap().get(contractMethodReturns[0]);
         List<String> nicknames = (List<String>) contractResult.getValueMap().get(contractMethodReturns[1]);
