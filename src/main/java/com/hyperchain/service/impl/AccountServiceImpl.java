@@ -397,7 +397,7 @@ public class AccountServiceImpl implements AccountService {
         contractMethodParams[9] = acctSvcrName;
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey);
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, "ReparoAccount");
         LogUtil.info("调用合约newAccount返回code：" + contractResult.getCode());
         return contractResult;
     }

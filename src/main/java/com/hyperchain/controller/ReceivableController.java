@@ -197,7 +197,7 @@ public class ReceivableController {
     }
 
     @LogInterceptor
-    @ApiOperation(value = "应收款操作流水号", notes = "应收款操作流水号")
+    @ApiOperation(value = "应收款历史操作流水号", notes = "应收款历史操作流水号")
     @ResponseBody
     @RequestMapping(value = "historySerialNo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableHistorySerialNo(

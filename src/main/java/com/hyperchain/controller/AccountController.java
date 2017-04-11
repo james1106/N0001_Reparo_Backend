@@ -80,7 +80,7 @@ public class AccountController {
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public BaseResult<Object> login(
-            @ApiParam(value = "用户名", required = true) @RequestParam("account_name") String accountName,
+            @ApiParam(value = "用户名", required = true) @RequestParam("accountName") String accountName,
             @ApiParam(value = "密码", required = true) @RequestParam("password") String password,
             HttpServletResponse response) {
         return accountService.login(accountName, password, response);
@@ -92,9 +92,9 @@ public class AccountController {
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public BaseResult<Object> forgetPassword(
             @ApiParam(value = "手机号", required = true) @RequestParam("phone") String phone,
-            @ApiParam(value = "新密码", required = true) @RequestParam("new_password") String newPassword,
-            @ApiParam(value = "验证码", required = true) @RequestParam("security_code") String securityCode,
-            @ApiParam(value = "验证码id", required = true) @RequestParam("security_code_id") String securityCodeId) {
+            @ApiParam(value = "新密码", required = true) @RequestParam("newPassword") String newPassword,
+            @ApiParam(value = "验证码", required = true) @RequestParam("securityCode") String securityCode,
+            @ApiParam(value = "验证码id", required = true) @RequestParam("securityCodeId") String securityCodeId) {
         //TODO 找回密码controller
         return null;
     }

@@ -11,6 +11,7 @@ import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.controller.vo.ReceivableDetailVo;
 import com.hyperchain.controller.vo.ReceivableRecordDetailVo;
 import com.hyperchain.service.ReceivableService;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -229,7 +230,8 @@ public class ReceivableServiceImpl implements ReceivableService{
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
-        int discounted = (int)contractResult.getValueMap().get(resultMapKey[3]);
+//        int discounted = (int)contractResult.getValueMap().get(resultMapKey[3]);
+        int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[3])));
         String note = (String) contractResult.getValueMap().get(resultMapKey[4]);
 
         String receivableNo = partParams0.get(0);
@@ -330,9 +332,11 @@ public class ReceivableServiceImpl implements ReceivableService{
         String applicantAcctId = (String)contractResult.getValueMap().get(resultMapKey[2]);
         String replyerAcctId = (String)contractResult.getValueMap().get(resultMapKey[3]);
         String  responseType =  (String)contractResult.getValueMap().get(resultMapKey[4]);
-        long time =  (long)contractResult.getValueMap().get(resultMapKey[5]);
+//        long time = Long.parseLong(contractResult.getValueMap().get(resultMapKey[5]));
+        long time = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
         String operateType = (String)contractResult.getValueMap().get(resultMapKey[6]);
-        long dealAmt = (long)contractResult.getValueMap().get(resultMapKey[7]);
+//        long dealAmt = (long)contractResult.getValueMap().get(resultMapKey[7]);
+        long dealAmt = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
         String receivableStatus = (String)contractResult.getValueMap().get(resultMapKey[8]);
 
 
@@ -380,8 +384,9 @@ public class ReceivableServiceImpl implements ReceivableService{
 
 //        List<Object> partParams0 = contractResult.getValue();
         List<String> partParams0 = (List<String>) contractResult.getValue().get(0);
+//        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+//        result.returnWithValue(code, partParams0);
         result.returnWithValue(code, partParams0);
-//        result.returnWithValue(code, contractResult.getValueMap());
         return result;
     }
 
