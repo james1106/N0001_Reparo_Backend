@@ -112,7 +112,7 @@ public class AuthFilter implements javax.servlet.Filter {
     private void redirectToLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 //        String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
 //        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
-        httpServletResponse.sendRedirect("http://localhost:8080/reparo/index.html");
+        httpServletResponse.sendRedirect("http://localhost:8080/reparo/docs/index.html");
     }
 
     //不需要过滤的url
