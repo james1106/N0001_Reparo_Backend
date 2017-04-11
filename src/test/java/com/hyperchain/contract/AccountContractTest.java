@@ -25,11 +25,11 @@ public class AccountContractTest extends SpringBaseTest {
     @Test
     public void testAccount() throws GeneralSecurityException, IOException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.PRIVATE_KEY_PASSWORD); //加密私钥
+        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
         String accountJson = keyInfo.get(1); //含address 私钥
 
         //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.PRIVATE_KEY_PASSWORD);
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
         String contractMethodName = "newAccount";
         Object[] contractMethodParams = new Object[10];
         String randomString = TestUtil.getRandomString();
@@ -51,7 +51,7 @@ public class AccountContractTest extends SpringBaseTest {
         System.out.println("调用合约newAccount返回code：" + contractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, contractResult.getCode());
 
-        ContractKey contractKey1 = new ContractKey(accountJson, BaseConstant.PRIVATE_KEY_PASSWORD);
+        ContractKey contractKey1 = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
         String contractMethodName1 = "getAccount";
         Object[] contractMethodParams1 = new Object[0];
         String[] resultMapKey1 = new String[]{"accountName", "companyName", "roleCode", "accountStatus", "certType", "certNo", "acctId", "class", "acctSvcr", "acctSvcrName"};
@@ -63,12 +63,12 @@ public class AccountContractTest extends SpringBaseTest {
     @Test
     public void testRepeatedAccount() throws GeneralSecurityException, IOException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.PRIVATE_KEY_PASSWORD); //加密私钥
+        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
         String accountJson = keyInfo.get(1); //含address 私钥
 
         for (int i = 0; i < 2; i++) {
             //账户信息存储到区块链
-            ContractKey contractKey = new ContractKey(accountJson, BaseConstant.PRIVATE_KEY_PASSWORD);
+            ContractKey contractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
             String contractMethodName = "newAccount";
             Object[] contractMethodParams = new Object[10];
             String randomString = TestUtil.getRandomString();

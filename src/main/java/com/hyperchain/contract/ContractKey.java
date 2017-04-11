@@ -11,7 +11,7 @@ import com.hyperchain.common.exception.PrivateKeyIllegalParam;
  */
 public class ContractKey {
     String privateKey;
-    String password = BaseConstant.PRIVATE_KEY_PASSWORD;
+    String password = BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD;
     String publicKey;
 
     public ContractKey(String privateKey, String password) throws PrivateKeyIllegalParam {

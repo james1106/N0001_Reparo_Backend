@@ -58,6 +58,7 @@ public class AuthFilter implements javax.servlet.Filter {
                     if (CommonUtil.isEmpty(token)) {
                         LogUtil.info("token为空");
                         redirectToLogin(httpServletRequest, httpServletResponse);
+                        return;
                     }
 
                     LogUtil.info("用户token：" + tokenInfo);
@@ -77,6 +78,7 @@ public class AuthFilter implements javax.servlet.Filter {
                         if (null == userEntity) {
                             LogUtil.info("token用户未注册");
                             redirectToLogin(httpServletRequest, httpServletResponse);
+                            return;
                         } else {
                             LogUtil.info("token验证通过");
                             //重设cookie中的token时间戳
@@ -86,10 +88,12 @@ public class AuthFilter implements javax.servlet.Filter {
                             cookie.setPath("/");
                             httpServletResponse.addCookie(newCookie);
                             filterChain.doFilter(servletRequest, servletResponse);
+                            return;
                         }
                     } catch (JSONException e) {
                         LogUtil.info("token json解析失败");
                         redirectToLogin(httpServletRequest, httpServletResponse);
+                        return;
                     }
 
                 }
@@ -108,7 +112,7 @@ public class AuthFilter implements javax.servlet.Filter {
     private void redirectToLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 //        String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
 //        httpServletResponse.sendRedirect(host + "/reparo/docs/index.html");
-        httpServletResponse.sendRedirect("http://localhost:8080/reparo/docs/index.html");
+        httpServletResponse.sendRedirect("http://localhost:8080/reparo/index.html");
     }
 
     //不需要过滤的url
