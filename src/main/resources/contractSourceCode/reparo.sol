@@ -1,6 +1,49 @@
+/*
+* ==========运单状态=======
+* 0 UNDEFINED  未定义
+  1 REQUESTING 发货待响应
+  2 REJECTED   发货被拒绝
+  3 SENDING    已发货
+  4 RECEIVED   已送达
+  ==========运单状态=======
 
+ *=========仓储状态=======
+ *  0 UNDEFINED                 未定义
+    1 WATING_INCOME_RESPONSE    入库待响应
+    2 WATING_INCOME             待入库
+    3 INCOMED                   已入库
+    4 WATING_OUTCOME_RESPONSE   出库待响应
+    5 WATING_OUTCOME            待出库
+    6 OUTCOMED                  已出库
+ ==========仓储状态=======
 
-contract ReparoAccount {
+ *=========仓单状态=======
+ 0 UNDEFINED                 未定义
+ ==========仓单状态=======
+
+ ==========订单交易状态=======
+   0  未定义
+   1  待确认
+   2  已确认
+ ==========订单交易状态=======
+
+ ==========应收款状态=======
+ 0      未定义
+ 1      已结清
+ 2      已作废
+ 3      签收拒绝
+ 21     承兑待签收
+ 26     承兑已签收
+ 31     已兑付
+ 36     已部分兑付
+ 39     兑付失败
+ 41     贴现待签收
+ 46     贴现已签收
+ 48     已部分贴现
+ 49     已全额贴现
+ ==========应收款状态=======
+* */
+contract AccountContract {
 
 enum RoleCode {COMPANY, LOGISTICS, REPOSITORY, FINANCIAL} //RCOMPANY融资企业, LOGISTICS物流公司,REPOSITORY仓储公司,FINANCIAL金融机构
 enum AccountStatus {VALID, INVALID,FROZEN} //账户状态，有效、无效、冻结
@@ -49,8 +92,7 @@ enum AccountStatus {VALID, INVALID,FROZEN} //账户状态，有效、无效、�
 
 }
 
-
-contract receivableContract{
+contract ReceivableContract{
     //应收款
     struct Receivable {
         bytes32 receivableNo;//应收款编号
@@ -708,9 +750,31 @@ enum DiscountedStatus {NO, YES} //贴现标志位
      }
      */
 
+
     //查找应收款的交易历史，返回流水号
-    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
-        return (0, receivableTransferHistoryMap[receivableNo]);
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint,bytes32[],uint[],ResponseType[]){
+        //return (0, receivableTransferHistoryMap[receivableNo]);
+        bytes32[] memory historyList1;
+        historyList1 = receivableTransferHistoryMap[receivableNo];
+        uint len = historyList1.length;
+        bytes32[] memory bytesList = new bytes32[](len * 5);//5个值
+        uint[] memory intList   = new uint[](len * 2);//2 ge
+        ResponseType[] memory responseTypeList = new ResponseType[](len);//1 ge
+
+        for (uint index = 0; index < len; index++) {
+            bytesList[index * 5] = receivableRecordMap[historyList1[index]].receivableNo;
+            bytesList[index * 5 + 1] = receivableRecordMap[historyList1[index]].serialNo;
+            bytesList[index * 5 + 2] = receivableRecordMap[historyList1[index]].applicantAcctId;
+            bytesList[index * 5 + 3] = receivableRecordMap[historyList1[index]].replyerAcctId;
+            bytesList[index * 5 + 4] = receivableRecordMap[historyList1[index]].operateType;
+
+            intList[index * 2] = receivableRecordMap[historyList1[index]].time;
+            intList[index * 2 + 1] = receivableRecordMap[historyList1[index]].dealAmount;
+
+            responseTypeList[index] = receivableRecordMap[historyList1[index]].responseType;
+        }
+
+        return (0,bytesList,intList,responseTypeList);
     }
 
     //流水号查询，自己查自己
@@ -756,7 +820,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 }
-contract Repository{
+contract RepositoryContract{
     //仓单结构体
     struct RepoCert{
         bytes32 incomeCert  ;// 入库凭证
@@ -1150,7 +1214,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         return string(c);
     }
 }
-contract order_reparo{
+contract OrderContract{
     address owner;
     function Reparo(){
         owner = msg.sender;
