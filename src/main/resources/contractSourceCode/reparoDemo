@@ -1,14 +1,14 @@
 contract Reparo {
-    
+
     struct User{
         uint id;
         bytes32 nickName;
         bytes32 password;
         bytes32 phoneNum;
     }
-    
+
     mapping (uint=>User) user;
-    
+
     uint[] users;
     string[] ss;
 
@@ -48,5 +48,46 @@ contract Reparo {
         }
 
       return (0, IdArr, nickNameArr, passwordArr, phoneNumArr);
+    }
+
+}
+contract contract1{
+    address owner;
+    function contract1(){
+        owner = msg.sender;
+    }
+
+    function callOthersContract(address conAddress) returns (uint) {
+      testContract   con =   testContract (conAddress) ;
+      return con.getV();
+    }
+
+    function callOthersContract2(address conAddress,uint key) returns (uint,uint) {
+          testContract   con =   testContract (conAddress) ;
+          return con.getMap(key);
+    }
+}
+contract testContract{
+    uint v;
+
+    //
+    mapping( uint => uint) accountMap;
+
+    function setV(uint bb) returns (uint){
+        v = bb;
+        return v;
+    }
+
+    function getV() returns (uint) {
+        return v;
+    }
+
+    function setMap(uint key,uint value) returns (uint){
+        accountMap[key] = value;
+        return 0;
+    }
+
+    function getMap(uint key) returns (uint,uint){
+           return (0,accountMap[key]) ;
     }
 }

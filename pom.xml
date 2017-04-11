@@ -56,8 +56,8 @@
 			<groupId>cn.hyperchain</groupId>
 			<artifactId>esdk</artifactId>
 			<scope>system</scope>
-			<version>2.0</version>
-			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/esdk-2.0.jar</systemPath>
+			<version>3.0</version>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/esdk-3.0.jar</systemPath>
 		</dependency>
 		<!--添加本地jar包結束-->
 
