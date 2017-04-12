@@ -606,12 +606,7 @@ contract ReceivableContract{
         return (0);
     }
 
-<<<<<<< HEAD
-    //根据应收款编号查询单张应收款具体信息
-=======
 //根据应收款编号查询单张应收款具体信息
-//根据应收款编号查询单张应收款具体信息
->>>>>>> 45bc4db916dc9eddc776f1a973b5cece34517a1b
     function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
         Receivable receivable = receivableDetailMap[receivableNo];
@@ -818,43 +813,19 @@ contract ReceivableContract{
         return orderCon.queryProductQuantityByOrderNo(orderNo);
     }
     function callAccountContractGetPyerEnterpriseName(address accountAddress, bytes32 receivableNo) returns (bytes32){
-        Account accountCon = AccountContract(accountAddress);
+        AccountContract accountCon = AccountContract(accountAddress);
         Receivable receivable = receivableDetailMap[receivableNo];
         bytes32 acctId = receivable.pyer;
         return accountCon.getEnterpriseNameByAcctId(acctId);
     }
     function callAccountContractGetPyeeEnterpriseName(address accountAddress, bytes32 receivableNo) returns (bytes32){
-        Account accountCon = AccountContract(accountAddress);
+        AccountContract accountCon = AccountContract(accountAddress);
         Receivable receivable = receivableDetailMap[receivableNo];
         bytes32 acctId = receivable.pyee;
         return accountCon.getEnterpriseNameByAcctId(acctId);
     }
 
 /*
-    function callAccountContractGetAddress(address accountAddress, bytes32 acctId) returns (address){
-        Account accountCon = AccountContract(accountAddress);
-        return accountCon.getAddress(acctId);
-    }
-*/
-
-/*
-contract contract1{
-    address owner;
-    function contract1(){
-        owner = msg.sender;
-    }
-
-    function callOthersContract(address conAddress) returns (uint) {
-      testContract   con =   testContract (conAddress) ;
-      return con.getV();
-    }
-
-    function callOthersContract2(address conAddress,uint key) returns (uint,uint) {
-          testContract   con =   testContract (conAddress) ;
-          return con.getMap(key);
-    }
-}
-
     function acctSvcrNameAndEnterpriseName(bytes32 receivableNo) returns (bytes32[]){
         Receivable receivable = receivableDetailMap[receivableNo];
         address pyerAddress = acctIdToAddressMap[receivable.pyer];
@@ -874,7 +845,7 @@ contract contract1{
         return bytesInfo;
     }
 */
-<<<<<<< HEAD
+
     /*
      function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
      Receivable receivable = receivableDetailMap[receivableNo];
@@ -1056,9 +1027,8 @@ contract contract1{
  }
  */
 
-
+/*
 //查找应收款的交易历史，返回流水号
->>>>>>> 45bc4db916dc9eddc776f1a973b5cece34517a1b
     function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint,bytes32[],uint[],ResponseType[]){
     //return (0, receivableTransferHistoryMap[receivableNo]);
         bytes32[] memory historyList1;
