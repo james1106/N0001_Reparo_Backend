@@ -106,6 +106,22 @@ contract AccountContract {
         return (0, account.accountName, account.enterpriseName, account.roleCode, account.accountStatus, account.certType, account.certNo, account.acctId, account.svcrClass, account.acctSvcr, account.acctSvcrName); //成功
     }
 
+    function isAccountExist(address accountAddress) returns (bool){
+        if(accountMap[accountAddress].accountName == ""){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    function checkRoleCode(address accountAddress, uint targetRoleCode)returns (bool){
+        if(accountMap[accountAddress].roleCode == targetRoleCode){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 }
 
 
@@ -1798,10 +1814,10 @@ contract WayBillContract {
     //TODO ：运单上的每一个address都要判断用户是否存在？（发货者、收货者、物流、发货仓储、收货仓储）
 
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        if(checkRoleCode(msg.sender, ROLE_COMPANY) == false || msg.sender != addrs[1]){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false || msg.sender != addrs[1]){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
         if(statusTransIdToWayBillDetail[strs[4]].productName != ""){ //运单已经存在
@@ -1829,10 +1845,10 @@ contract WayBillContract {
         WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]];
 
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        if(checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress || oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress || oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
 
@@ -1848,10 +1864,10 @@ contract WayBillContract {
     function listWayBillOrderNo(address accountContractAddr) returns (uint code, bytes32[] orderNoList){
         accountContract = AccountContract (accountContractAddr);
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return (CODE_INVALID_USER, orderNoList);
         }
-        if(checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
             return (CODE_PERMISSION_DENIED, orderNoList);
         }
 
@@ -1862,10 +1878,10 @@ contract WayBillContract {
     function getWayBill(bytes32 orderNo, address accountContractAddr) returns (uint code, uint[] ints, bytes32[] strs, address[] addrs, bytes32[] logisticsInfo, uint waybillStatus) {
         accountContract = AccountContract (accountContractAddr);
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return (CODE_INVALID_USER,ints, strs, addrs, logisticsInfo, waybillStatus);
         }
-        if(checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
             return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo, waybillStatus);
         }
 
@@ -1937,10 +1953,10 @@ contract WayBillContract {
         orderContract = OrderContract (orderContractAddr);
 
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        if(checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
 
@@ -1964,10 +1980,10 @@ contract WayBillContract {
         accountContract = AccountContract (accountContractAddr);
 
     //权限控制
-        if(isAccountExist(msg.sender) == false){ //用户不存在
+        if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        if(checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
 
@@ -1986,27 +2002,6 @@ contract WayBillContract {
         orderNoToStatusTransIdList[orderNo][statusTransIdList.length] =  statusTransId;
     //
         return (CODE_SUCCESS);
-    }
-
-
-    function isAccountExist(address accountAddress) returns (bool){
-
-        var(code, accountName, enterpriseName, roleCode, accountStatus, certType, certNo, cctId, class, acctSvcr, acctSvcrName) = accountContract.getAccountByAddress(accountAddress);
-
-        if(accountName == ""){
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-    function checkRoleCode(address accountAddress, uint targetRoleCode)returns (bool){
-        var(code, accountName, enterpriseName, roleCode, accountStatus, certType, certNo, cctId, class, acctSvcr, acctSvcrName) = accountContract.getAccountByAddress(accountAddress);
-        if(roleCode == targetRoleCode){
-            return true;
-        }else{
-            return false;
-        }
     }
 
 //备注：用户权限控制：用户是否存在，用户身份操作权限，业务状态流转权限
