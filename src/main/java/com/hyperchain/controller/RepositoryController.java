@@ -146,7 +146,7 @@ public class RepositoryController {
     }
 
     @LogInterceptor
-    @ApiOperation(value = "查询仓储流转历史", notes = "查询仓储流转历史")
+    @ApiOperation(value = "查询仓储详情+仓储流转历史", notes = "查询仓储详情+仓储流转历史")
     @ResponseBody
     @RequestMapping(value = "getRepoBusiHistoryList",method = RequestMethod.POST)
     public BaseResult<Object> getRepoBusiHistoryList(

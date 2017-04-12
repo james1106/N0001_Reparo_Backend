@@ -1541,7 +1541,7 @@ contract RepositoryContract{
         bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
         uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4-出库待响应,5-待出库,6-已出库）
         bytes32 orderNo ;// 订单号
-        bytes   wayBillNo   ;// 运单号
+        bytes32 wayBillNo   ;// 运单号
         bytes32 repoCertNo  ;// 仓单编号
         address logisticsEnterpriseAddress  ;// 物流公司
         address repoEnterpriseAddress   ;// 保管人(仓储公司)
@@ -1555,7 +1555,7 @@ contract RepositoryContract{
         uint    productUnitPrice;//货品单价(分)
         uint    productTotalPrice   ;// 货品合计金额(分)
         bytes32 productLocation ;// 仓储物场所（地址，前台填）
-        bytes32 operateOperateTime  ;// 操作时间(时间戳)
+        uint operateOperateTime  ;// 操作时间(时间戳)
     }
 
 
@@ -1595,7 +1595,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         bytes32 orderNo,              //  仓储状态
         address storerAddress,        //  存货人
         address repoEnterpriseAddress,//  保管人(仓储公司)
-        bytes32 operateOperateTime,   //  操作时间(时间戳)
+        uint operateOperateTime,   //  操作时间(时间戳)
         bytes32 productName,  //  仓储物名称
         uint    productQuantitiy,     //  仓储物数量
         uint    productUnitPrice,     //  货品单价(分)
@@ -1648,7 +1648,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     function incomeResponse(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 1
-        bytes32 operateOperateTime   //  操作时间(时间戳)
+        uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
@@ -1671,7 +1671,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     function incomeConfirm(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
-        bytes32 operateOperateTime   //  操作时间(时间戳)
+        uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
@@ -1694,7 +1694,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     function outcomeApply(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
-        bytes32 operateOperateTime   //  操作时间(时间戳)
+        uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
 
         //waittodo 待补充
@@ -1716,7 +1716,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     function outcomeResponse(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 4
-        bytes32 operateOperateTime   //  操作时间(时间戳)
+        uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
@@ -1737,7 +1737,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
     function outcomeConfirm(bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 4
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 5
-        bytes32 operateOperateTime   //  操作时间(时间戳)
+        uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
@@ -1797,10 +1797,6 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         );
         return (0,repoCertNo);
     }
-
-
-
-
     //仓储业务历史列表
     /* bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
      uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4-出库待响应,5-待出库,6-已出库）
@@ -1811,25 +1807,74 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         historyList1 = businessTransNoMap[repoBusinessNo];
         uint len = historyList1.length;
 
-        bytes32[] memory bytesList = new bytes32[](len * 2);//2个值
-        uint[] memory intList   = new uint[](len);//1 ge
+        bytes32[] memory bytesList = new bytes32[](len);//1个值
+        uint[] memory intList   = new uint[](len*2);//2 ge
 
         for (uint index = 0; index < len; index++) {
             bytesList[index * 2] = historyList1[index];//liu shui hao
-            bytesList[index * 2 + 1] = businessDetailMap[historyList1[index]].operateOperateTime;
+            //bytesList[index * 2 + 1] = businessDetailMap[historyList1[index]].operateOperateTime;
 
-            intList[index] = businessDetailMap[historyList1[index]].repoBusiStatus;
+            intList[index* 2 + 1] = businessDetailMap[historyList1[index]].repoBusiStatus;
+            intList[index* 2 ] = businessDetailMap[historyList1[index]].operateOperateTime;
         }
 
         return (0,bytesList,intList);
+    }
+
+    function getRepoBusiDtlAndHistoryList(bytes32 repoBusinessNo) returns (uint,uint[],bytes32[],uint[],address[]){
+        //===================获取操作历史列表，包含操作流水号，操作时间=================／／
+        bytes32[] memory historyList1;
+        historyList1 = businessTransNoMap[repoBusinessNo];
+        uint len = historyList1.length;
+
+        //bytes32[] memory bytesList = new bytes32[](len * 2);//2个值
+        uint[] memory historyList   = new uint[](len * 2);//2 ge
+
+        //bytes32 repoBusiTranNo;
+        RepoBusiness memory repoBusinsess;
+        for (uint index = 0; index < len; index++) {
+            //repoBusiTranNo  = historyList1[index];
+            repoBusinsess = businessDetailMap[historyList1[index]];
+            /*
+             historyList[index * 2] = historyList1[index];//流水号
+             historyList[index * 2 + 1] = businessDetailMap[historyList1[index]].operateOperateTime;
+             */
+
+            historyList[index * 2] = repoBusinsess.repoBusiStatus;//
+            historyList[index * 2 + 1] = repoBusinsess.operateOperateTime;
+
+            //intList[index] = businessDetailMap[historyList1[index]].repoBusiStatus;
+        }
+
+        //===================获取仓储详情=================
+        bytes32[]   memory detailInfoList1 = new bytes32[](5);//5个值
+        uint[]      memory detailInfoList2 = new uint[](4);//4个值
+        address[]   memory detailInfoList3 = new address[](2);//个值
+
+        detailInfoList1[0] = repoBusinsess.repoBusinessNo;
+        detailInfoList1[1] = repoBusinsess.wayBillNo;
+        detailInfoList1[2] = repoBusinsess.repoCertNo;
+        detailInfoList1[3] = repoBusinsess.productName;
+        detailInfoList1[4] = repoBusinsess.measureUnit;
+        //detailInfoList1[5] = repoBusinsess.operateOperateTime;
+
+        detailInfoList2[0] = repoBusinsess.repoBusiStatus;
+        detailInfoList2[1] = repoBusinsess.productQuantitiy;
+        detailInfoList2[2] = repoBusinsess.productTotalPrice;
+        detailInfoList2[3] = repoBusinsess.operateOperateTime;
+
+        detailInfoList3[0] = repoBusinsess.logisticsEnterpriseAddress;
+        detailInfoList3[1] = repoBusinsess.repoEnterpriseAddress;
+
+        return (0,historyList,detailInfoList1,detailInfoList2,detailInfoList3);
     }
 
 //查询仓储业务详情详情
     function getRepoBusinessDetail(bytes32 businessTransNo) returns(uint,
         uint,/// 仓储状态
         address,//持有人
-        bytes32[] ,//3个
-        uint[]   //3个
+        bytes32[] ,//2个
+        uint[]   //4个
     ) {
         //waittodo 校验
         RepoBusiness busDtl =  businessDetailMap[businessTransNo];
@@ -1838,12 +1883,13 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         /**/
         outBytesList[0] = busDtl.productName;
         outBytesList[1] = busDtl.measureUnit;
-        outBytesList[2] = busDtl.operateOperateTime;
+        //outBytesList[2] = busDtl.operateOperateTime;
 
         /**/
         outUintList[0] = busDtl.productQuantitiy;
         outUintList[1] = busDtl.productUnitPrice;
         outUintList[2] = busDtl.productTotalPrice;
+        outUintList[3] = busDtl.operateOperateTime;
 
         return (0,
                 busDtl.repoBusiStatus,

@@ -110,8 +110,8 @@ public class RepositoryServiceImpl implements RepositoryService{
 
     @Override
     public BaseResult<Object> getRepoBusiHistoryList(ContractKey contractKey, Object[] contractParams) {
-        String contractMethodName = "getRepoBusiHistoryList";
-        String[] resultMapKey = new String[]{"partList1", "partList2"};//给返回值取了个名称
+        String contractMethodName = "getRepoBusiDtlAndHistoryList";
+        String[] resultMapKey = new String[]{"historyList", "detailInfoList1","detailInfoList2","detailInfoList3"};//给返回值取了个名称
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
@@ -131,12 +131,15 @@ public class RepositoryServiceImpl implements RepositoryService{
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
 
-        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
-        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> historyList = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> detailInfoList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> detailInfoList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+        List<String> detailInfoList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[3]);
+
        // List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
-        int length = partList2.size();
-        List<RepoBusinessVo> repoBusuVoList = new ArrayList<>();
-        for(int i = 0; i < length; i++){
+        int length = historyList.size();
+        List<OperationRecordVo> opVoList = new ArrayList<>();
+        for(int i = 0; i < length / 2; i++){
             /*ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
             receivableVo.setSerialNo(partList1.get(i*5+1));
             receivableVo.setReceivableNo(partList1.get(i*5));
@@ -152,18 +155,38 @@ public class RepositoryServiceImpl implements RepositoryService{
             // receivableVo.setReceivableStatus(Long.parseLong(partList3.get(i*5+1)));
 
 
-            RepoBusinessVo repoBusinessVo  = new RepoBusinessVo();
+            //RepoBusinessVo repoBusinessVo  = new RepoBusinessVo();
 
-            repoBusinessVo.setBusinessTransNo(partList1.get(i*2));
+            /*repoBusinessVo.setBusinessTransNo(partList1.get(i*2));
             repoBusinessVo.setOperateOperateTime(partList1.get(i*2 + 1));
-            repoBusinessVo.setRepoBusiStatus(partList2.get(i));
+            repoBusinessVo.setRepoBusiStatus(partList2.get(i));*/
 
-            repoBusuVoList.add(repoBusinessVo);
+            //OperationRecordVo opVo = new OperationRecordVo();
+
+            //repoBusuVoList.add(opVo);
+            //operationRecordVoList
+            OperationRecordVo opVo = new OperationRecordVo(Integer.parseInt(historyList.get(i * 2)), Long.parseLong(historyList.get(i * 2+ 1)));
+            opVoList.add(opVo);
         }
+        RepoBusinessVo repoBusinessVo  = new RepoBusinessVo();
+        repoBusinessVo.setOperationRecordVoList(opVoList);
+        repoBusinessVo.setRepoBusiNo(detailInfoList1.get(0));
+        repoBusinessVo.setWaybillNo(detailInfoList1.get(1));
+        repoBusinessVo.setRepoCertNo(detailInfoList1.get(2));
+        repoBusinessVo.setProductName(detailInfoList1.get(3));
+        repoBusinessVo.setMeasureUnit(detailInfoList1.get(4));
 
-        result.returnWithValue(code, repoBusuVoList);
+        repoBusinessVo.setCurRepoBusiStatus(Integer.parseInt(detailInfoList2.get(0)));
+        repoBusinessVo.setProductQuantity(Long.parseLong(detailInfoList2.get(1)));
+        repoBusinessVo.setProductTotalPrice(Long.parseLong(detailInfoList2.get(2)));
+        repoBusinessVo.setOpgTimeOfCurStatus(detailInfoList2.get(3));
 
-        return result;
+        repoBusinessVo.setLogisticsEntepsName(detailInfoList3.get(0));
+        repoBusinessVo.setRepoEnterpriceName(detailInfoList3.get(1));
+
+        //result.returnWithValue(code, repoBusuVoList);
+         result.returnWithValue(code, repoBusinessVo);
+         return result;
     }
 
 }
