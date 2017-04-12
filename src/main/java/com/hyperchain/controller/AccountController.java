@@ -108,7 +108,6 @@ public class AccountController {
     public BaseResult<Object> testLogin(HttpServletRequest request) {
         System.out.println("进入");
         String address = TokenUtil.getAddressFromCookie(request);
-
         System.out.println("拿到地址：" + address);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.setCode(0);
