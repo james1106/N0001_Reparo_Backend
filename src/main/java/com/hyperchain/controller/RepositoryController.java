@@ -127,7 +127,7 @@ public class RepositoryController {
     public BaseResult<Object> incomeApplyResponse(
             @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo
      ) throws Exception {
-
+        //String methodName = "getRepoBusinessDetail";
         BaseResult result = new BaseResult();
         Code code;
         long operateTime = System.currentTimeMillis();
