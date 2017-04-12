@@ -18,7 +18,7 @@ public enum Code {
     JSON_TRANSFER_ERROR(20, "JSON转化异常"),
 
     //订单管理部分
-    ORDER_NOT_EXIST(2001, "账单不存在"),
+    ORDER_NOT_EXIST(2001, "订单不存在"),
     QEURY_ORDER_PERMISSION_DENIED(2002, "无权限查询该账单"),
     COMPANY_NOT_BE_REGISTERED(2003, "卖方公司名称未注册"),
     ORDER_ALREADY_EXSIT(2004, "该订单号已经存在"),

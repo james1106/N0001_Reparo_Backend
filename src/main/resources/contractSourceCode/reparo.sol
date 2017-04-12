@@ -1497,14 +1497,14 @@ contract OrderContract{
         Order order = orderDetailMap[orderNo];
 
     //如果订单不存在，返回"订单不存在"
-    /*if(!orderExists(orderNo)){
-        return (2001, resultAccount, resultBytes32, resultUint, resultMethod, txState);
-    }*/
+        if(!orderExists(orderNo)){
+            return (2001, resultAccount, resultBytes32, resultUint, resultMethod, txState);
+        }
 
     //如果订单与合约调用者无关，"权限拒绝"
-    /*if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
-        return (2005, resultAccount, resultBytes32, resultUint, resultMethod, txState);
-    }*/
+        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
+            return (2005, resultAccount, resultBytes32, resultUint, resultMethod, txState);
+        }
     //取出应收账款概要信息
     //param1:receNo, receivingSide, payingSide, dueDate
     //param2:receGenerateTime, receAmount, coupon, receLatestStatus, receUpdateTime
@@ -1696,6 +1696,20 @@ contract OrderContract{
     //添加该订单对应的流水号
         txSerialNoList[orderNo].push(txSerialNo);
         return 0;
+    }
+
+/*============================================================================
+                                其他合约接口方法
+  ============================================================================*/
+
+/***********************根据订单编号查询货品名称*********************************/
+    function queryProductNameByOrderNo(bytes32 orderNo)returns(bytes32){
+        return orderDetailMap[orderNo].productName;
+    }
+
+/***********************根据订单编号查询货品数量*********************************/
+    function queryProductQuantityByOrderNo(bytes32 orderNo)returns(uint){
+        return orderDetailMap[orderNo].productQuantity;
     }
 }
 contract WayBillContract {
