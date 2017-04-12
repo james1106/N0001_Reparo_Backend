@@ -12,7 +12,7 @@ public class ReceivableRecordDetailVo {
     private long time;
     private String operateType;
     private long dealAmount;
-    private String receivableStatus;
+    private int receivableStatus;
 
     public String getSerialNo() {
         return serialNo;
@@ -78,11 +78,11 @@ public class ReceivableRecordDetailVo {
         this.dealAmount = dealAmount;
     }
 
-    public String getReceivableStatus() {
+    public int getReceivableStatus() {
         return receivableStatus;
     }
 
-    public void setReceivableStatus(String receivableStatus) {
+    public void setReceivableStatus(int receivableStatus) {
         this.receivableStatus = receivableStatus;
     }
 }

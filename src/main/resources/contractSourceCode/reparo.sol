@@ -1,6 +1,49 @@
+/*
+* ==========运单状态=======
+* 0 UNDEFINED  未定义
+  1 REQUESTING 发货待响应
+  2 REJECTED   发货被拒绝
+  3 SENDING    已发货
+  4 RECEIVED   已送达
+  ==========运单状态=======
 
+ *=========仓储状态=======
+ *  0 UNDEFINED                 未定义
+    1 WATING_INCOME_RESPONSE    入库待响应
+    2 WATING_INCOME             待入库
+    3 INCOMED                   已入库
+    4 WATING_OUTCOME_RESPONSE   出库待响应
+    5 WATING_OUTCOME            待出库
+    6 OUTCOMED                  已出库
+ ==========仓储状态=======
 
-contract ReparoAccount {
+ *=========仓单状态=======
+ 0 UNDEFINED                 未定义
+ ==========仓单状态=======
+
+ ==========订单交易状态=======
+   0  未定义
+   1  待确认
+   2  已确认
+ ==========订单交易状态=======
+
+ ==========应收款状态=======
+ 0      未定义
+ 1      已结清
+ 2      已作废
+ 3      签收拒绝
+ 21     承兑待签收
+ 26     承兑已签收
+ 31     已兑付
+ 36     已部分兑付
+ 39     兑付失败
+ 41     贴现待签收
+ 46     贴现已签收
+ 48     已部分贴现
+ 49     已全额贴现
+ ==========应收款状态=======
+* */
+contract AccountContract {
 
 enum RoleCode {COMPANY, LOGISTICS, REPOSITORY, FINANCIAL} //RCOMPANY融资企业, LOGISTICS物流公司,REPOSITORY仓储公司,FINANCIAL金融机构
 enum AccountStatus {VALID, INVALID,FROZEN} //账户状态，有效、无效、冻结
@@ -49,8 +92,7 @@ enum AccountStatus {VALID, INVALID,FROZEN} //账户状态，有效、无效、�
 
 }
 
-
-contract receivableContract{
+contract ReceivableContract{
     //应收款
     struct Receivable {
         bytes32 receivableNo;//应收款编号
@@ -63,8 +105,8 @@ contract receivableContract{
         bytes32 secondOwner;//下手持有人账号
         uint isseAmt; //票面金额
         uint cashedAmount;//已兑付金额
-        bytes32 status;//应收款状态
-        bytes32 lastStatus;//上一状态
+        uint status;//应收款状态
+        uint lastStatus;//上一状态
         uint isseDt; //签发日
         uint signInDt;//签收日
         uint dueDt; //到期日
@@ -86,7 +128,7 @@ contract receivableContract{
         uint time;//时间戳
         bytes32 operateType; //操作类型
         uint dealAmount;//操作金额
-        bytes32 receivableStatus;//应收款状态
+        uint receivableStatus;//应收款状态
     }
 
     //帐户信息
@@ -214,7 +256,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
     //记录操作详情
-    function newReceivableRecord(bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType response, uint time, bytes32 operateType, uint dealAmount, bytes32 receivableStatus) internal {
+    function newReceivableRecord(bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType response, uint time, bytes32 operateType, uint dealAmount, uint receivableStatus) internal {
         receivableRecordMap[serialNo].serialNo = serialNo;
         receivableRecordMap[serialNo].receivableNo = receivableNo;
         receivableRecordMap[serialNo].applicantAcctId = applicantAcctId;
@@ -280,7 +322,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivable.isseDt = time;
         receivable.dueDt = dueDt;
         receivable.rate = rate;
-        receivable.status = "020001";
+        receivable.status = 21;
         receivable.contractNo = contractAndInvoiceNo[0];
         receivable.invoiceNo = contractAndInvoiceNo[1];
         newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
@@ -305,7 +347,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          }
          */
         Receivable receivable = receivableDetailMap[receivableNo];
-        if(receivable.status != "020001"){
+        if(receivable.status != 21){
             return (1006);
         }
         /*        if(replyerAcctId != receivable.accptr){
@@ -313,9 +355,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          }*/
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
-            receivable.status = "000003";
+            receivable.status = 3;
         }else{
-            receivable.status = "020006";
+            receivable.status = 26;
         }
         receivable.signInDt = time;
 
@@ -353,7 +395,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          */
         Receivable receivable = receivableDetailMap[receivableNo];
         receivable.lastStatus = receivable.status;
-        receivable.status = "070001";
+        receivable.status = 41;
         receivable.secondOwner = replyerAcctId;
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
@@ -406,11 +448,11 @@ enum DiscountedStatus {NO, YES} //贴现标志位
                 copyValue(receivableNo, newReceivableNo);
                 newReceivable.receivableNo = newReceivableNo;
                 receivable.lastStatus = receivable.status;
-                receivable.status = "070009";//已全额贴现
+                receivable.status = 49;//已全额贴现
                 receivable.discounted = DiscountedStatus.YES;
                 receivable.signInDt = time;
-                newReceivable.lastStatus = "070001";
-                newReceivable.status = "070006";//贴现已签收
+                newReceivable.lastStatus = 41;
+                newReceivable.status = 46;//贴现已签收
                 newReceivable.signInDt = time;
                 newReceivable.firstOwner = receivable.secondOwner;
                 newReceivable.secondOwner = "";
@@ -421,7 +463,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
                 copyValue(receivableNo, newReceivableNo);
                 newReceivable.receivableNo = newReceivableNo;
                 newReceivable.lastStatus = newReceivable.status;
-                newReceivable.status = "070006";//贴现已签收
+                newReceivable.status = 46;//贴现已签收
                 newReceivable.isseAmt = discountApplyAmount;
                 newReceivable.firstOwner = receivable.secondOwner;
                 newReceivable.secondOwner = "";
@@ -429,7 +471,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
                 newReceivable.signInDt = time;
 
                 receivable.lastStatus = receivable.status;
-                receivable.status = "070008";//已部分贴现
+                receivable.status = 48;//已部分贴现
                 receivable.isseAmt = oriAmount - discountApplyAmount;
                 receivable.signInDt = time;
                 receivable.firstOwner = receivable.firstOwner;
@@ -488,7 +530,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
     //兑付
-    function cash(bytes32 receivableNo, uint cashedAmount, uint time,bytes32 serialNo, ResponseType responseType)returns(uint){
+    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (3);
         }
@@ -514,7 +556,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         receivable.lastStatus = receivable.status;
         receivable.cashedAmount = cashedAmount;
-        receivable.status = "000001";
+        receivable.status = 1;
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
         return (0);
@@ -522,18 +564,18 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
     //根据应收款编号查询单张应收款具体信息
     //根据应收款编号查询单张应收款具体信息
-    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], bytes32[], uint[], DiscountedStatus discounted, bytes note){
+    function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
         Receivable receivable = receivableDetailMap[receivableNo];
 
-        uint[] memory uintInfo = new uint[](6);
-        bytes32[] memory bytesInfo1 = new bytes32[](13);
-        bytes32[] memory bytesInfo2 = new bytes32[](4);
+        uint[] memory uintInfo = new uint[](8);
+        bytes32[] memory bytesInfo1 = new bytes32[](11);
+        //bytes32[] memory bytesInfo2 = new bytes32[](4);
         /*
          if(judgeAccount(msg.sender)){
          return (2,
          bytesInfo1,
-         bytesInfo2,
+         //bytesInfo2,
          uintInfo,
          discounted,
          note
@@ -543,7 +585,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivableNo == ""){
             return (3,
                     bytesInfo1,
-                    bytesInfo2,
+                    //bytesInfo2,
                     uintInfo,
                     discounted,
                     note
@@ -553,7 +595,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivable.receivableNo == 0x0) {
             return(1005,
                     bytesInfo1,
-                    bytesInfo2,
+                    //bytesInfo2,
                     uintInfo,
                     discounted,
                     note
@@ -564,7 +606,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
          return(1,
          bytesInfo1,
-         bytesInfo2,
+         //bytesInfo2,
          uintInfo,
          discounted,
          note
@@ -577,6 +619,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         uintInfo[3] = receivable.signInDt;
         uintInfo[4] = receivable.dueDt;
         uintInfo[5] = receivable.discountInHandAmount;
+        uintInfo[6] = receivable.status;
+        uintInfo[7] = receivable.lastStatus;
 
         bytesInfo1[0] = receivableNo;
         bytesInfo1[1] = receivable.orderNo;
@@ -586,21 +630,19 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         bytesInfo1[5] = receivable.pyee;
         bytesInfo1[6] = receivable.firstOwner;
         bytesInfo1[7] = receivable.secondOwner;
-        bytesInfo1[8] = receivable.status;
-        bytesInfo1[9] = receivable.lastStatus;
-        bytesInfo1[10] = receivable.rate;
-        bytesInfo1[11] = receivable.contractNo;
-        bytesInfo1[12] = receivable.invoiceNo;
+        bytesInfo1[8] = receivable.rate;
+        bytesInfo1[9] = receivable.contractNo;
+        bytesInfo1[10] = receivable.invoiceNo;
 
         return (0,
                 bytesInfo1,
-                acctSvcrNameAndEnterpriseName(receivableNo),
+                //acctSvcrNameAndEnterpriseName(receivableNo),
                 uintInfo,
                 discounted,
                 note
         );
     }
-
+/*
     function acctSvcrNameAndEnterpriseName(bytes32 receivableNo) returns (bytes32[]){
         Receivable receivable = receivableDetailMap[receivableNo];
         address pyerAddress = acctIdToAddressMap[receivable.pyer];
@@ -619,6 +661,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         bytesInfo[3] = pyeeAcctSvcrName;
         return bytesInfo;
     }
+*/
     /*
      function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
      Receivable receivable = receivableDetailMap[receivableNo];
@@ -708,13 +751,35 @@ enum DiscountedStatus {NO, YES} //贴现标志位
      }
      */
 
+
     //查找应收款的交易历史，返回流水号
-    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
-        return (0, receivableTransferHistoryMap[receivableNo]);
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint,bytes32[],uint[],ResponseType[]){
+        //return (0, receivableTransferHistoryMap[receivableNo]);
+        bytes32[] memory historyList1;
+        historyList1 = receivableTransferHistoryMap[receivableNo];
+        uint len = historyList1.length;
+        bytes32[] memory bytesList = new bytes32[](len * 5);//5个值
+        uint[] memory intList   = new uint[](len * 2);//2 ge
+        ResponseType[] memory responseTypeList = new ResponseType[](len);//1 ge
+
+        for (uint index = 0; index < len; index++) {
+            bytesList[index * 5] = receivableRecordMap[historyList1[index]].receivableNo;
+            bytesList[index * 5 + 1] = receivableRecordMap[historyList1[index]].serialNo;
+            bytesList[index * 5 + 2] = receivableRecordMap[historyList1[index]].applicantAcctId;
+            bytesList[index * 5 + 3] = receivableRecordMap[historyList1[index]].replyerAcctId;
+            bytesList[index * 5 + 4] = receivableRecordMap[historyList1[index]].operateType;
+
+            intList[index * 2] = receivableRecordMap[historyList1[index]].time;
+            intList[index * 2 + 1] = receivableRecordMap[historyList1[index]].dealAmount;
+
+            responseTypeList[index] = receivableRecordMap[historyList1[index]].responseType;
+        }
+
+        return (0,bytesList,intList,responseTypeList);
     }
 
     //流水号查询，自己查自己
-    function getRecordBySerialNo(bytes32 serialNm) returns(uint, bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, bytes32 receivableStatus){
+    function getRecordBySerialNo(bytes32 serialNm) returns(uint, bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, uint receivableStatus){
         Account account = accountMap[msg.sender];
         ReceivableRecord receivableRecord = receivableRecordMap[serialNm];
         if(serialNm == ""){
@@ -756,7 +821,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 }
-contract Repository{
+contract RepositoryContract{
     //仓单结构体
     struct RepoCert{
         bytes32 incomeCert  ;// 入库凭证
@@ -1150,7 +1215,7 @@ enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
         return string(c);
     }
 }
-contract order_reparo{
+contract OrderContract{
     address owner;
     function Reparo(){
         owner = msg.sender;

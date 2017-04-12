@@ -15,8 +15,8 @@ public class ReceivableDetailVo {
     private String pyee;
     private String firstOwner;
     private String secondOwner;
-    private String status;
-    private String lastStatus;
+    private int status;
+    private int lastStatus;
     private String rate;
     private String contractNo;
     private String invoiceNo;
@@ -35,6 +35,42 @@ public class ReceivableDetailVo {
 
     private int discounted;
     private String note;
+
+    private String pyerLinkMan;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getLastStatus() {
+        return lastStatus;
+    }
+
+    public void setLastStatus(int lastStatus) {
+        this.lastStatus = lastStatus;
+    }
+
+    private String pyeeLinkman;
+
+    public String getPyerLinkMan() {
+        return pyerLinkMan;
+    }
+
+    public void setPyerLinkMan(String pyerLinkMan) {
+        this.pyerLinkMan = pyerLinkMan;
+    }
+
+    public String getPyeeLinkman() {
+        return pyeeLinkman;
+    }
+
+    public void setPyeeLinkman(String pyeeLinkman) {
+        this.pyeeLinkman = pyeeLinkman;
+    }
 
     public long getDiscountInHandAmount() {
         return discountInHandAmount;
@@ -122,22 +158,6 @@ public class ReceivableDetailVo {
 
     public void setSecondOwner(String secondOwner) {
         this.secondOwner = secondOwner;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getLastStatus() {
-        return lastStatus;
-    }
-
-    public void setLastStatus(String lastStatus) {
-        this.lastStatus = lastStatus;
     }
 
     public String getRate() {
