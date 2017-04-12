@@ -43,7 +43,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "sign",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutApply(
-            @ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
+            //@ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
             @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
             @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
@@ -94,7 +94,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "accept",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutReply(
-            @ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
+            //@ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,
             @ApiParam(value = "回复意见", required = true) @RequestParam int response,
@@ -127,7 +127,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "discountApply",method = RequestMethod.POST)//路径
     public BaseResult<Object> discountApply(
-            @ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
+            //@ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
@@ -191,7 +191,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "receivableInfo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableAllInfo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId,
             HttpServletRequest request//http请求实体
@@ -218,7 +218,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "recordInfo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getRecordBySerialNo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "流水号", required = true) @RequestParam String serialNo,
             HttpServletRequest request
     ) throws Exception {
@@ -242,7 +242,7 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "historySerialNo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableHistorySerialNo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             HttpServletRequest request
     ) throws Exception {
