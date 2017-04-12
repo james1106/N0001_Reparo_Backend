@@ -19,7 +19,10 @@ import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.hyperchain.common.constant.BaseConstant.CONTRACT_NAME_RECEIVABLE;
 
 /**
  * Created by YanYufei on 2017/4/9.
@@ -41,7 +44,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -106,7 +109,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "ReceivableContract");
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -127,7 +130,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -182,7 +185,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         BaseResult result = new BaseResult();
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "ReceivableContract");
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -205,7 +208,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -331,7 +334,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -391,13 +394,14 @@ public class ReceivableServiceImpl implements ReceivableService{
     public BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams) {
 //        System.out.println("=====+++++++ooooo");
         String contractMethodName = "getReceivableHistorySerialNo";
-        String[] resultMapKey = new String[]{"transferHistorySerialNo[]"};//给返回值取了个名称
+        //String[] resultMapKey = new String[]{"transferHistorySerialNo[]"};//给返回值取了个名称
 
+        String[] resultMapKey = new String[]{"transferHistorySerialNo[]", "partList2", "partList3"};//给返回值取了个名称
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -413,11 +417,39 @@ public class ReceivableServiceImpl implements ReceivableService{
         Code code = Code.fromInt(resultCode);
 
 
-//        List<Object> partParams0 = contractResult.getValue();
+/*//        List<Object> partParams0 = contractResult.getValue();
         List<String> partParams0 = (List<String>) contractResult.getValue().get(0);
 //        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
 //        result.returnWithValue(code, partParams0);
         result.returnWithValue(code, partParams0);
+
+        return result;*/
+        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+        int length = partList3.size();
+        List<ReceivableRecordDetailVo> receivableVoList = new ArrayList<>();
+        for(int i = 0; i < length; i++){
+            ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
+            receivableVo.setSerialNo(partList1.get(i*5+1));
+            receivableVo.setReceivableNo(partList1.get(i*5));
+            receivableVo.setApplicantAcctId(partList1.get(i*5+2));
+            receivableVo.setReplyerAcctId(partList1.get(i*5+3));
+            receivableVo.setOperateType(partList1.get(i*5+4));
+
+            receivableVo.setTime(Long.parseLong(partList2.get(i*2)));
+            receivableVo.setDealAmount(Long.parseLong(partList3.get(i*5)));
+            receivableVo.setResponseType(partList3.get(i));
+
+
+           // receivableVo.setReceivableStatus(Long.parseLong(partList3.get(i*5+1)));
+
+
+            receivableVoList.add(receivableVo);
+        }
+
+        result.returnWithValue(code, receivableVoList);
+
         return result;
     }
 

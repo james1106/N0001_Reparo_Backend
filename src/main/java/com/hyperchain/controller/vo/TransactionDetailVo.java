@@ -1,6 +1,9 @@
 package com.hyperchain.controller.vo;
 
+import com.hyperchain.dal.entity.OperationRecord;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Created by liangyue on 2017/4/9.
@@ -10,13 +13,11 @@ public class TransactionDetailVo {
 
     private String orderId;
     private String productName;
-    private String payerAddress;
-    private String payeeAddress;
+    private String payerCompanyName;
+    private String payeeCompanyName;
     private String payerBank;
     private String payerBankClss;
     private String payerAccount;
-    private long orderGenerateTime;
-    private long orderConfirmTime;
     private long productUnitPrice;
     private long productQuantity;
     private long productTotalPrice;
@@ -24,24 +25,39 @@ public class TransactionDetailVo {
     private String payeeRepo;
     private String repoCertNo;
     private String repoBusinessNo;
-    private String payingMethod;
+    private int payingMethod;
+    private List<OperationRecord> operationRecordList;
 
-    public String getOrderState() {
-        return orderState;
+    public List<OperationRecord> getOperationRecordList() {
+        return operationRecordList;
     }
 
-    public void setOrderState(String orderState) {
-        this.orderState = orderState;
+    public void setOperationRecordList(List<OperationRecord> operationRecordList) {
+        this.operationRecordList = operationRecordList;
     }
 
-    private String orderState;
-
-    public long getOrderGenerateTime() {
-        return orderGenerateTime;
+    public int getPayingMethod() {
+        return payingMethod;
     }
 
-    public void setOrderGenerateTime(long orderGenerateTime) {
-        this.orderGenerateTime = orderGenerateTime;
+    public void setPayingMethod(int payingMethod) {
+        this.payingMethod = payingMethod;
+    }
+
+    public String getPayerCompanyName() {
+        return payerCompanyName;
+    }
+
+    public void setPayerCompanyName(String payerCompanyName) {
+        this.payerCompanyName = payerCompanyName;
+    }
+
+    public String getPayeeCompanyName() {
+        return payeeCompanyName;
+    }
+
+    public void setPayeeCompanyName(String payeeCompanyName) {
+        this.payeeCompanyName = payeeCompanyName;
     }
 
 
@@ -59,23 +75,6 @@ public class TransactionDetailVo {
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public String getPayerAddress() {
-        return payerAddress;
-    }
-
-    public void
-    setPayerAddress(String payerAddress) {
-        this.payerAddress = payerAddress;
-    }
-
-    public String getPayeeAddress() {
-        return payeeAddress;
-    }
-
-    public void setPayeeAddress(String payeeAddress) {
-        this.payeeAddress = payeeAddress;
     }
 
     public String getPayerBank() {
@@ -135,14 +134,6 @@ public class TransactionDetailVo {
         this.repoBusinessNo = repoBusinessNo;
     }
 
-    public String getPayingMethod() {
-        return payingMethod;
-    }
-
-    public void setPayingMethod(String payingMethod) {
-        this.payingMethod = payingMethod;
-    }
-
     public long getProductUnitPrice() {
         return productUnitPrice;
     }
@@ -167,11 +158,4 @@ public class TransactionDetailVo {
         this.productTotalPrice = productTotalPrice;
     }
 
-    public long getOrderConfirmTime() {
-        return orderConfirmTime;
-    }
-
-    public void setOrderConfirmTime(long orderConfirmTime) {
-        this.orderConfirmTime = orderConfirmTime;
-    }
 }

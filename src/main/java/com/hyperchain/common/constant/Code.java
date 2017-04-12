@@ -18,13 +18,14 @@ public enum Code {
     JSON_TRANSFER_ERROR(20, "JSON转化异常"),
 
     //订单管理部分
-    ORDER_NOT_EXIST(2001, "账单不存在"),
+    ORDER_NOT_EXIST(2001, "订单不存在"),
     QEURY_ORDER_PERMISSION_DENIED(2002, "无权限查询该账单"),
     COMPANY_NOT_BE_REGISTERED(2003, "卖方公司名称未注册"),
     ORDER_ALREADY_EXSIT(2004, "该订单号已经存在"),
     NOT_TELATIVE_ORDER(2005, "该订单与用户无关"),
     ORDER_ALREADY_CONFIRMED(2006, "该订单已经确认"),
     NOT_PAYEE_FOR_ORDER(2007, "用户不是订单的卖方"),
+    BANKACCOUNT_NOT_EXIST(2008, "用户无该银行账号"),
 
     //账户管理部分
     PHONE_ALREADY_EXIST(5001, "手机号码已注册"),
@@ -112,6 +113,8 @@ public enum Code {
                 return ORDER_ALREADY_CONFIRMED;
             case 2007:
                 return NOT_PAYEE_FOR_ORDER;
+            case 2008:
+                return BANKACCOUNT_NOT_EXIST;
 
 
             case 5002:

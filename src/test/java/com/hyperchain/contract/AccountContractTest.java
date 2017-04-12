@@ -47,7 +47,7 @@ public class AccountContractTest extends SpringBaseTest {
         contractMethodParams[9] = "acctSvcrName";
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, "ReparoAccount");
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
         System.out.println("调用合约newAccount返回code：" + contractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, contractResult.getCode());
 
@@ -55,7 +55,7 @@ public class AccountContractTest extends SpringBaseTest {
         String contractMethodName1 = "getAccount";
         Object[] contractMethodParams1 = new Object[0];
         String[] resultMapKey1 = new String[]{"accountName", "companyName", "roleCode", "accountStatus", "certType", "certNo", "acctId", "class", "acctSvcr", "acctSvcrName"};
-        ContractResult contractResult1 = ContractUtil.invokeContract(contractKey1, contractMethodName1, contractMethodParams1, resultMapKey1, "ReparoAccount");
+        ContractResult contractResult1 = ContractUtil.invokeContract(contractKey1, contractMethodName1, contractMethodParams1, resultMapKey1, BaseConstant.CONTRACT_NAME_ACCOUNT);
         System.out.println("调用合约getAccount返回：" + contractResult1.getValueMap());
         Assert.assertEquals(Code.SUCCESS, contractResult1.getCode());
     }
@@ -86,7 +86,7 @@ public class AccountContractTest extends SpringBaseTest {
             contractMethodParams[9] = "acctSvcrName";
             String[] resultMapKey = new String[]{};
             // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, "ReparoAccount");
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
             System.out.println("调用合约newAccount返回code：" + contractResult.getCode());
             if (i == 0) {
                 Assert.assertEquals(Code.SUCCESS, contractResult.getCode());
