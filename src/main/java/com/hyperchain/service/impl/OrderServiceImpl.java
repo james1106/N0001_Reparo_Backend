@@ -8,8 +8,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.*;
-import com.hyperchain.dal.entity.OperationRecord;
-import com.hyperchain.dal.entity.UserEntity;
+import com.hyperchain.controller.vo.OperationRecordVo;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,12 +128,12 @@ public class OrderServiceImpl implements OrderService{
         long coupon = Long.parseLong(partParams2.get(7));
         int receLatestStatus = Integer.parseInt(partParams2.get(8));
         long receUpdateTime = Long.parseLong(partParams2.get(9));
-        List<OperationRecord> txRecordList = new ArrayList<>();
+        List<OperationRecordVo> txRecordList = new ArrayList<>();
 
 
-        txRecordList.add(new OperationRecord(1, orderGenerateTime));
+        txRecordList.add(new OperationRecordVo(1, orderGenerateTime));
         if(txStateInt == 2){
-            txRecordList.add(new OperationRecord(txStateInt, orderComfirmTime));
+            txRecordList.add(new OperationRecordVo(txStateInt, orderComfirmTime));
         }
 
         //以下为物流概要信息
@@ -163,7 +162,7 @@ public class OrderServiceImpl implements OrderService{
         txDetailVo.setProductQuantity(productQuantity);
         txDetailVo.setProductTotalPrice(productTotalPrice);
         txDetailVo.setOrderId(orderId);
-        txDetailVo.setOperationRecordList(txRecordList);
+        txDetailVo.setOperationRecordVoList(txRecordList);
         txDetailVo.setProductName(productName);
         txDetailVo.setPayerBank(payerBank);
         txDetailVo.setPayerBankClss(payerBankClss);

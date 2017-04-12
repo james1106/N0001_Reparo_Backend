@@ -1,6 +1,5 @@
 package com.hyperchain.controller.vo;
 
-import com.hyperchain.dal.entity.OperationRecord;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,14 +25,14 @@ public class TransactionDetailVo {
     private String repoCertNo;
     private String repoBusinessNo;
     private int payingMethod;
-    private List<OperationRecord> operationRecordList;
+    private List<OperationRecordVo> operationRecordVoList;
 
-    public List<OperationRecord> getOperationRecordList() {
-        return operationRecordList;
+    public List<OperationRecordVo> getOperationRecordVoList() {
+        return operationRecordVoList;
     }
 
-    public void setOperationRecordList(List<OperationRecord> operationRecordList) {
-        this.operationRecordList = operationRecordList;
+    public void setOperationRecordVoList(List<OperationRecordVo> operationRecordVoList) {
+        this.operationRecordVoList = operationRecordVoList;
     }
 
     public int getPayingMethod() {

@@ -64,4 +64,24 @@ public class RepositoryController {
         return repositoryService.incomeApplyResponse(contractKey, params);
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "查询仓储流转历史", notes = "查询仓储流转历史")
+    @ResponseBody
+    @RequestMapping(value = "getRepoBusiHistoryList",method = RequestMethod.POST)
+    public BaseResult<Object> getRepoBusiHistoryList(
+            @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo
+    ) throws Exception {
+
+
+        String privatekey = "{\"address\":\"c841cff583353b651b98fdd9ab72ec3fac98fac4\",\"encrypted\":\"07bb12934457f512c8e2ad82ed70ff88cca94a0f52dbb04af50ba56cf3f22d0b\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
+        ContractKey contractKey = new ContractKey(privatekey);
+
+        Object[] params = new Object[1];
+        params[0] = repoBusinessNo;
+
+
+        // 调用合约查询账户，获取返回结果
+        return repositoryService.getRepoBusiHistoryList(contractKey, params);
+    }
+
 }

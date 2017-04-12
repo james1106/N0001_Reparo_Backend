@@ -88,7 +88,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         BaseResult result = new BaseResult();
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
             if(code == Code.SUCCESS){
                 //result.returnWithValue(code);
@@ -107,4 +107,63 @@ public class RepositoryServiceImpl implements RepositoryService{
         }
         return result;
     }
+
+    @Override
+    public BaseResult<Object> getRepoBusiHistoryList(ContractKey contractKey, Object[] contractParams) {
+        String contractMethodName = "getRepoBusiHistoryList";
+        String[] resultMapKey = new String[]{"partList1", "partList2"};//给返回值取了个名称
+
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = null;
+        try {
+            contractResult = invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+
+        BaseResult<Object> result = new BaseResult<>();
+//         将合约结果转化为接口返回数据
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+
+        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+       // List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+        int length = partList2.size();
+        List<RepoBusinessVo> repoBusuVoList = new ArrayList<>();
+        for(int i = 0; i < length; i++){
+            /*ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
+            receivableVo.setSerialNo(partList1.get(i*5+1));
+            receivableVo.setReceivableNo(partList1.get(i*5));
+            receivableVo.setApplicantAcctId(partList1.get(i*5+2));
+            receivableVo.setReplyerAcctId(partList1.get(i*5+3));
+            receivableVo.setOperateType(partList1.get(i*5+4));
+
+            receivableVo.setTime(Long.parseLong(partList2.get(i*2)));
+            receivableVo.setDealAmount(Long.parseLong(partList3.get(i*5)));
+            receivableVo.setResponseType(partList3.get(i));*/
+
+
+            // receivableVo.setReceivableStatus(Long.parseLong(partList3.get(i*5+1)));
+
+
+            RepoBusinessVo repoBusinessVo  = new RepoBusinessVo();
+
+            repoBusinessVo.setBusinessTransNo(partList1.get(i*2));
+            repoBusinessVo.setOperateOperateTime(partList1.get(i*2 + 1));
+            repoBusinessVo.setRepoBusiStatus(partList2.get(i));
+
+            repoBusuVoList.add(repoBusinessVo);
+        }
+
+        result.returnWithValue(code, repoBusuVoList);
+
+        return result;
+    }
+
 }
