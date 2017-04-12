@@ -8,6 +8,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.*;
+import com.hyperchain.dal.entity.OperationRecord;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.OrderService;
@@ -93,7 +94,6 @@ public class OrderServiceImpl implements OrderService{
         int payingMethodInt = payingMethodString.equals("") ? 0 : Integer.parseInt(payingMethodString);
         int txStateInt = txStateString.equals("")? 0 : Integer.parseInt(txStateString);
 
-
         String payerAddress = addressList.get(0).substring(1);
         String payeeAddress = addressList.get(1).substring(1);
 
@@ -129,6 +129,13 @@ public class OrderServiceImpl implements OrderService{
         long coupon = Long.parseLong(partParams2.get(7));
         int receLatestStatus = Integer.parseInt(partParams2.get(8));
         long receUpdateTime = Long.parseLong(partParams2.get(9));
+        List<OperationRecord> txRecordList = new ArrayList<>();
+
+
+        txRecordList.add(new OperationRecord(1, orderGenerateTime));
+        if(txStateInt == 2){
+            txRecordList.add(new OperationRecord(txStateInt, orderComfirmTime));
+        }
 
         //以下为物流概要信息
         String wayBillNo = partParams1.get(13);
@@ -152,13 +159,11 @@ public class OrderServiceImpl implements OrderService{
         txDetailVo.setPayerCompanyName(payerCompanyName);
         txDetailVo.setPayeeCompanyName(payeeCompanyName);
         txDetailVo.setPayingMethod(payingMethodInt);
-        txDetailVo.setOrderState(txStateInt);
         txDetailVo.setProductUnitPrice(productUnitPrice);
         txDetailVo.setProductQuantity(productQuantity);
         txDetailVo.setProductTotalPrice(productTotalPrice);
-        txDetailVo.setOrderGenerateTime(orderGenerateTime);
-        txDetailVo.setOrderConfirmTime(orderGenerateTime);
         txDetailVo.setOrderId(orderId);
+        txDetailVo.setOperationRecordList(txRecordList);
         txDetailVo.setProductName(productName);
         txDetailVo.setPayerBank(payerBank);
         txDetailVo.setPayerBankClss(payerBankClss);
@@ -167,10 +172,8 @@ public class OrderServiceImpl implements OrderService{
         txDetailVo.setPayerRepo(payerRepo);
         txDetailVo.setRepoBusinessNo(repoBusinessNo);
         txDetailVo.setRepoCertNo(repoCertNo);
-        txDetailVo.setOrderConfirmTime(orderComfirmTime);
 
         ReceOverVo receOverVo = new ReceOverVo();
-
         receOverVo.setReceNo(receNo);
         receOverVo.setReceivingSide(receivingSide);
         receOverVo.setPayingSide(payingSide);

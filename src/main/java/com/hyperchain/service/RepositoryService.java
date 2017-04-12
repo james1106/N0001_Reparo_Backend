@@ -12,4 +12,5 @@ public interface RepositoryService {
     BaseResult<Object> incomeApplyResponse(ContractKey contractKey, Object[] contractParams);
 
     BaseResult<Object> getRepoBusiInfo(ContractKey contractKey, Object[] contractParams);
+    //String methodName = "getRepoBusinessDetail";
 }

@@ -40,6 +40,9 @@ public class OrderController {
     private UserEntityRepository userEntityRepository;
 
     @Autowired
+    RepositoryService repositoryService;
+
+    @Autowired
     OrderService orderService;
 
 
@@ -100,33 +103,72 @@ public class OrderController {
         String payeeAddress = payeeUserEntity.getAddress();
 
         long orderGenerateTime = System.currentTimeMillis();
-        String orderId = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
-        String txSerialNo = orderId + "00";
+        String orderNo = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
+        String txSerialNo = orderNo + "00";
         String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
 
-        List<String> list= new ArrayList<>();
-        list.add(orderId);
-        list.add(productName);
-        list.add(payerRepo);
-        list.add(repoBusinessNo);
-        list.add(payerBank);
-        list.add(payerBankClss);
-        list.add(payerAccount);
-        list.add(txSerialNo);
+        List<String> orderParamlist= new ArrayList<>();
+        orderParamlist.add(orderNo);
+        orderParamlist.add(productName);
+        orderParamlist.add(payerRepo);
+        orderParamlist.add(repoBusinessNo);
+        orderParamlist.add(payerBank);
+        orderParamlist.add(payerBankClss);
+        orderParamlist.add(payerAccount);
+        orderParamlist.add(txSerialNo);
 
         ContractKey contractKey = new ContractKey(payerPrivateKey);
-        Object[] params = new Object[8];
-        params[0] = acctContractAddress;
-        params[1] = payeeAddress;
-        params[2] = productUnitPrice*100; //单价
-        params[3] = productQuantity; //
-        params[4] = productTotalPrice*100; //
-        params[5] = list;
-        params[6] = payingMethod;
-        params[7] = orderGenerateTime;
+        Object[] orderParams = new Object[8];
+        orderParams[0] = acctContractAddress;
+        orderParams[1] = payeeAddress;
+        orderParams[2] = productUnitPrice*100; //单价
+        orderParams[3] = productQuantity; //
+        orderParams[4] = productTotalPrice*100; //
+        orderParams[5] = orderParamlist;
+        orderParams[6] = payingMethod;
+        orderParams[7] = orderGenerateTime;
         // 调用合约查询账户，获取返回结果
-        return orderService.createOrder(contractKey, params, orderId);
+
+
+        //从数据库中查询卖方公司对应的地址，如果查询不到数据，返回仓储机构名称未注册
+        UserEntity payerRepoEntity = userEntityRepository.findByCompanyName(payerRepo);
+        if(CommonUtil.isEmpty(payeeUserEntity)){
+            code = Code.COMPANY_NOT_BE_REGISTERED;
+            result.returnWithoutValue(code);
+            return  result;
+        }
+        String payerRepoAddress = payerRepoEntity.getAddress();
+        Object[] repoParams = new Object[10];
+        repoParams[0] = repoBusinessNo;
+        repoParams[1] = repoBusinessNo + "0"; //仓储业务流转号
+        repoParams[2] = orderNo;
+        repoParams[3] = payerAddress; // 存货人
+        repoParams[4] = payerRepoAddress; //保管人
+        repoParams[5] = orderGenerateTime; //操作时间
+        repoParams[6] = productName; //  仓储物名称
+        repoParams[7] =   productQuantity;     //  仓储物数量
+        repoParams[8] =    productUnitPrice;     //  货品单价(分)
+        repoParams[9] =      productTotalPrice ;    //  货品合计金额(分)
+        // 调用合约查询账户，获取返回结果
+
+        BaseResult createOrderResult = orderService.createOrder(contractKey, orderParams, orderNo);
+        BaseResult createRepoResult = repositoryService.incomeApply(contractKey, repoParams, repoBusinessNo);
+        if(createOrderResult.getCode() != 0){
+            return createOrderResult;
+        }
+        else if(createRepoResult.getCode() != 0){
+            return createRepoResult;
+        }
+
+        else {
+            BaseResult createResult = new BaseResult();
+            Map<String, String> resultMap= new HashMap<>();
+            resultMap.put("orderNo", (String)createOrderResult.getData());
+            resultMap.put("repoBusinessNo", (String)createRepoResult.getData());
+            createResult.returnWithValue(Code.SUCCESS, resultMap);
+            return createResult;
+        }
     }
 
 

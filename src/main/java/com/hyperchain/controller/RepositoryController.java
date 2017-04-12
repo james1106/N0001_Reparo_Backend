@@ -40,94 +40,13 @@ public class RepositoryController {
     RepositoryService repositoryService;
 
     @LogInterceptor
-    @ApiOperation(value = "入库申请", notes = "生成仓储业务信息")
-    @ResponseBody
-    @RequestMapping(value = "creation",method = RequestMethod.POST)
-    public BaseResult<Object> incomeApply(
-            @ApiParam(value = "卖方公司名称", required = true) @RequestParam String payeeCompanyName,
-            @ApiParam(value = "货品名称", required = true) @RequestParam String productName,
-            @ApiParam(value = "货品单价", required = true) @RequestParam long productUnitPrice,
-            @ApiParam(value = "货品数量", required = true) @RequestParam long productQuantity,
-            @ApiParam(value = "货品总价", required = true) @RequestParam long productTotalPrice,
-            @ApiParam(value = "付款人申请仓储公司", required = true) @RequestParam String payerRepo,
-            @ApiParam(value = "付款人开户行", required = true) @RequestParam String payerBank,
-            @ApiParam(value = "开户行别", required = true) @RequestParam String payerBankClss,
-            @ApiParam(value = "付款账户", required = true) @RequestParam String payerAccount,
-            @ApiParam(value = "付款方式", required = true) @RequestParam int payingMethod
-    ) throws Exception {
-
-        BaseResult result = new BaseResult();
-        Code code;
-
-        //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
-
-        UserEntity payerUserEntity = userEntityRepository.findByAddress(payerAddress);
-        if(CommonUtil.isEmpty(payerUserEntity)){
-            code = Code.INVALID_USER;
-            result.returnWithoutValue(code);
-            return result;
-        }
-
-        //从数据库中查询卖方公司对应的地址，如果查询不到数据，返回卖方公司名称未注册
-        UserEntity payeeUserEntity = userEntityRepository.findByCompanyName(payeeCompanyName);
-        if(CommonUtil.isEmpty(payeeUserEntity)){
-
-            code = Code.COMPANY_NOT_BE_REGISTERED;
-            result.returnWithoutValue(code);
-            return  result;
-        }
-        String payerPrivateKey = payerUserEntity.getPrivateKey();
-        String payeeAddress = payeeUserEntity.getAddress();
-
-
-        //从数据库中查询卖方公司对应的地址，如果查询不到数据，返回仓储机构名称未注册
-        UserEntity payerRepoEntity = userEntityRepository.findByCompanyName(payerRepo);
-        if(CommonUtil.isEmpty(payeeUserEntity)){
-
-            code = Code.COMPANY_NOT_BE_REGISTERED;
-            result.returnWithoutValue(code);
-            return  result;
-        }
-        try{
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        String payerRepoPrivateKey = payerUserEntity.getPrivateKey();
-        String payerRepoAddress = payerRepoEntity.getAddress();
-
-        long orderGenerateTime = System.currentTimeMillis();
-        String orderId = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
-        String txSerialNo = orderId + "00";
-        String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
-
-        //String privatekey = "{\"address\":\"c841cff583353b651b98fdd9ab72ec3fac98fac4\",\"encrypted\":\"07bb12934457f512c8e2ad82ed70ff88cca94a0f52dbb04af50ba56cf3f22d0b\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
-        ContractKey contractKey = new ContractKey(payerRepoPrivateKey);
-        Object[] params = new Object[10];
-        params[0] = repoBusinessNo;
-        params[1] = repoBusinessNo + "0"; //仓储业务流转号
-        params[2] = orderId;
-        params[3] = payerAddress; // 存活人
-        params[4] = payerRepoAddress; //保管人
-        params[5] = orderGenerateTime; //操作时间
-        params[6] = productName; //  仓储物名称
-        params[7] =   productQuantity;     //  仓储物数量
-        params[8] =    productUnitPrice;     //  货品单价(分)
-        params[9] =      productTotalPrice ;    //  货品合计金额(分)
-        // 调用合约查询账户，获取返回结果
-        return repositoryService.incomeApply(contractKey, params, repoBusinessNo);
-    }
-
-    @LogInterceptor
     @ApiOperation(value = "回复入库申请", notes = "仓储机构回复是否同意企业的入库申请")
     @ResponseBody
     @RequestMapping(value = "incomeApplyResponse",method = RequestMethod.POST)
     public BaseResult<Object> incomeApplyResponse(
             @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo
      ) throws Exception {
-
+        //String methodName = "getRepoBusinessDetail";
         BaseResult result = new BaseResult();
         Code code;
         long operateTime = System.currentTimeMillis();

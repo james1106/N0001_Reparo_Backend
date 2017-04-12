@@ -1,6 +1,9 @@
 package com.hyperchain.controller.vo;
 
+import com.hyperchain.dal.entity.OperationRecord;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Created by liangyue on 2017/4/9.
@@ -15,8 +18,6 @@ public class TransactionDetailVo {
     private String payerBank;
     private String payerBankClss;
     private String payerAccount;
-    private long orderGenerateTime;
-    private long orderConfirmTime;
     private long productUnitPrice;
     private long productQuantity;
     private long productTotalPrice;
@@ -25,14 +26,14 @@ public class TransactionDetailVo {
     private String repoCertNo;
     private String repoBusinessNo;
     private int payingMethod;
-    private int orderState;
+    private List<OperationRecord> operationRecordList;
 
-    public int getOrderState() {
-        return orderState;
+    public List<OperationRecord> getOperationRecordList() {
+        return operationRecordList;
     }
 
-    public void setOrderState(int orderState) {
-        this.orderState = orderState;
+    public void setOperationRecordList(List<OperationRecord> operationRecordList) {
+        this.operationRecordList = operationRecordList;
     }
 
     public int getPayingMethod() {
@@ -57,14 +58,6 @@ public class TransactionDetailVo {
 
     public void setPayeeCompanyName(String payeeCompanyName) {
         this.payeeCompanyName = payeeCompanyName;
-    }
-
-    public long getOrderGenerateTime() {
-        return orderGenerateTime;
-    }
-
-    public void setOrderGenerateTime(long orderGenerateTime) {
-        this.orderGenerateTime = orderGenerateTime;
     }
 
 
@@ -165,11 +158,4 @@ public class TransactionDetailVo {
         this.productTotalPrice = productTotalPrice;
     }
 
-    public long getOrderConfirmTime() {
-        return orderConfirmTime;
-    }
-
-    public void setOrderConfirmTime(long orderConfirmTime) {
-        this.orderConfirmTime = orderConfirmTime;
-    }
 }

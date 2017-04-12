@@ -59,7 +59,8 @@ public class RepositoryServiceImpl implements RepositoryService{
         BaseResult result = new BaseResult();
 
         try {
-            ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            ContractResult contractResult;
+            contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
             if(code == Code.SUCCESS){
                 //result.returnWithValue(code);
@@ -82,11 +83,12 @@ public class RepositoryServiceImpl implements RepositoryService{
     @Override
     public BaseResult<Object> getRepoBusiInfo(ContractKey contractKey, Object[] contractParams) {
         String methodName = "getRepoBusinessDetail";
+        //String methodName = "getRepoBusinessDetail";
         String[] resultMapKey = new String[]{};
         BaseResult result = new BaseResult();
 
         try {
-            ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
             if(code == Code.SUCCESS){
                 //result.returnWithValue(code);
