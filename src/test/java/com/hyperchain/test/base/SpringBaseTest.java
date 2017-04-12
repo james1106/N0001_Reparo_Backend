@@ -8,9 +8,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SpringBaseTest {
-    @Test
-    public void testDemo() throws Exception {
-        System.out.print("");
-    }
+//    @Test
+//    public void testDemo() throws Exception {
+//        System.out.print("");
+//    }
 
 }

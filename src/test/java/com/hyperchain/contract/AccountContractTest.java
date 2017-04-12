@@ -55,7 +55,7 @@ public class AccountContractTest extends SpringBaseTest {
         String contractMethodName1 = "getAccount";
         Object[] contractMethodParams1 = new Object[0];
         String[] resultMapKey1 = new String[]{"accountName", "companyName", "roleCode", "accountStatus", "certType", "certNo", "acctId", "class", "acctSvcr", "acctSvcrName"};
-        ContractResult contractResult1 = ContractUtil.invokeContract(contractKey1, contractMethodName1, contractMethodParams1, resultMapKey1, "ReparoAccount");
+        ContractResult contractResult1 = ContractUtil.invokeContract(contractKey1, contractMethodName1, contractMethodParams1, resultMapKey1, BaseConstant.CONTRACT_NAME_ACCOUNT);
         System.out.println("调用合约getAccount返回：" + contractResult1.getValueMap());
         Assert.assertEquals(Code.SUCCESS, contractResult1.getCode());
     }
