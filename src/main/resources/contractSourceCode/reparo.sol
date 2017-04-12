@@ -989,6 +989,8 @@ contract RepositoryContract{
 
     //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+
+        //waittodo 待补充 修改订单中的买家仓储状态
         return (0);
     }
 
