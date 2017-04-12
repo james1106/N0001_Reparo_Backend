@@ -105,28 +105,37 @@ public class OrderController {
         String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
 
-        List<String> list= new ArrayList<>();
-        list.add(orderId);
-        list.add(productName);
-        list.add(payerRepo);
-        list.add(repoBusinessNo);
-        list.add(payerBank);
-        list.add(payerBankClss);
-        list.add(payerAccount);
-        list.add(txSerialNo);
+        List<String> orderParamlist= new ArrayList<>();
+        orderParamlist.add(orderId);
+        orderParamlist.add(productName);
+        orderParamlist.add(payerRepo);
+        orderParamlist.add(repoBusinessNo);
+        orderParamlist.add(payerBank);
+        orderParamlist.add(payerBankClss);
+        orderParamlist.add(payerAccount);
+        orderParamlist.add(txSerialNo);
 
         ContractKey contractKey = new ContractKey(payerPrivateKey);
-        Object[] params = new Object[8];
-        params[0] = acctContractAddress;
-        params[1] = payeeAddress;
-        params[2] = productUnitPrice*100; //单价
-        params[3] = productQuantity; //
-        params[4] = productTotalPrice*100; //
-        params[5] = list;
-        params[6] = payingMethod;
-        params[7] = orderGenerateTime;
+        Object[] orderParams = new Object[8];
+        orderParams[0] = acctContractAddress;
+        orderParams[1] = payeeAddress;
+        orderParams[2] = productUnitPrice*100; //单价
+        orderParams[3] = productQuantity; //
+        orderParams[4] = productTotalPrice*100; //
+        orderParams[5] = orderParamlist;
+        orderParams[6] = payingMethod;
+        orderParams[7] = orderGenerateTime;
         // 调用合约查询账户，获取返回结果
-        return orderService.createOrder(contractKey, params, orderId);
+
+
+
+
+
+
+
+
+
+        return orderService.createOrder(contractKey, orderParams, orderId);
     }
 
 
