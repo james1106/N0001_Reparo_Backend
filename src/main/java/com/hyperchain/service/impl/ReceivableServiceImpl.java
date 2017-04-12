@@ -10,8 +10,13 @@ import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.controller.vo.ReceivableDetailVo;
 import com.hyperchain.controller.vo.ReceivableRecordDetailVo;
+import com.hyperchain.dal.entity.AccountEntity;
+import com.hyperchain.dal.entity.UserEntity;
+import com.hyperchain.dal.repository.AccountEntityRepository;
+import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.ReceivableService;
 import org.omg.PortableInterceptor.INACTIVE;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,10 +29,18 @@ import static com.hyperchain.common.constant.BaseConstant.CONTRACT_NAME_RECEIVAB
  */
 @Service
 public class ReceivableServiceImpl implements ReceivableService{
+
+    @Autowired
+    AccountEntityRepository accountEntityRepository;
+    @Autowired
+    UserEntityRepository userEntityRepository;
+
     @Override
     public BaseResult<Object> signOutApply(ContractKey contractKey, Object[] contractParams, String receivableNo) {//第二个参数是给合约的参数
         String methodName = "signOutApply";
         String[] resultMapKey = new String[]{};
+
+
 
         ContractResult contractResult = null;
         try {
@@ -189,7 +202,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfo";
-        String[] resultMapKey = new String[]{"receivable[]", "name[]", "uint[]", "discounted", "note"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted", "note"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -203,7 +216,6 @@ public class ReceivableServiceImpl implements ReceivableService{
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
         }
-
 
         BaseResult<Object> result = new BaseResult<>();
 //         将合约结果转化为接口返回数据
@@ -231,11 +243,13 @@ public class ReceivableServiceImpl implements ReceivableService{
 
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
+        //List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
-        List<String> partParams2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
-//        int discounted = (int)contractResult.getValueMap().get(resultMapKey[3]);
-        int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[3])));
-        String note = (String) contractResult.getValueMap().get(resultMapKey[4]);
+        int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
+        String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
+
+
+
 
         String receivableNo = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -245,23 +259,36 @@ public class ReceivableServiceImpl implements ReceivableService{
         String pyee = partParams0.get(5);
         String firstOwner = partParams0.get(6);
         String secondOwner = partParams0.get(7);
-        String status = partParams0.get(8);
-        String lastStatus = partParams0.get(9);
-        String rate = partParams0.get(10);
-        String contractNo = partParams0.get(11);
-        String invoiceNo = partParams0.get(12);
+        String rate = partParams0.get(8);
+        String contractNo = partParams0.get(9);
+        String invoiceNo = partParams0.get(10);
 
-        String pyerEnterpriseName = partParams1.get(0);
-        String pyerAcctSvcrName = partParams1.get(1);
-        String pyeeEnterpriseName = partParams1.get(2);
-        String pyeeAcctSvcrName = partParams1.get(3);
+//        String pyerEnterpriseName = partParams1.get(0);
+//        String pyerAcctSvcrName = partParams1.get(1);
+//        String pyeeEnterpriseName = partParams1.get(2);
+//        String pyeeAcctSvcrName = partParams1.get(3);
 
-        long isseAmt = Long.parseLong(partParams2.get(0));
-        long cashedAmount = (partParams2.get(1).equals(""))? 0L:Long.parseLong(partParams2.get(1));
-        long isseDt = Long.parseLong(partParams2.get(2));
-        long signInDt = (partParams2.get(3).equals(""))? 0L:Long.parseLong(partParams2.get(3));
-        long dueDt = Long.parseLong(partParams2.get(4));
-        long discountInHandAmount = (partParams2.get(5).equals(""))? 0L:Long.parseLong(partParams2.get(5));
+        long isseAmt = Long.parseLong(partParams1.get(0));
+        long cashedAmount = (partParams1.get(1).equals("")) ? 0L:Long.parseLong(partParams1.get(1));
+        long isseDt = Long.parseLong(partParams1.get(2));
+        long signInDt = (partParams1.get(3).equals("")) ? 0L:Long.parseLong(partParams1.get(3));
+        long dueDt = Long.parseLong(partParams1.get(4));
+        long discountInHandAmount = (partParams1.get(5).equals("")) ? 0L:Long.parseLong(partParams1.get(5));
+        int status = (partParams1.get(6).equals("")) ? 0 : Integer.parseInt(partParams1.get(6));
+        int lastStatus = (partParams1.get(7).equals("")) ? 0 : Integer.parseInt(partParams1.get(7));
+
+        AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
+        AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);
+        String pyerAddress = pyerAccountEntity.getAddress();
+        String pyeeAddress = pyeeAccountEntity.getAddress();
+        String pyerAcctSvcrName = pyerAccountEntity.getAcctSvcrName();//付款人开户行
+        String pyeeAcctSvcrName = pyeeAccountEntity.getAcctSvcrName();//收款人开户行
+        UserEntity pyerUserEntity = userEntityRepository.findByAddress(pyerAddress);
+        UserEntity pyeeUserEntity = userEntityRepository.findByAddress(pyeeAddress);
+        String pyerLinkMan = pyerUserEntity.getPhone();//付款人联系方式
+        String pyerEnterpriseName = pyerUserEntity.getCompanyName();//付款人企业名
+        String pyeeLinkman = pyeeUserEntity.getPhone();//收款人联系方式
+        String pyeeEnterpriseName = pyeeUserEntity.getCompanyName();//收款人企业名
 
         ReceivableDetailVo receivableDetailVo = new ReceivableDetailVo();
 
@@ -290,6 +317,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
         receivableDetailVo.setDiscounted(discounted);
         receivableDetailVo.setNote(note);
+        receivableDetailVo.setPyeeLinkman(pyeeLinkman);
+        receivableDetailVo.setPyerLinkMan(pyerLinkMan);
+
 
         result.returnWithValue(code, receivableDetailVo);
         return result;
@@ -336,12 +366,13 @@ public class ReceivableServiceImpl implements ReceivableService{
         String replyerAcctId = (String)contractResult.getValueMap().get(resultMapKey[3]);
         String  responseType =  (String)contractResult.getValueMap().get(resultMapKey[4]);
 //        long time = Long.parseLong(contractResult.getValueMap().get(resultMapKey[5]));
-        long time = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
+//        long time = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
+        long time = (String.valueOf(contractResult.getValueMap().get(resultMapKey[5])).equals("")) ? 0 : Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
         String operateType = (String)contractResult.getValueMap().get(resultMapKey[6]);
 //        long dealAmt = (long)contractResult.getValueMap().get(resultMapKey[7]);
-        long dealAmt = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
-        String receivableStatus = (String)contractResult.getValueMap().get(resultMapKey[8]);
-
+        long dealAmt = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
+//        String receivableStatus = (String)contractResult.getValueMap().get(resultMapKey[8]);
+        int receivableStatus = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
 
         ReceivableRecordDetailVo receivableRecordDetailVo = new ReceivableRecordDetailVo();
 

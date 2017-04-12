@@ -1,8 +1,12 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import com.hyperchain.common.constant.BaseConstant;
+import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.dal.entity.UserEntity;
+import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.*;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,20 +35,24 @@ public class ReceivableController {
     @Autowired
     ReceivableService receivableService;
 
+    @Autowired
+    UserEntityRepository userEntityRepository;
+
     @LogInterceptor
     @ApiOperation(value = "签发申请", notes = "签发申请")
     @ResponseBody
     @RequestMapping(value = "sign",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutApply(
-            @ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
-            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
-            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
+            //@ApiParam(value = "收款人私钥", required = true) @RequestParam String pyeeAddress,//收款人即签发人
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
-            @ApiParam(value = "票面金额", required = true) @RequestParam int isseAmt,
-            @ApiParam(value = "到期日", required = true) @RequestParam int dueDt,
+            @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
+            @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
+            @ApiParam(value = "票面金额", required = true) @RequestParam long isseAmt,
+            @ApiParam(value = "到期日", required = true) @RequestParam long dueDt,
             @ApiParam(value = "带息利率", required = true) @RequestParam String rate,
             @ApiParam(value = "合同编号", required = true) @RequestParam String contractNo,
-            @ApiParam(value = "发票号", required = true) @RequestParam String invoiceNo
+            @ApiParam(value = "发票号", required = true) @RequestParam String invoiceNo,
+            HttpServletRequest request
     ) throws Exception {
 
         long receivableGenerateTime = System.currentTimeMillis();
@@ -53,7 +62,13 @@ public class ReceivableController {
         list.add(contractNo);
         list.add(invoiceNo);
 
-        ContractKey contractKey = new ContractKey(pyeeAddress);
+//        ContractKey contractKey = new ContractKey(pyeeAddress);
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
 
         Object[] params = new Object[12];
@@ -79,16 +94,22 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "accept",method = RequestMethod.POST)//路径
     public BaseResult<Object> signOutReply(
-            @ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
+            //@ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,
-            @ApiParam(value = "回复意见", required = true) @RequestParam String response
+            @ApiParam(value = "回复意见", required = true) @RequestParam int response,
+            HttpServletRequest request
     ) throws Exception {
 
         long signOutReplyTime = System.currentTimeMillis();
         String serialNo = "122" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//签发回复流水号122
 
-        ContractKey contractKey = new ContractKey(replyerAddress);
+//        ContractKey contractKey = new ContractKey(replyerAddress);
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         Object[] params = new Object[5];
         params[0] = receivableNo;
@@ -106,17 +127,23 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "discountApply",method = RequestMethod.POST)//路径
     public BaseResult<Object> discountApply(
-            @ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
+            //@ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
-            @ApiParam(value = "申请贴现金额", required = true) @RequestParam String discountApplyAmount//申请贴现金额
+            @ApiParam(value = "申请贴现金额", required = true) @RequestParam long discountApplyAmount,//申请贴现金额
+            HttpServletRequest request
     ) throws Exception {
 
         long discountApplyTime = System.currentTimeMillis();
         String serialNo = "123" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());//贴现申请流水号123
 
-        ContractKey contractKey = new ContractKey(applicantAddress);
+//        ContractKey contractKey = new ContractKey(applicantAddress);
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         Object[] params = new Object[6];
         params[0] = receivableNo;
@@ -164,11 +191,19 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "receivableInfo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableAllInfo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
-            @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId
+            @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId,
+            HttpServletRequest request//http请求实体
     ) throws Exception {
-        ContractKey contractKey = new ContractKey(operatorAddress);
+//        ContractKey contractKey = new ContractKey(operatorAddress);
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
         Object[] params = new Object[2];
         params[0] = receivableNo;
         params[1] = operatorAcctId;
@@ -183,11 +218,17 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "recordInfo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getRecordBySerialNo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
-            @ApiParam(value = "流水号", required = true) @RequestParam String serialNo
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "流水号", required = true) @RequestParam String serialNo,
+            HttpServletRequest request
     ) throws Exception {
 
-        ContractKey contractKey = new ContractKey(operatorAddress);
+//        ContractKey contractKey = new ContractKey(operatorAddress);
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         Object[] params = new Object[1];
         params[0] = serialNo;
@@ -201,11 +242,17 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "historySerialNo",method = RequestMethod.POST)//路径
     public BaseResult<Object> getReceivableHistorySerialNo(
-            @ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
-            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
+            HttpServletRequest request
     ) throws Exception {
 
-        ContractKey contractKey = new ContractKey(operatorAddress);
+//        ContractKey contractKey = new ContractKey(operatorAddress);
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         Object[] params = new Object[1];
         params[0] = receivableNo;
