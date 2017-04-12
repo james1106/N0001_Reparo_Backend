@@ -2,6 +2,7 @@ package com.hyperchain.dal.repository;
 
 import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
