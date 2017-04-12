@@ -2862,12 +2862,12 @@ public class WayBillContractTest extends SpringBaseTest {
         requestLongs[0] = new Date().getTime(); //requestTime
         requestLongs[1] = new Long(100000); //productValue
         requestLongs[2] = new Long(1000); //productQuantity
-        String[] requestSddrs = new String[5];
-        requestSddrs[0] = logisticsAddress; //logisticsAddress
-        requestSddrs[1] = senderAddress; //senderAddress
-        requestSddrs[2] = receiverAddress; //receiverAddress
-        requestSddrs[3] = receiverRepoAddress; //receiverRepoAddress
-        requestSddrs[4] = senderRepoAddress; //senderRepoAddress
+        String[] requestAddrs = new String[5];
+        requestAddrs[0] = logisticsAddress; //logisticsAddress
+        requestAddrs[1] = senderAddress; //senderAddress
+        requestAddrs[2] = receiverAddress; //receiverAddress
+        requestAddrs[3] = receiverRepoAddress; //receiverRepoAddress
+        requestAddrs[4] = senderRepoAddress; //senderRepoAddress
         String[] requestStrs = new String[5];
         requestStrs[0] = "123订单" + random; //orderNo
         requestStrs[1] = "productName"; //productName
@@ -2875,10 +2875,21 @@ public class WayBillContractTest extends SpringBaseTest {
         requestStrs[3] = "receiverRepoBusinessNo"; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
         requestContractMethodParams[0] = requestLongs;
-        requestContractMethodParams[1] = requestSddrs;
+        requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
         requestContractMethodParams[3] = accountContractAddr;
         requestContractMethodParams[4] = receivableContractAddr;
+        for(int i = 0 ; i < requestLongs.length; i++) {
+            System.out.println("第0个参数：" + requestLongs[i]);
+        }
+        for(int i = 0 ; i < requestAddrs.length; i++) {
+            System.out.println("第1个参数：" + requestAddrs[i]);
+        }
+        for(int i = 0 ; i < requestStrs.length; i++) {
+            System.out.println("第2个参数：" + requestStrs[i]);
+        }
+        System.out.println("第3个参数：" + accountContractAddr);
+        System.out.println("第4个参数：" + receivableContractAddr);
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2968,6 +2979,55 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("logisticsInfo: " + logisticsInfo);
         System.out.println("wayBillStatus: " + wayBillStatus);
 
+    }
+
+//    @Test
+    public void test() throws PrivateKeyIllegalParam, GeneralSecurityException, IOException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //生成公私钥和用户地址
+        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson = keyInfo.get(1); //含address 私钥
+
+        ContractKey confirmContractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "test";
+        Object[] confirmContractMethodParams = new Object[1];
+        String[] strs = new String[0];
+        confirmContractMethodParams[0] = strs; //orderNo
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        System.out.println("调用合约test回code：" + confirmContractResult.getCode());
+//        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+
+    }
+
+//    @Test
+    public void test2() throws PrivateKeyIllegalParam, GeneralSecurityException, IOException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //生成公私钥和用户地址
+        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson = keyInfo.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String contractMethodName = "newAccount";
+        Object[] contractMethodParams = new Object[10];
+        String randomString = TestUtil.getRandomString();
+        contractMethodParams[0] = "用户名" + randomString;
+        contractMethodParams[1] = "企业名称" + randomString;
+        contractMethodParams[2] = 0;
+        contractMethodParams[3] = AccountStatus.VALID.getCode();
+        contractMethodParams[4] = "certType";
+        contractMethodParams[5] = "certNo";
+        String[] acctIdList = new String[1];
+        acctIdList[0] = "acctIds";
+        contractMethodParams[6] = acctIdList;
+        contractMethodParams[7] = "svcrClass";
+        contractMethodParams[8] = "acctSvcr";
+        contractMethodParams[9] = "acctSvcrName";
+        String[] resultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
+        System.out.println("调用合约newAccount返回code：" + contractResult.getCode());
+        Assert.assertEquals(Code.SUCCESS, contractResult.getCode());
     }
 
 }
