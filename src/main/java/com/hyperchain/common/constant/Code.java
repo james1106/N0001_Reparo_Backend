@@ -25,6 +25,7 @@ public enum Code {
     NOT_TELATIVE_ORDER(2005, "该订单与用户无关"),
     ORDER_ALREADY_CONFIRMED(2006, "该订单已经确认"),
     NOT_PAYEE_FOR_ORDER(2007, "用户不是订单的卖方"),
+    BANKACCOUNT_NOT_EXIST(2008, "用户无该银行账号"),
 
     //账户管理部分
     PHONE_ALREADY_EXIST(5001, "手机号码已注册"),
@@ -112,6 +113,8 @@ public enum Code {
                 return ORDER_ALREADY_CONFIRMED;
             case 2007:
                 return NOT_PAYEE_FOR_ORDER;
+            case 2008:
+                return BANKACCOUNT_NOT_EXIST;
 
 
             case 5002:

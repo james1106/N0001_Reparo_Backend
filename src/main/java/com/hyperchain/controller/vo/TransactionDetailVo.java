@@ -10,8 +10,8 @@ public class TransactionDetailVo {
 
     private String orderId;
     private String productName;
-    private String payerAddress;
-    private String payeeAddress;
+    private String payerCompanyName;
+    private String payeeCompanyName;
     private String payerBank;
     private String payerBankClss;
     private String payerAccount;
@@ -24,17 +24,40 @@ public class TransactionDetailVo {
     private String payeeRepo;
     private String repoCertNo;
     private String repoBusinessNo;
-    private String payingMethod;
+    private int payingMethod;
+    private int orderState;
 
-    public String getOrderState() {
+    public int getOrderState() {
         return orderState;
     }
 
-    public void setOrderState(String orderState) {
+    public void setOrderState(int orderState) {
         this.orderState = orderState;
     }
 
-    private String orderState;
+    public int getPayingMethod() {
+        return payingMethod;
+    }
+
+    public void setPayingMethod(int payingMethod) {
+        this.payingMethod = payingMethod;
+    }
+
+    public String getPayerCompanyName() {
+        return payerCompanyName;
+    }
+
+    public void setPayerCompanyName(String payerCompanyName) {
+        this.payerCompanyName = payerCompanyName;
+    }
+
+    public String getPayeeCompanyName() {
+        return payeeCompanyName;
+    }
+
+    public void setPayeeCompanyName(String payeeCompanyName) {
+        this.payeeCompanyName = payeeCompanyName;
+    }
 
     public long getOrderGenerateTime() {
         return orderGenerateTime;
@@ -59,23 +82,6 @@ public class TransactionDetailVo {
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public String getPayerAddress() {
-        return payerAddress;
-    }
-
-    public void
-    setPayerAddress(String payerAddress) {
-        this.payerAddress = payerAddress;
-    }
-
-    public String getPayeeAddress() {
-        return payeeAddress;
-    }
-
-    public void setPayeeAddress(String payeeAddress) {
-        this.payeeAddress = payeeAddress;
     }
 
     public String getPayerBank() {
@@ -133,14 +139,6 @@ public class TransactionDetailVo {
 
     public void setRepoBusinessNo(String repoBusinessNo) {
         this.repoBusinessNo = repoBusinessNo;
-    }
-
-    public String getPayingMethod() {
-        return payingMethod;
-    }
-
-    public void setPayingMethod(String payingMethod) {
-        this.payingMethod = payingMethod;
     }
 
     public long getProductUnitPrice() {

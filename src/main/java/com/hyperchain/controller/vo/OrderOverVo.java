@@ -15,11 +15,55 @@ public class OrderOverVo {
     private String payerRepo;
     private String payerBank;
     private String payerBankAccount;
-    private String payingMethod;
+    private int payingMethod;
     private long orderGenerateTime;
     private long orderConfirmTime;
-    private String payerAddress;
-    private String payeeAddress;
+    private String payerCompanyName;
+    private String payeeCompanyName;
+    private int transactionStatus;
+    private int repoStatus;
+    private int receStatus;
+    private int wayBillStatus;
+
+    public int getPayingMethod() {
+        return payingMethod;
+    }
+
+    public void setPayingMethod(int payingMethod) {
+        this.payingMethod = payingMethod;
+    }
+
+    public int getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(int transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public int getRepoStatus() {
+        return repoStatus;
+    }
+
+    public void setRepoStatus(int repoStatus) {
+        this.repoStatus = repoStatus;
+    }
+
+    public int getReceStatus() {
+        return receStatus;
+    }
+
+    public void setReceStatus(int receStatus) {
+        this.receStatus = receStatus;
+    }
+
+    public int getWayBillStatus() {
+        return wayBillStatus;
+    }
+
+    public void setWayBillStatus(int wayBillStatus) {
+        this.wayBillStatus = wayBillStatus;
+    }
 
     public String getOrderNo() {
         return orderNo;
@@ -31,14 +75,6 @@ public class OrderOverVo {
 
     public long getOrderGenerateTime() {
         return orderGenerateTime;
-    }
-
-    public String getPayeeAddress() {
-        return payeeAddress;
-    }
-
-    public void setPayeeAddress(String payeeAddress) {
-        this.payeeAddress = payeeAddress;
     }
 
     public void setOrderGenerateTime(long orderGenerateTime) {
@@ -54,14 +90,6 @@ public class OrderOverVo {
     }
     public String getProductName() {
         return productName;
-    }
-
-    public String getPayerAddress() {
-        return payerAddress;
-    }
-
-    public void setPayerAddress(String payerAddress) {
-        this.payerAddress = payerAddress;
     }
 
     public void setProductName(String productName) {
@@ -116,11 +144,19 @@ public class OrderOverVo {
         this.payerBankAccount = payerBankAccount;
     }
 
-    public String getPayingMethod() {
-        return payingMethod;
+    public String getPayerCompanyName() {
+        return payerCompanyName;
     }
 
-    public void setPayingMethod(String payingMethod) {
-        this.payingMethod = payingMethod;
+    public void setPayerCompanyName(String payerCompanyName) {
+        this.payerCompanyName = payerCompanyName;
+    }
+
+    public String getPayeeCompanyName() {
+        return payeeCompanyName;
+    }
+
+    public void setPayeeCompanyName(String payeeCompanyName) {
+        this.payeeCompanyName = payeeCompanyName;
     }
 }
