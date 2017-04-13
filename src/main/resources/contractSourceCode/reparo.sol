@@ -1618,7 +1618,7 @@ contract RepositoryContract{
 contract OrderContract{
   address owner;
   AccountContract accountContract;
-  WayBillContract wayBillContract;
+  //WayBillContract wayBillContract;
   ReceivableContract receivableContract;
   RepositoryContract repositoryContract;
   function Reparo(){
