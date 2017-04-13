@@ -1070,8 +1070,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return (0,bytesList,intList,responseTypeList);
     }
 */
-    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (bytes32[]){
-        return receivableTransferHistoryMap[receivableNo];
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
+        return (0, receivableTransferHistoryMap[receivableNo]);
     }
 
 //流水号查询，自己查自己

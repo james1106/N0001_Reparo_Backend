@@ -4397,5 +4397,23 @@ public class AccountServiceImplTest extends SpringBaseTest {
 
     }
 
+    @Test
+    public void findAllEnterpriseNameByRoleCode() {
+        BaseResult<Object> baseResult = accountService.findAllEnterpriseNameByRoleCode(0);
+        System.out.println("所有企业名称：" + baseResult.toString());
+        Assert.assertEquals(Code.SUCCESS.getCode(), baseResult.getCode());
+
+        BaseResult<Object> baseResult1 = accountService.findAllEnterpriseNameByRoleCode(1);
+        System.out.println("所有物流名称：" + baseResult1.toString());
+        Assert.assertEquals(Code.SUCCESS.getCode(), baseResult1.getCode());
+
+        BaseResult<Object> baseResult2 = accountService.findAllEnterpriseNameByRoleCode(2);
+        System.out.println("所有仓储名称：" + baseResult2.toString());
+        Assert.assertEquals(Code.SUCCESS.getCode(), baseResult2.getCode());
+
+        BaseResult<Object> baseResult3 = accountService.findAllEnterpriseNameByRoleCode(3);
+        System.out.println("所有银行名称：" + baseResult3.toString());
+        Assert.assertEquals(Code.SUCCESS.getCode(), baseResult3.getCode());
+    }
 
 }

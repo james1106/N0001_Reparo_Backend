@@ -72,7 +72,7 @@ public class WayBillContractTest extends SpringBaseTest {
                 4,
                 "certType",
                 "1111",
-                "11111",
+                "11111" + randomString,
                 "class",
                 "acctSvcr",
                 "acctSvcrName",
@@ -630,7 +630,7 @@ public class WayBillContractTest extends SpringBaseTest {
                 4,
                 "certType",
                 "1111",
-                "11111",
+                "11111" + randomString1,
                 "class",
                 "acctSvcr",
                 "acctSvcrName",
@@ -1181,14 +1181,14 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString2 = TestUtil.getRandomString();
         BaseResult<Object> result2 = accountService.register("account" + randomString2, //unique
                 "123",
-                "企业" + randomString2, //unique
+                "物流" + randomString2, //unique
                 "1881881" + randomString2, //unique
                 1,
                 "859051",
                 4,
                 "certType",
                 "1111",
-                "11111",
+                "11111" + randomString2,
                 "class",
                 "acctSvcr",
                 "acctSvcrName",
@@ -1739,14 +1739,14 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString3 = TestUtil.getRandomString();
         BaseResult<Object> result3 = accountService.register("account" + randomString3, //unique
                 "123",
-                "企业" + randomString3, //unique
+                "仓储" + randomString3, //unique
                 "1881881" + randomString3, //unique
                 2,
                 "859051",
                 4,
                 "certType",
                 "1111",
-                "11111",
+                "11111" + randomString3,
                 "class",
                 "acctSvcr",
                 "acctSvcrName",
@@ -2293,14 +2293,14 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString4 = TestUtil.getRandomString();
         BaseResult<Object> result4 = accountService.register("account" + randomString4, //unique
                 "123",
-                "企业" + randomString4, //unique
+                "仓储" + randomString4, //unique
                 "1881881" + randomString4, //unique
                 2,
                 "859051",
                 4,
                 "certType",
                 "1111",
-                "11111",
+                "11111" + randomString4,
                 "class",
                 "acctSvcr",
                 "acctSvcrName",
@@ -2894,6 +2894,7 @@ public class WayBillContractTest extends SpringBaseTest {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约generateUnConfirmedWayBill返回code：" + requestContractResult.getCode());
+        System.out.println("调用合约generateUnConfirmedWayBill返回结果：" + requestContractResult.toString());
         Assert.assertEquals(Code.SUCCESS, requestContractResult.getCode());
 
         //物流确认发货，生成完整运单
@@ -2909,6 +2910,7 @@ public class WayBillContractTest extends SpringBaseTest {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
+        System.out.println("调用合约generateWayBill返回结果：" + confirmContractResult.toString());
         Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
 
         //更新运单状态为已送达
@@ -2925,6 +2927,7 @@ public class WayBillContractTest extends SpringBaseTest {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约updateWayBillStatusToReceived返回code：" + updateToReceivedResult.getCode());
+        System.out.println("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
         Assert.assertEquals(Code.SUCCESS, updateToReceivedResult.getCode());
 
         //获取所有用户相关运单的订单号列表
@@ -2936,18 +2939,20 @@ public class WayBillContractTest extends SpringBaseTest {
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约listWayBillOrderNo返回code：" + listOrderNoContractResult.getCode());
+        System.out.println("调用合约getWayBill返回结果：" + listOrderNoContractResult.toString());
         Assert.assertEquals(Code.SUCCESS, listOrderNoContractResult.getCode());
-        Map<String, Object> listOrderNoResultValueMap = listOrderNoContractResult.getValueMap();
-        String[] orderNoList = (String[]) listOrderNoResultValueMap.get("orderNoList");
-        for (int i = 0; i < orderNoList.length; i++) {
-            System.out.println("运单订单号" + i + " : " + orderNoList[i]);
+        List<String> orderNoList= (List<String>) listOrderNoContractResult.getValue().get(0); //注意：getValue()返回的是所有结果的List！如果只有一个结果，须取下标为0的结果！
+        for (int i = 0; i < orderNoList.size(); i++) {
+            System.out.println("运单订单号" + i + " : " + orderNoList.get(i));
         }
 
         //获取最后一个运单信息
         ContractKey waybillContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String waybillContractMethodName = "getWayBill";
         Object[] waybillContractMethodParams = new Object[2];
-        waybillContractMethodParams[0] = "123订单" + random; //orderNo
+        waybillContractMethodParams[0] = orderNoList.get(orderNoList.size() - 1); //orderNo
+        System.out.println("===========请求订单号（正确？）：" + waybillContractMethodParams[0]);
+//        waybillContractMethodParams[0] = "123订单" + random; //orderNo
         waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
         String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -2955,79 +2960,31 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("调用合约getWayBill返回code：" + waybillContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, waybillContractResult.getCode());
         Map<String, Object> waybillResultValueMap = waybillContractResult.getValueMap();
-        Long[] longs = (Long[]) waybillResultValueMap.get("longs");
-        String[] strs = (String[]) waybillResultValueMap.get("strs");
-        String[] addrs = (String[]) waybillResultValueMap.get("addrs");
-        String[] logisticsInfo = (String[]) waybillResultValueMap.get("logisticsInfo");
-        Integer wayBillStatus = (Integer) waybillResultValueMap.get("wayBillStatus");
-        System.out.println("productQuantity: " + longs[0]);
-        System.out.println("productValue: " + longs[1]);
-        System.out.println("requestTime: " + longs[2]);
-        System.out.println("receiveTime: " + longs[3]);
-        System.out.println("sendTime: " + longs[4]);
-        System.out.println("rejectTime: " + longs[5]);
-        System.out.println("orderNo: " + strs[0]);
-        System.out.println("wayBillNo: " + strs[1]);
-        System.out.println("productName: " + strs[2]);
-        System.out.println("senderRepoCertNo: " + strs[3]);
-        System.out.println("receiverRepoBusinessNo: " + strs[4]);
-        System.out.println("logisticsAddress: " + addrs[0]);
-        System.out.println("senderAddress: " + addrs[1]);
-        System.out.println("receiverAddress: " + addrs[2]);
-        System.out.println("senderRepoAddress: " + addrs[3]);
-        System.out.println("receiverRepoAddress: " + addrs[4]);
+        System.out.println("调用合约getWayBill返回结果：" + waybillContractResult.toString());
+        List<Long> longs = (List<Long>) waybillResultValueMap.get("longs");
+        List<String> strs = (List<String>) waybillResultValueMap.get("strs");
+        List<String> addrs = (List<String>) waybillResultValueMap.get("addrs");
+        List<String> logisticsInfo = (List<String>) waybillResultValueMap.get("logisticsInfo");
+        int wayBillStatus = Integer.parseInt((String) waybillResultValueMap.get("wayBillStatus"));
+        System.out.println("productQuantity: " + longs.get(0));
+        System.out.println("productValue: " + longs.get(1));
+        System.out.println("requestTime: " + longs.get(2));
+        System.out.println("receiveTime: " + longs.get(3));
+        System.out.println("sendTime: " + longs.get(4));
+        System.out.println("rejectTime: " + longs.get(5));
+        System.out.println("orderNo: " + strs.get(0));
+        System.out.println("wayBillNo: " + strs.get(1));
+        System.out.println("productName: " + strs.get(2));
+        System.out.println("senderRepoCertNo: " + strs.get(3));
+        System.out.println("receiverRepoBusinessNo: " + strs.get(4));
+        System.out.println("logisticsAddress: " + addrs.get(0));
+        System.out.println("senderAddress: " + addrs.get(1));
+        System.out.println("receiverAddress: " + addrs.get(2));
+        System.out.println("senderRepoAddress: " + addrs.get(3));
+        System.out.println("receiverRepoAddress: " + addrs.get(4));
         System.out.println("logisticsInfo: " + logisticsInfo);
         System.out.println("wayBillStatus: " + wayBillStatus);
 
-    }
-
-//    @Test
-    public void test() throws PrivateKeyIllegalParam, GeneralSecurityException, IOException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
-        String accountJson = keyInfo.get(1); //含address 私钥
-
-        ContractKey confirmContractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
-        String confirmContractMethodName = "test";
-        Object[] confirmContractMethodParams = new Object[1];
-        String[] strs = new String[0];
-        confirmContractMethodParams[0] = strs; //orderNo
-        String[] confirmResultMapKey = new String[]{};
-        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        System.out.println("调用合约test回code：" + confirmContractResult.getCode());
-//        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
-
-    }
-
-//    @Test
-    public void test2() throws PrivateKeyIllegalParam, GeneralSecurityException, IOException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
-        String accountJson = keyInfo.get(1); //含address 私钥
-
-        //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
-        String contractMethodName = "newAccount";
-        Object[] contractMethodParams = new Object[10];
-        String randomString = TestUtil.getRandomString();
-        contractMethodParams[0] = "用户名" + randomString;
-        contractMethodParams[1] = "企业名称" + randomString;
-        contractMethodParams[2] = 0;
-        contractMethodParams[3] = AccountStatus.VALID.getCode();
-        contractMethodParams[4] = "certType";
-        contractMethodParams[5] = "certNo";
-        String[] acctIdList = new String[1];
-        acctIdList[0] = "acctIds";
-        contractMethodParams[6] = acctIdList;
-        contractMethodParams[7] = "svcrClass";
-        contractMethodParams[8] = "acctSvcr";
-        contractMethodParams[9] = "acctSvcrName";
-        String[] resultMapKey = new String[]{};
-        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
-        System.out.println("调用合约newAccount返回code：" + contractResult.getCode());
-        Assert.assertEquals(Code.SUCCESS, contractResult.getCode());
     }
 
 }

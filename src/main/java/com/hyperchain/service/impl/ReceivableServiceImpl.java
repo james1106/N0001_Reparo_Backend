@@ -398,7 +398,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         String contractMethodName = "getReceivableHistorySerialNo";
         //String[] resultMapKey = new String[]{"transferHistorySerialNo[]"};//给返回值取了个名称
 
-        String[] resultMapKey = new String[]{"transferHistorySerialNo[]", "partList2", "partList3"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"transferHistorySerialNo[]"};//给返回值取了个名称
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
@@ -415,45 +415,45 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         BaseResult<Object> result = new BaseResult<>();
 //         将合约结果转化为接口返回数据
-        int resultCode = contractResult.getCode().getCode();
-        Code code = Code.fromInt(resultCode);
+//        int resultCode = contractResult.getCode().getCode();
+        Code code = contractResult.getCode();
 
-
-/*//        List<Object> partParams0 = contractResult.getValue();
-        List<String> partParams0 = (List<String>) contractResult.getValue().get(0);
+//        List<Object> partParams0 = contractResult.getValue();
+//        List<String> partParams0 = (List<String>) contractResult.getValue().get(0);
 //        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
 //        result.returnWithValue(code, partParams0);
-        result.returnWithValue(code, partParams0);
+        List<String> resutList = (ArrayList)contractResult.getValue().get(0);
+        result.returnWithValue(code, resutList);
 
-        return result;*/
-        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
-        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
-        List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
-        int length = partList3.size();
-        List<ReceivableRecordDetailVo> receivableVoList = new ArrayList<>();
-        for(int i = 0; i < length; i++){
-            ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
-            receivableVo.setSerialNo(partList1.get(i*5+1));
-            receivableVo.setReceivableNo(partList1.get(i*5));
-            receivableVo.setApplicantAcctId(partList1.get(i*5+2));
-            receivableVo.setReplyerAcctId(partList1.get(i*5+3));
-            receivableVo.setOperateType(partList1.get(i*5+4));
-
-            receivableVo.setTime(Long.parseLong(partList2.get(i*2)));
-            receivableVo.setDealAmount(Long.parseLong(partList3.get(i*5)));
-            receivableVo.setResponseType(partList3.get(i));
+        return result;
+//        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+//        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+//        List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+//        int length = partList3.size();
+//        List<ReceivableRecordDetailVo> receivableVoList = new ArrayList<>();
+//        for(int i = 0; i < length; i++){
+//            ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
+//            receivableVo.setSerialNo(partList1.get(i*5+1));
+//            receivableVo.setReceivableNo(partList1.get(i*5));
+//            receivableVo.setApplicantAcctId(partList1.get(i*5+2));
+//            receivableVo.setReplyerAcctId(partList1.get(i*5+3));
+//            receivableVo.setOperateType(partList1.get(i*5+4));
+//
+//            receivableVo.setTime(Long.parseLong(partList2.get(i*2)));
+//            receivableVo.setDealAmount(Long.parseLong(partList3.get(i*5)));
+//            receivableVo.setResponseType(partList3.get(i));
 
 
            // receivableVo.setReceivableStatus(Long.parseLong(partList3.get(i*5+1)));
 
 
-            receivableVoList.add(receivableVo);
+//            receivableVoList.add(receivableVo);
         }
 
-        result.returnWithValue(code, receivableVoList);
-
-        return result;
-    }
+//        result.returnWithValue(code, receivableVoList);
+//
+//        return result;
+//    }
 
     //返回买卖方应收款列表
     @Override
