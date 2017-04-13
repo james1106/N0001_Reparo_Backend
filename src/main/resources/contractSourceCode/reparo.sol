@@ -362,7 +362,8 @@ contract ReceivableContract{
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
-
+        pyerToReceivableMap[pyer].push(receivableNo);
+        pyeeToReceivableMap[pyee].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
 
         return (0);

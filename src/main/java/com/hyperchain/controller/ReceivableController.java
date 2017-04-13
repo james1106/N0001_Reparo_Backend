@@ -1,11 +1,14 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
+import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.*;
 import com.wordnik.swagger.annotations.Api;
@@ -37,6 +40,9 @@ public class ReceivableController {
 
     @Autowired
     UserEntityRepository userEntityRepository;
+
+    @Autowired
+    AccountEntityRepository accountEntityRepository;
 
     @LogInterceptor
     @ApiOperation(value = "签发申请", notes = "签发申请")
@@ -259,6 +265,40 @@ public class ReceivableController {
 
         // 调用合约查询账户，获取返回结果
         return receivableService.getReceivableHistorySerialNo(contractKey, params);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "买方／卖方应收款列表", notes = "买方／卖方应收款列表")
+    @ResponseBody
+    @RequestMapping(value = "receivableSimpleDeatilList",method = RequestMethod.POST)//路径
+    public BaseResult<Object> receivableSimpleDeatilList(
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "用户角色", required = true) @RequestParam int roleCode,//0是买家、1是卖家
+            HttpServletRequest request
+    ) throws Exception {
+
+//        ContractKey contractKey = new ContractKey(operatorAddress);
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
+        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+
+        List<AccountEntity> accountEntityList = accountEntityRepository.findByAddress(address);
+        AccountEntity accountEntity = accountEntityList.get(0);//取出来的结构体
+        String acctId = accountEntity.getAcctId();
+
+        Object[] params = new Object[4];
+        params[0] = roleCode;
+        params[1] = acctId;
+        params[2] = orderContractAddress;
+        params[3] = accountContractAddress;
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.receivableSimpleDeatilList(contractKey, params);
     }
 
 }
