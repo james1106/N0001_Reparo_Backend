@@ -174,7 +174,9 @@ contract WayBillContract {
         if(accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false || msg.sender != addrs[1]){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
+
         if(statusTransIdToWayBillDetail[strs[4]].productName != ""){ //运单已经存在
+        //if(orderNoToStatusTransIdList[strs[0]][0] != ""){ //运单已经存在
             return CODE_WAY_BILL_ALREADY_EXIST;
         }
     //TODO 查应收款状态是否为承兑已签收（订单状态是否为已确认已经先判断），否则无权限
