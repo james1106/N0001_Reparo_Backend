@@ -1,6 +1,7 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
@@ -45,15 +46,20 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "发货人企业名称（当前账户企业名称）", required = true) @RequestParam("senderEnterpriseName") String senderEnterpriseName,
             @ApiParam(value = "收货人企业名称", required = true) @RequestParam("receiverEnterpriseName") String receiverEnterpriseName,
             @ApiParam(value = "货品名称", required = true) @RequestParam("productName") String productName,
-            @ApiParam(value = "货品数量", required = false) @RequestParam("productQuantity") long productQuantity,
-            @ApiParam(value = "货品价值", required = false) @RequestParam("productValue") long productValue,
-            @ApiParam(value = "货品所在仓储公司名称", required = false) @RequestParam("senderRepoEnterpriseName") String senderRepoEnterpriseName,
-            @ApiParam(value = "发货货品仓单编号", required = false) @RequestParam("senderRepoCertNo") String senderRepoCertNo,
-            @ApiParam(value = "收货仓储公司名称", required = false) @RequestParam("receiverRepoEnterpriseName") String receiverRepoEnterpriseName,
-            @ApiParam(value = "收货仓储业务编号", required = false) @RequestParam("receiverRepoBusinessNo") String receiverRepoBusinessNo,
+            @ApiParam(value = "货品数量", required = true) @RequestParam("productQuantity") long productQuantity,
+            @ApiParam(value = "货品价值", required = true) @RequestParam("productValue") long productValue,
+            @ApiParam(value = "货品所在仓储公司名称", required = true) @RequestParam("senderRepoEnterpriseName") String senderRepoEnterpriseName,
+            @ApiParam(value = "发货货品仓单编号", required = true) @RequestParam("senderRepoCertNo") String senderRepoCertNo,
+            @ApiParam(value = "收货仓储公司名称", required = true) @RequestParam("receiverRepoEnterpriseName") String receiverRepoEnterpriseName,
+            @ApiParam(value = "收货仓储业务编号", required = true) @RequestParam("receiverRepoBusinessNo") String receiverRepoBusinessNo,
             HttpServletRequest request,
             HttpServletResponse response)
             throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+        LogUtil.debug("logisticsEnterpriseName：" + logisticsEnterpriseName);
+        LogUtil.debug("receiverEnterpriseName：" + receiverEnterpriseName);
+        LogUtil.debug("senderEnterpriseName：" + senderEnterpriseName);
+        LogUtil.debug("senderRepoEnterpriseName：" + senderRepoEnterpriseName);
+        LogUtil.debug("receiverRepoEnterpriseName：" + receiverRepoEnterpriseName);
         return wayBillService.generateUnConfirmedWaybill(orderNo, logisticsEnterpriseName, senderEnterpriseName, receiverEnterpriseName, productName, productQuantity, productValue, senderRepoEnterpriseName, senderRepoCertNo, receiverRepoEnterpriseName, receiverRepoBusinessNo, request);
     }
 
@@ -82,7 +88,7 @@ public class WayBillController extends BaseController{
     }
 
     @LogInterceptor
-    @ApiOperation(value = "查询所有与自己相关的运单信息", notes = "查询所有与自己相关的运单信息")
+    @ApiOperation(value = "根据订单号查询所有运单信息", notes = "根据订单号查询所有运单信息")
     @ResponseBody
     @RequestMapping(value = "/wayBillDetail", method = RequestMethod.GET)
     public BaseResult<Object> getWayBillDetailByOrderNo(
@@ -96,7 +102,7 @@ public class WayBillController extends BaseController{
     @LogInterceptor
     @ApiOperation(value = "查询所有与自己相关的运单信息", notes = "查询所有与自己相关的运单信息")
     @ResponseBody
-    @RequestMapping(value = "/wayBillStatus", method = RequestMethod.PUT)
+    @RequestMapping(value = "/receivedStatus", method = RequestMethod.PUT)
     public BaseResult<Object> updateWayBillStatusToReceived(
             @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
             HttpServletRequest request,

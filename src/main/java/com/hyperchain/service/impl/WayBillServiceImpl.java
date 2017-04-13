@@ -119,7 +119,7 @@ public class WayBillServiceImpl implements WayBillService {
 
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(requestContractResult.getCode());
-        return null;
+        return baseResult;
     }
 
     /**
@@ -279,7 +279,7 @@ public class WayBillServiceImpl implements WayBillService {
 
     private WayBillDetailVo parseContractResultToWayBillDetailVo(ContractResult waybillContractResult) {
         Map<String, Object> waybillResultValueMap = waybillContractResult.getValueMap();
-        List<Long> longs = (List<Long>) waybillResultValueMap.get("longs");
+        List<String> longs = (List<String>) waybillResultValueMap.get("longs");
         List<String> strs = (List<String>) waybillResultValueMap.get("strs");
         List<String> addrs = (List<String>) waybillResultValueMap.get("addrs");
         List<String> logisticsInfo = (List<String>) waybillResultValueMap.get("logisticsInfo");
@@ -306,8 +306,8 @@ public class WayBillServiceImpl implements WayBillService {
 //            System.out.println("logisticsInfo: " + logisticsInfo);
 //            System.out.println("wayBillStatus: " + wayBillStatus);
 
-        wayBillDetailVo.setProductQuantity(longs.get(0));
-        wayBillDetailVo.setProductValue(longs.get(1));
+        wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
+        wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
         wayBillDetailVo.setOrderNo(strs.get(0));
         wayBillDetailVo.setWayBillNo(strs.get(1));
         wayBillDetailVo.setProductName(strs.get(2));
@@ -327,15 +327,15 @@ public class WayBillServiceImpl implements WayBillService {
         wayBillDetailVo.setLogisticsInfo(logisticsInfo);
         if (wayBillStatus == WayBillStatus.REQUESTING.getCode()) {
             Long[] allOperateTime = new Long[1];
-            allOperateTime[0] = longs.get(2); //requestTime
+            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
             int[] allStatusCode = new int[1];
             allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
             wayBillDetailVo.setAllOperateTime(allOperateTime);
             wayBillDetailVo.setAllStatusCode(allStatusCode);
         } else if (wayBillStatus == WayBillStatus.REJECTED.getCode()) {
             Long[] allOperateTime = new Long[2];
-            allOperateTime[0] = longs.get(2); //requestTime
-            allOperateTime[1] = longs.get(5); //rejectTime
+            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
+            allOperateTime[1] = Long.parseLong(longs.get(5)); //rejectTime
             int[] allStatusCode = new int[2];
             allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
             allStatusCode[1] = WayBillStatus.REJECTED.getCode();
@@ -343,8 +343,8 @@ public class WayBillServiceImpl implements WayBillService {
             wayBillDetailVo.setAllStatusCode(allStatusCode);
         } else if (wayBillStatus == WayBillStatus.SENDING.getCode()) {
             Long[] allOperateTime = new Long[2];
-            allOperateTime[0] = longs.get(2); //requestTime
-            allOperateTime[1] = longs.get(4); //sendTime
+            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
+            allOperateTime[1] = Long.parseLong(longs.get(4)); //sendTime
             int[] allStatusCode = new int[2];
             allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
             allStatusCode[1] = WayBillStatus.SENDING.getCode();
@@ -352,13 +352,13 @@ public class WayBillServiceImpl implements WayBillService {
             wayBillDetailVo.setAllStatusCode(allStatusCode);
         } else if (wayBillStatus == WayBillStatus.RECEIVED.getCode()) {
             Long[] allOperateTime = new Long[3];
-            allOperateTime[0] = longs.get(2); //requestTime
-            allOperateTime[1] = longs.get(4); //sendTime
-            allOperateTime[2] = longs.get(3); //receiveTime
+            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
+            allOperateTime[1] = Long.parseLong(longs.get(4)); //sendTime
+            allOperateTime[2] = Long.parseLong(longs.get(3)); //receiveTime
             int[] allStatusCode = new int[3];
             allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
             allStatusCode[1] = WayBillStatus.SENDING.getCode();
-            allStatusCode[3] = WayBillStatus.RECEIVED.getCode();
+            allStatusCode[2] = WayBillStatus.RECEIVED.getCode();
             wayBillDetailVo.setAllOperateTime(allOperateTime);
             wayBillDetailVo.setAllStatusCode(allStatusCode);
         }
