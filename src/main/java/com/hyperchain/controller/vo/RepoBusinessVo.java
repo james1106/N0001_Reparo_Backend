@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Created by chenxiaoyang on 2017/4/12.
+ * 仓储详情及仓储流水数据
  */
 public class RepoBusinessVo {
     /*private String businessTransNo;

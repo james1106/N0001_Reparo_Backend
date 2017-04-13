@@ -11,6 +11,12 @@ public interface RepositoryService {
 
     BaseResult<Object> incomeApplyResponse(ContractKey contractKey, Object[] contractParams);
 
+    BaseResult<Object> incomeConfirm(ContractKey contractKey, Object[] contractParams);
+
     BaseResult<Object> getRepoBusiInfo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoBusiHistoryList(ContractKey contractKey, Object[] contractParams);
+
+
+
+    BaseResult<Object> getRepoCertDetail(ContractKey contractKey, Object[] contractParams);
 }
