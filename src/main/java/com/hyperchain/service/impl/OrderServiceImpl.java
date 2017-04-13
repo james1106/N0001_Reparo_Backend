@@ -179,23 +179,23 @@ public class OrderServiceImpl implements OrderService{
         txDetailVo.setPayeeRepoCertNo(payeeRepoCertNo);
         txDetailVo.setPayerRepoCertNo(payerRepoCertNo);
 
-//        ReceOverVo receOverVo = new ReceOverVo();
-//        receOverVo.setReceNo(receNo);
-//        receOverVo.setReceivingSide(receivingSide);
-//        receOverVo.setPayingSide(payingSide);
-//        receOverVo.setDueDate(dueDate);
-//        receOverVo.setReceGenerateTime(receGenerateTime);
-//        receOverVo.setReceAmount(receAmount);
-//        receOverVo.setCoupon(coupon);
-//        receOverVo.setReceLatestStatus(receLatestStatus);
-//        receOverVo.setReceUpdateTime(receUpdateTime);
+        ReceOverVo receOverVo = new ReceOverVo();
+        receOverVo.setReceNo("");
+        receOverVo.setReceivingSide("");
+        receOverVo.setPayingSide("");
+        receOverVo.setDueDate("");
+        receOverVo.setReceGenerateTime(0);
+        receOverVo.setReceAmount(0);
+        receOverVo.setCoupon(0);
+        receOverVo.setReceLatestStatus(0);
+        receOverVo.setReceUpdateTime(0);
 
-//        WayBillOverInfo wayBillOverInfo = new WayBillOverInfo();
-//        wayBillOverInfo.setLogisticCompany(logisticCompany);
-//        wayBillOverInfo.setWayBillGenerateTime(wayBillGenerateTime);
-//        wayBillOverInfo.setWayBillLatestStatus(wayBillLatestStatus);
-//        wayBillOverInfo.setWayBillNo(wayBillNo);
-//        wayBillOverInfo.setWayBillUpdateTime(wayBillUpdateTime);
+        WayBillOverInfo wayBillOverInfo = new WayBillOverInfo();
+        wayBillOverInfo.setLogisticCompany("");
+        wayBillOverInfo.setWayBillGenerateTime(0);
+        wayBillOverInfo.setWayBillLatestStatus(0);
+        wayBillOverInfo.setWayBillNo("");
+        wayBillOverInfo.setWayBillUpdateTime(0);
 
         RepoOverVo repoOverVo = new RepoOverVo();
         repoOverVo.setPayerRepoCertNo(payerRepoCertNo);
@@ -208,8 +208,8 @@ public class OrderServiceImpl implements OrderService{
         repoOverVo.setPayerRepoBusiState(payerRepoBusiState);
 
         orderDetailMap.put("txDetail", txDetailVo);
-        orderDetailMap.put("receOver", null);
-        orderDetailMap.put("wayBillOver", null);
+        orderDetailMap.put("receOver", receOverVo);
+        orderDetailMap.put("wayBillOver", wayBillOverInfo);
         orderDetailMap.put("repoOver", repoOverVo);
 
         result.returnWithValue(code, orderDetailMap);
