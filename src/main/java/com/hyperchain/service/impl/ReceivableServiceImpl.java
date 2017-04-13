@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.hyperchain.common.constant.BaseConstant.CONTRACT_NAME_RECEIVABLE;
 
@@ -326,6 +328,148 @@ public class ReceivableServiceImpl implements ReceivableService{
         return result;
     }
 
+    //单张应收款详情
+    @Override
+    public BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams) {
+        String contractMethodName = "getReceivableAllInfoWithSerial";
+        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted", "note"};//给返回值取了个名称
+
+
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = null;
+        try {
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        BaseResult<Object> result = new BaseResult<>();
+//         将合约结果转化为接口返回数据
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+        if(code == Code.INVALID_USER){//2
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.PARAMETER_EMPTY){//3
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.RECEIVABLE_NOT_EXITS){//1005
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        if(code == Code.PERMISSION_DENIED){//1
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
+        //List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
+        String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
+
+        String receivableNo = partParams0.get(0);
+        String orderNo = partParams0.get(1);
+        String signer = partParams0.get(2);
+        String accptr = partParams0.get(3);
+        String pyer = partParams0.get(4);
+        String pyee = partParams0.get(5);
+        String firstOwner = partParams0.get(6);
+        String secondOwner = partParams0.get(7);
+        String rate = partParams0.get(8);
+        String contractNo = partParams0.get(9);
+        String invoiceNo = partParams0.get(10);
+
+//        String pyerEnterpriseName = partParams1.get(0);
+//        String pyerAcctSvcrName = partParams1.get(1);
+//        String pyeeEnterpriseName = partParams1.get(2);
+//        String pyeeAcctSvcrName = partParams1.get(3);
+
+        List<ReceivableSimpleSerialVo> receivableSimpleSerialVoList = new ArrayList<>();
+        List<ReceivableDetailVo> receivableDetailVoList = new ArrayList<>();
+        int length = (partParams1.size() - 8) / 2;
+        int lastLength = partParams1.size() - 8;
+
+        long isseAmt = Long.parseLong(partParams1.get(lastLength));
+        long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 1));
+        long isseDt = Long.parseLong(partParams1.get(lastLength + 2));
+        long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 3));
+        long dueDt = Long.parseLong(partParams1.get(lastLength + 4));
+        long discountInHandAmount = (partParams1.get(lastLength + 5).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 5));
+        int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
+        int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
+
+        AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
+        AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);
+        String pyerAddress = pyerAccountEntity.getAddress();
+        String pyeeAddress = pyeeAccountEntity.getAddress();
+        String pyerAcctSvcrName = pyerAccountEntity.getAcctSvcrName();//付款人开户行
+        String pyeeAcctSvcrName = pyeeAccountEntity.getAcctSvcrName();//收款人开户行
+        UserEntity pyerUserEntity = userEntityRepository.findByAddress(pyerAddress);
+        UserEntity pyeeUserEntity = userEntityRepository.findByAddress(pyeeAddress);
+        String pyerLinkMan = pyerUserEntity.getPhone();//付款人联系方式
+        String pyerEnterpriseName = pyerUserEntity.getCompanyName();//付款人企业名
+        String pyeeLinkman = pyeeUserEntity.getPhone();//收款人联系方式
+        String pyeeEnterpriseName = pyeeUserEntity.getCompanyName();//收款人企业名
+
+        ReceivableDetailVo receivableDetailVo = new ReceivableDetailVo();
+
+        receivableDetailVo.setReceivableNo(receivableNo);
+        receivableDetailVo.setOrderNo(orderNo);
+        receivableDetailVo.setSigner(signer);
+        receivableDetailVo.setAccptr(accptr);
+        receivableDetailVo.setPyer(pyer);
+        receivableDetailVo.setPyee(pyee);
+        receivableDetailVo.setFirstOwner(firstOwner);
+        receivableDetailVo.setSecondOwner(secondOwner);
+        receivableDetailVo.setStatus(status);
+        receivableDetailVo.setLastStatus(lastStatus);
+        receivableDetailVo.setRate(rate);
+        receivableDetailVo.setContractNo(contractNo);
+        receivableDetailVo.setInvoiceNo(invoiceNo);
+        receivableDetailVo.setPyerEnterpriseName(pyerEnterpriseName);
+        receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);
+        receivableDetailVo.setPyeeEnterpriseName(pyeeEnterpriseName);
+        receivableDetailVo.setPyeeAcctSvcrName(pyeeAcctSvcrName);
+        receivableDetailVo.setIsseAmt(isseAmt);
+        receivableDetailVo.setCashedAmount(cashedAmount);
+        receivableDetailVo.setIsseDt(isseDt);
+        receivableDetailVo.setSignInDt(signInDt);
+        receivableDetailVo.setDueDt(dueDt);
+        receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
+        receivableDetailVo.setDiscounted(discounted);
+        receivableDetailVo.setNote(note);
+        receivableDetailVo.setPyeeLinkman(pyeeLinkman);
+        receivableDetailVo.setPyerLinkMan(pyerLinkMan);
+
+        receivableDetailVoList.add(receivableDetailVo);
+
+        for(int i = 0; i < length; i++){
+            ReceivableSimpleSerialVo receivableSimpleSerialVo = new ReceivableSimpleSerialVo();
+            receivableSimpleSerialVo.setReceivableStatus(Integer.parseInt(partParams1.get(i*2)));
+            receivableSimpleSerialVo.setTime(Long.parseLong(partParams1.get(i*2+1)));
+
+            receivableSimpleSerialVoList.add(receivableSimpleSerialVo);
+        }
+
+        Map<String, List> map = new HashMap<>();
+        map.put("detailVoList", receivableDetailVoList);
+        map.put("serialVoList", receivableSimpleSerialVoList);
+
+        result.returnWithValue(code, map);
+        return result;
+    }
+
+
     //查询单比流水信息
     @Override
     public BaseResult<Object> getRecordBySerialNo(ContractKey contractKey, Object[] contractParams) {
@@ -367,13 +511,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         String applicantAcctId = (String)contractResult.getValueMap().get(resultMapKey[2]);
         String replyerAcctId = (String)contractResult.getValueMap().get(resultMapKey[3]);
         String  responseType =  (String)contractResult.getValueMap().get(resultMapKey[4]);
-//        long time = Long.parseLong(contractResult.getValueMap().get(resultMapKey[5]));
-//        long time = Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
         long time = (String.valueOf(contractResult.getValueMap().get(resultMapKey[5])).equals("")) ? 0 : Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[5])));
         String operateType = (String)contractResult.getValueMap().get(resultMapKey[6]);
-//        long dealAmt = (long)contractResult.getValueMap().get(resultMapKey[7]);
         long dealAmt = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
-//        String receivableStatus = (String)contractResult.getValueMap().get(resultMapKey[8]);
         int receivableStatus = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
 
         ReceivableRecordDetailVo receivableRecordDetailVo = new ReceivableRecordDetailVo();

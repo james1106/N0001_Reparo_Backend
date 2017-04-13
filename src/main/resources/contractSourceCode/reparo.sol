@@ -29,19 +29,19 @@
 
  ==========应收款状态=======
  0      未定义
- 1      已结清
- 2      已作废
- 3      签收拒绝
- 10     待签发
- 21     承兑待签收
- 26     承兑已签收
- 31     已兑付
- 36     已部分兑付
- 39     兑付失败
- 41     贴现待签收
- 46     贴现已签收
- 48     已部分贴现
- 49     已全额贴现
+ 1      已结清 SETTLED
+ 2      已作废 CANCELLED
+ 3      签收拒绝 SIGNOUT_REFUSED
+ 10     待签发 WAITING_SIGNOUT
+ 21     承兑待签收 WAITING_ACCEPT
+ 26     承兑已签收 ACCEPTED
+ 31     已兑付 CASHED
+ 36     已部分兑付 PART_CASHED
+ 39     兑付失败 CASH_REFUSED
+ 41     贴现待签收 WAITING_DISCOUNT
+ 46     贴现已签收 DISCOUNTED
+ 48     已部分贴现 PART_DISCOUNTED
+ 49     已全额贴现 ALL_DISCOUNTED
  ==========应收款状态=======
 * */
 
@@ -361,8 +361,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
-        pyerToReceivableMap[pyer].push(receivableNo);
-        pyeeToReceivableMap[pyee].push(receivableNo);
+        //pyerToReceivableMap[pyer].push(receivableNo);
+        //pyeeToReceivableMap[pyee].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
 
         return (0);
@@ -698,25 +698,27 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         bytesInfo1,
         //acctSvcrNameAndEnterpriseName(receivableNo),
         uintInfo,
-        discounted,
-        note
+        receivable.discounted,
+        receivable.note
         );
     }
 
-    //买家、卖家应收款列表
-    function getReceivableAllList(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
+    //带有应收款流水信息的应收款更具体详情
+    function getReceivableAllInfoWithSerial(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
         Receivable receivable = receivableDetailMap[receivableNo];
+        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
 
-        uint[] memory uintInfo = new uint[](8);
+        uint[] memory uintInfo = new uint[](historySerialNos.length * 2 + 8);
         bytes32[] memory bytesInfo1 = new bytes32[](11);
-        //bytes32[] memory bytesInfo2 = new bytes32[](4);
+        //uint[] memory uintSerials = new uint[](historySerialNos.length * 2 + 8);
         /*
          if(judgeAccount(msg.sender)){
          return (2,
          bytesInfo1,
          //bytesInfo2,
          uintInfo,
+         uintSerials,
          discounted,
          note
          );
@@ -725,8 +727,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivableNo == ""){
             return (3,
                     bytesInfo1,
-                    //bytesInfo2,
                     uintInfo,
+
                     discounted,
                     note
             );
@@ -735,8 +737,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivable.receivableNo == 0x0) {
             return(1005,
                     bytesInfo1,
-                    //bytesInfo2,
                     uintInfo,
+
                     discounted,
                     note
             );
@@ -746,21 +748,28 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
          return(1,
          bytesInfo1,
-         //bytesInfo2,
          uintInfo,
+         uintSerials,
          discounted,
          note
          );
          }
          */
-        uintInfo[0] = receivable.isseAmt;
-        uintInfo[1] = receivable.cashedAmount;
-        uintInfo[2] = receivable.isseDt;
-        uintInfo[3] = receivable.signInDt;
-        uintInfo[4] = receivable.dueDt;
-        uintInfo[5] = receivable.discountInHandAmount;
-        uintInfo[6] = receivable.status;
-        uintInfo[7] = receivable.lastStatus;
+
+        ReceivableRecord memory receivableRecord;
+        for(uint i = 0; i < historySerialNos.length; i++){
+            receivableRecord = receivableRecordMap[historySerialNos[i]];
+            uintInfo[i*2] = receivableRecord.receivableStatus;
+            uintInfo[i*2+1] = receivableRecord.time;
+        }
+        uintInfo[historySerialNos.length * 2] = receivable.isseAmt;
+        uintInfo[historySerialNos.length * 2 + 1] = receivable.cashedAmount;
+        uintInfo[historySerialNos.length * 2 + 2] = receivable.isseDt;
+        uintInfo[historySerialNos.length * 2 + 3] = receivable.signInDt;
+        uintInfo[historySerialNos.length * 2 + 4] = receivable.dueDt;
+        uintInfo[historySerialNos.length * 2 + 5] = receivable.discountInHandAmount;
+        uintInfo[historySerialNos.length * 2 + 6] = receivable.status;
+        uintInfo[historySerialNos.length * 2 + 7] = receivable.lastStatus;
 
         bytesInfo1[0] = receivableNo;
         bytesInfo1[1] = receivable.orderNo;
@@ -774,14 +783,11 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         bytesInfo1[9] = receivable.contractNo;
         bytesInfo1[10] = receivable.invoiceNo;
 
-        //bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
-
         return (0,
                 bytesInfo1,
-                //acctSvcrNameAndEnterpriseName(receivableNo),
                 uintInfo,
-                discounted,
-                note
+                receivable.discounted,
+                receivable.note
         );
     }
 
@@ -1073,7 +1079,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return (0, receivableTransferHistoryMap[receivableNo]);
     }
 
-//流水号查询，自己查自己
+//单比流水号查询，返回所有具体信息
     function getRecordBySerialNo(bytes32 serialNm) returns(uint, bytes32 serialNo, bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, ResponseType, uint, bytes32 operateType, uint, uint receivableStatus){
         Account account = accountMap[msg.sender];
         ReceivableRecord receivableRecord = receivableRecordMap[serialNm];
