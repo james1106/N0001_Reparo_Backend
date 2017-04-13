@@ -12,13 +12,16 @@
     1 WATING_INCOME_RESPONSE    入库待响应
     2 WATING_INCOME             待入库
     3 INCOMED                   已入库
-    4 WATING_OUTCOME_RESPONSE   出库待响应
+    --取消 4 WATING_OUTCOME_RESPONSE   出库待响应
     5 WATING_OUTCOME            待出库
     6 OUTCOMED                  已出库
  ==========仓储状态=======
 
  *=========仓单状态=======
- 0 UNDEFINED                 未定义
+ 0 UNDEFINED  未定义
+ 1 可流转
+ 2 冻结中
+ 3 已失效
  ==========仓单状态=======
 
  ==========订单交易状态=======
@@ -133,8 +136,6 @@ contract AccountContract {
     }
 
 }
-
-
 
 contract ReceivableContract{
     //==============================test===add by liangyue=================================//
@@ -1069,8 +1070,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return (0,bytesList,intList,responseTypeList);
     }
 */
-    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (bytes32[]){
-        return receivableTransferHistoryMap[receivableNo];
+    function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
+        return (0, receivableTransferHistoryMap[receivableNo]);
     }
 
 //流水号查询，自己查自己
@@ -1132,13 +1133,13 @@ contract RepositoryContract{
         bytes32 norms   ;// 仓储物规格(类似10cm*10cm)
         uint    productTotalPrice   ;// 货品合计金额(分)
         bytes32 productLocation ;// 仓储物场所（地址，前台填）
-        RepoCertStatus  repoCertStatus  ;// 仓单状态（质押，解质押…）
+        uint    repoCertStatus  ;// 仓单状态
     }
 //仓储结构体
     struct RepoBusiness{
         bytes32 repoBusinessNo  ;// 仓储业务编号
         bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
-        uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4-出库待响应,5-待出库,6-已出库）
+        uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4（取消）-出库待响应,5-待出库,6-已出库）
         bytes32 orderNo ;// 订单号
         bytes32 wayBillNo   ;// 运单号
         bytes32 repoCertNo  ;// 仓单编号
@@ -1157,16 +1158,19 @@ contract RepositoryContract{
         uint operateOperateTime  ;// 操作时间(时间戳)
     }
 
-//仓单状态待定
-    enum RepoCertStatus{wait_for_define}
-//仓储状态
-    enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
-    WATING_INCOME           ,// 1-待入库
-    INCOMED                 ,// 2-已入库
-    WATING_OUTCOME_RESPONSE ,// 3-出库待响应
-    WATING_OUTCOME          ,// 4-待出库
-    OUTCOMED                //  5-已出库
-    }
+
+    /*
+     //仓单状态待定
+     enum RepoCertStatus{wait_for_define}
+     //仓储状态
+     enum RepoBusiStatus{WATING_INCOME_RESPONSE  ,// 0-入库待响应
+     WATING_INCOME           ,// 1-待入库
+     INCOMED                 ,// 2-已入库
+     WATING_OUTCOME_RESPONSE ,// 3-出库待响应
+     WATING_OUTCOME          ,// 4-待出库
+     OUTCOMED                //  5-已出库
+     }
+     */
 
 //用户address  —> 仓储业务编号列表
     mapping( address => bytes32[]) usrRepoBusinessMap;
@@ -1185,6 +1189,97 @@ contract RepositoryContract{
 
 //仓单编号 -> 仓单详情
     mapping(bytes32=> RepoCert) repoCertDetailMap;
+
+    //仓储业务编号 => 仓单编号
+    mapping(bytes32=> bytes32) repoBusiToCertMap;
+    /*
+     //仓储结构体
+     struct RepoBusiness{
+     bytes32 repoBusinessNo  ;// 仓储业务编号
+     uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,（取消）4-出库待响应,5-待出库,6-已出库）
+     bytes32 orderNo ;// 订单号
+     bytes32 repoCertNo  ;// 仓单编号
+     uint    repoCertStatus;//仓单状态
+     address repoEnterpriseAddress   ;// 保管人(仓储公司)
+     bytes32 productName ;// 仓储物名称
+     uint    productQuantitiy    ;// 仓储物数量
+     bytes32 measureUnit ;// 仓储物计量单位(如箱)
+     uint operateOperateTime  ;// 操作时间(时间戳)
+
+     }
+     */
+    //查询我的仓储列表 0-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)，1-出库管理（5-待出库,6-已出库），3-仓储机构（不区分状态）
+    function getRepoBusiList(address userAddress,uint role) returns (uint,bytes32[] repoBusiDetail1,uint[] repoBusiDetail2,address[] repoBusiDetail3){
+        bytes32[] memory repoBusiNoList = usrRepoBusinessMap[userAddress];
+        RepoBusiness repoBusinsess ;
+        RepoCert  repoCert;
+        bytes32   repoCertNo;
+        uint length = repoBusiNoList.length;
+        /*
+         bytes32[length*5]  repoBusiDetail1 ;
+         uint[length*4]     repoBusiDetail2 ;
+         address[length]    repoBusiDetail3;//仓储公司
+         */
+        /*
+         bytes32[]  repoBusiDetail1 ; //repoBusinessNo,orderNo,repoCertNo,productName,measureUnit
+         uint[]     repoBusiDetail2 ; //repoBusiStatus,repoCertStatus,productQuantitiy,operateOperateTime
+         address[]  repoBusiDetail3;//仓储公司
+         */
+        bool flag = false;
+        uint returnNum = 0;
+        for(uint index = 0; index < length; index++){
+            flag = false;
+            repoBusinsess = businessDetailMap[repoBusiNoList[index]];//获取仓储结构体
+            repoCert      = repoCertDetailMap[repoBusiNoList[index]];//仓单信息 [repoBusiNoList[index]];
+            //0-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)
+            if(role == 1 && (repoBusinsess.repoBusiStatus == 1
+                || repoBusinsess.repoBusiStatus == 2
+                || repoBusinsess.repoBusiStatus == 3)){
+                flag = true;
+                returnNum ++;
+            }
+            //卖家,1-出库管理（5-待出库,6-已出库）
+            else if(role == 2 && (repoBusinsess.repoBusiStatus == 5
+                || repoBusinsess.repoBusiStatus == 6)){
+                flag = true;
+                returnNum ++;
+            }//3-仓储机构（不区分状态）
+            else if(role == 3){
+                flag = true;
+                returnNum ++;
+            }
+            if (flag) {
+                repoBusiDetail1[returnNum * 5]     = repoBusinsess.repoBusinessNo;
+                repoBusiDetail1[returnNum * 5 + 1] = repoBusinsess.orderNo;
+                repoBusiDetail1[returnNum * 5 + 2] = repoBusinsess.repoCertNo;
+                repoBusiDetail1[returnNum * 5 + 3] = repoBusinsess.productName;
+                repoBusiDetail1[returnNum * 5 + 4] = repoBusinsess.measureUnit;
+
+                repoBusiDetail2[returnNum * 4 ]    = repoBusinsess.repoBusiStatus;
+                repoBusiDetail2[returnNum * 4 + 1] = repoCert.repoCertStatus;//
+                repoBusiDetail2[returnNum * 4 + 2] = repoBusinsess.productQuantitiy;
+                repoBusiDetail2[returnNum * 4 + 3] = repoBusinsess.operateOperateTime;
+
+                repoBusiDetail3[returnNum] = repoBusinsess.repoEnterpriseAddress;
+            }
+        }
+    }
+    /*
+     //根据仓储业务编号获取仓单编号
+     function getRepoCertNObyRepoBusiNO(bytes32 repoBusinessNo) returns(uint,bytes32){
+     bytes32[] memory repoBusiTransNoList = businessTransNoMap[repoBusinessNo];
+     uint length = repoBusiTransNoList.length;
+     bytes32 repoCertNo = repoBusiTransNoList[length-1].repoCertNo;
+     if(repoCertNo == "0" || repoCertNo == ""){
+     return (1,"");//仓单编号未生成
+     }
+     else{
+     return(0,repoCertNo);
+     }
+
+     }
+     */
+
 
 //入库申请  1111,11110,0,"3434","4545",201010100101,"productName",100,100,10000
     function  incomeApply(bytes32 repoBusinessNo,       //  仓储业务编号
@@ -1220,6 +1315,7 @@ contract RepositoryContract{
         businessDetailMap[businessTransNo].productQuantitiy = productQuantitiy;
         businessDetailMap[businessTransNo].productUnitPrice = productUnitPrice;
         businessDetailMap[businessTransNo].productTotalPrice = productTotalPrice;
+        businessDetailMap[businessTransNo].repoCertNo = "";
 
         return (0,repoBusinessNo);
     }
@@ -1284,6 +1380,8 @@ contract RepositoryContract{
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+
+
         return (0);
     }
 
@@ -1360,6 +1458,8 @@ contract RepositoryContract{
 
 //仓单生成
     function repoCertNoApply(bytes32 repoBusinessNo,bytes32 repoCertNo,bytes32 operateTime) returns (uint,bytes32){
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
+
         //users.length
         bytes32[] memory transList = businessTransNoMap[repoBusinessNo];
         uint index = transList.length - 1;
@@ -1390,7 +1490,7 @@ contract RepositoryContract{
             currentRepoBusinsess.norms,
             currentRepoBusinsess.productTotalPrice,
             currentRepoBusinsess.productLocation,
-            RepoCertStatus.wait_for_define
+            1
         );
         return (0,repoCertNo);
     }
