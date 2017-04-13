@@ -350,10 +350,11 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          if(judgeReplyerAccount(accptr)){
          return (1031);
          }
+         */
          if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
          return (1030);
          }
-         */
+
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
 
@@ -474,6 +475,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
+         if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
+         return (1030);
+         }
         /*
          if(judgeAccount(msg.sender)){
          return(2);
