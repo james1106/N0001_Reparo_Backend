@@ -38,7 +38,8 @@ public enum Code {
     INVALID_TOKEN(5008, "token无效"),
 
     //运单部分
-    WAY_BILL_ALREADY_EXIST(3000, "订单已经存在"),
+    WAY_BILL_ALREADY_EXIST(3000, "订单对应的运单已经存在"),
+    WAY_BILL_CONTENT_INVALID(3050, "运单内容不合法"),
 
     //应收款部分
     SERIALNO_EXIST(1032, "流水号已存在"),
