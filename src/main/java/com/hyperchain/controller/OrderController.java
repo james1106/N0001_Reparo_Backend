@@ -2,12 +2,12 @@ package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
+import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
@@ -17,7 +17,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,14 +58,15 @@ public class OrderController {
             @ApiParam(value = "付款人申请仓储公司", required = true) @RequestParam String payerRepo,
             @ApiParam(value = "付款人开户行", required = true) @RequestParam String payerBank,
             @ApiParam(value = "付款账户", required = true) @RequestParam String payerAccount,
-            @ApiParam(value = "付款方式", required = true) @RequestParam int payingMethod
+            @ApiParam(value = "付款方式", required = true) @RequestParam int payingMethod,
+            HttpServletRequest request
     ) throws Exception {
         BaseResult result = new BaseResult();
         Code code;
 
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
-
+//        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
+        String payerAddress = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity payerUserEntity = userEntityRepository.findByAddress(payerAddress);
         if(CommonUtil.isEmpty(payerUserEntity)){
             code = Code.INVALID_USER;
@@ -99,6 +99,16 @@ public class OrderController {
             result.returnWithoutValue(code);
             return  result;
         }
+
+        //从数据库中查询买方指定的仓储公司对应的地址，如果查询不到数据，返回仓储机构名称未注册
+        UserEntity payerRepoEntity = userEntityRepository.findByCompanyName(payerRepo);
+        if(CommonUtil.isEmpty(payerRepoEntity)){
+            code = Code.COMPANY_NOT_BE_REGISTERED;
+            result.returnWithoutValue(code);
+            return  result;
+        }
+        String payerRepoAddress = payerRepoEntity.getAddress();
+        String payerAccountName = payerRepoEntity.getAddress();
         String payerPrivateKey = payerUserEntity.getPrivateKey();
         String payeeAddress = payeeUserEntity.getAddress();
 
@@ -111,34 +121,26 @@ public class OrderController {
         List<String> orderParamlist= new ArrayList<>();
         orderParamlist.add(orderNo);
         orderParamlist.add(productName);
-        orderParamlist.add(payerRepo);
         orderParamlist.add(repoBusinessNo);
         orderParamlist.add(payerBank);
         orderParamlist.add(payerBankClss);
         orderParamlist.add(payerAccount);
         orderParamlist.add(txSerialNo);
 
-        ContractKey contractKey = new ContractKey(payerPrivateKey);
-        Object[] orderParams = new Object[8];
+        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+
+        Object[] orderParams = new Object[9];
         orderParams[0] = acctContractAddress;
         orderParams[1] = payeeAddress;
-        orderParams[2] = productUnitPrice*100; //单价
-        orderParams[3] = productQuantity; //
-        orderParams[4] = productTotalPrice*100; //
-        orderParams[5] = orderParamlist;
-        orderParams[6] = payingMethod;
-        orderParams[7] = orderGenerateTime;
+        orderParams[2] = payerRepoAddress;
+        orderParams[3] = productUnitPrice*100; //单价
+        orderParams[4] = productQuantity; //
+        orderParams[5] = productTotalPrice*100; //
+        orderParams[6] = orderParamlist;
+        orderParams[7] = payingMethod;
+        orderParams[8] = orderGenerateTime;
         // 调用合约查询账户，获取返回结果
 
-
-        //从数据库中查询卖方公司对应的地址，如果查询不到数据，返回仓储机构名称未注册
-        UserEntity payerRepoEntity = userEntityRepository.findByCompanyName(payerRepo);
-        if(CommonUtil.isEmpty(payeeUserEntity)){
-            code = Code.COMPANY_NOT_BE_REGISTERED;
-            result.returnWithoutValue(code);
-            return  result;
-        }
-        String payerRepoAddress = payerRepoEntity.getAddress();
         Object[] repoParams = new Object[10];
         repoParams[0] = repoBusinessNo;
         repoParams[1] = repoBusinessNo + "0"; //仓储业务流转号
@@ -178,22 +180,34 @@ public class OrderController {
     @RequestMapping(value = "confirmation",method = RequestMethod.POST)
     public BaseResult<Object> confirmOrder(
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
-            @ApiParam(value = "仓储公司", required = true) @RequestParam String payeeRepo,
-            @ApiParam(value = "仓单编号", required = true) @RequestParam String payeeRepoCertNo
+            @ApiParam(value = "仓储公司", required = true) @RequestParam String payeeRepoName,
+            @ApiParam(value = "仓单编号", required = true) @RequestParam String payeeRepoCertNo,
+            HttpServletRequest request
     ) throws Exception {
-        String payeeAddress1 = "3ebc9f7cfa20950b8b35524e491c56705c067400";
-        String payeeAddress =  "d5911f79bb94b23b018e505add48c0748f510eac";
+//        String payeeAddress =  "d5911f79bb94b23b018e505add48c0748f510eac";
+        String payeeAddress = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity payeeUserEntity = userEntityRepository.findByAddress(payeeAddress);
         String payeePrivateKey = payeeUserEntity.getPrivateKey();
+        String payeeAccountName = payeeUserEntity.getAccountName();
 
-        ContractKey contractKey = new ContractKey(payeePrivateKey);
+        //从数据库中查询卖方指定的仓储公司对应的地址，如果查询不到数据，返回仓储机构名称未注册
+        UserEntity payeeRepoEntity = userEntityRepository.findByCompanyName(payeeRepoName);
+        if(CommonUtil.isEmpty(payeeRepoEntity)){
+            BaseResult result = new BaseResult();
+            Code code = Code.COMPANY_NOT_BE_REGISTERED;
+            result.returnWithoutValue(code);
+            return  result;
+        }
+        String payeeRepoAddress = payeeRepoEntity.getAddress();
+        ContractKey contractKey = new ContractKey(payeePrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payeeAccountName);
+
         long txConfirmTime = System.currentTimeMillis();
         String txSerialNo = orderNo + "01";
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
         Object[] contractParams = new Object[6];
         contractParams[0] = acctContractAddress;
         contractParams[1] = orderNo;
-        contractParams[2] = payeeRepo;
+        contractParams[2] = payeeRepoAddress;
         contractParams[3] = payeeRepoCertNo;
         contractParams[4] = txSerialNo;
         contractParams[5] = txConfirmTime;
@@ -207,17 +221,21 @@ public class OrderController {
     @ResponseBody
     @RequestMapping(value = "detail",method = RequestMethod.GET)
     public BaseResult<Object> queryOrderDetail(
-            @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo
+            @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
+            HttpServletRequest request
     ) throws Exception {
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
-        UserEntity payerUserEntity = userEntityRepository.findByAddress(payerAddress);
+//        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+
+        UserEntity payerUserEntity = userEntityRepository.findByAddress(address);
 
         String payerPrivateKey = payerUserEntity.getPrivateKey();
+        String payerAccountName = payerUserEntity.getAccountName();
         String receAddress = ESDKUtil.getHyperchainInfo("ReceivableContract");
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
 
-        ContractKey contractKey = new ContractKey(payerPrivateKey);
         Object[] contractParams = new Object[3];
         contractParams[0] = acctContractAddress;
         contractParams[1] = receAddress;
@@ -231,15 +249,19 @@ public class OrderController {
     @ResponseBody
     @RequestMapping(value = "order_list/{role}",method = RequestMethod.GET)
     public BaseResult<Object> queryAllOrderList(
-            @ApiParam(value = "公司角色", required = true) @PathVariable(value = "role") int companyRole
+            @ApiParam(value = "公司角色", required = true) @PathVariable(value = "role") int companyRole,
+            HttpServletRequest request
     ) throws Exception {
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
-        UserEntity payeeUserEntity = userEntityRepository.findByAddress(payerAddress);
+//        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
 
-        String payerPrivateKey = payeeUserEntity.getPrivateKey();
-        ContractKey contractKey = new ContractKey(payerPrivateKey);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
         Object[] contractParams = new Object[2];
         contractParams[0] = acctContractAddress;
         contractParams[1] = companyRole;

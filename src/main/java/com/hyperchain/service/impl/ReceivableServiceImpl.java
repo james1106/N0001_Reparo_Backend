@@ -1,5 +1,7 @@
 package com.hyperchain.service.impl;
 
+import com.hyperchain.ESDKUtil;
+import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
@@ -7,9 +9,7 @@ import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
-import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.controller.vo.ReceivableDetailVo;
-import com.hyperchain.controller.vo.ReceivableRecordDetailVo;
+import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
@@ -35,6 +35,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Autowired
     UserEntityRepository userEntityRepository;
 
+    //签发申请
     @Override
     public BaseResult<Object> signOutApply(ContractKey contractKey, Object[] contractParams, String receivableNo) {//第二个参数是给合约的参数
         String methodName = "signOutApply";
@@ -101,6 +102,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
+    //签发回复
     @Override
     public BaseResult<Object> signOutReply(ContractKey contractKey, Object[] contractParams) {
         String methodName = "signOutReply";
@@ -123,6 +125,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
+    //贴现申请
     @Override
     public BaseResult<Object> discountApply(ContractKey contractKey, Object[] contractParams, String receivableNo) {//第二个参数是给合约的参数
         String methodName = "discountApply";
@@ -178,6 +181,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
+    //贴现回复
     @Override
     public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
         String methodName = "discountReply";
@@ -199,6 +203,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
+    //单张应收款详情
     @Override
     public BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfo";
@@ -241,15 +246,11 @@ public class ReceivableServiceImpl implements ReceivableService{
             return result;
         }
 
-
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
         //List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
         String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
-
-
-
 
         String receivableNo = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -325,6 +326,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         return result;
     }
 
+    //查询单比流水信息
     @Override
     public BaseResult<Object> getRecordBySerialNo(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getRecordBySerialNo";
@@ -449,6 +451,59 @@ public class ReceivableServiceImpl implements ReceivableService{
         }
 
         result.returnWithValue(code, receivableVoList);
+
+        return result;
+    }
+
+    //返回买卖方应收款列表
+    @Override
+    public BaseResult<Object> receivableSimpleDeatilList(ContractKey contractKey, Object[] contractParams) {
+        String contractMethodName = "receivableSimpleDeatilList";
+        String[] resultMapKey = new String[]{"list1", "list2"};
+        ContractResult contractResult = null;
+        Code code = null;
+        try {
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "ReceivableContract");
+            code = contractResult.getCode();
+            if(code != Code.SUCCESS){
+                BaseResult result = new BaseResult();
+                result.returnWithoutValue(code);
+                return result;
+            }
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        List<String> list1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> list2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+//        List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+//        List<String> methodList = (List<String>) contractResult.getValueMap().get(resultMapKey[3]);
+//        List<String> stateList = (List<String>) contractResult.getValueMap().get(resultMapKey[4]);
+//        int length = methodList.size();
+//        List<OrderOverVo> orderOverVoList = new ArrayList<>();
+        List<ReceivableSimpleListVo> receivableSimpleList = new ArrayList<>();
+        int length = list1.size() / 3;
+        for(int i = 0; i < length; i++){
+            ReceivableSimpleListVo receivableSimpleListVo = new ReceivableSimpleListVo();
+            receivableSimpleListVo.setReceivableNo(list1.get(i*3));
+            receivableSimpleListVo.setProductName(list1.get(i*3+1));
+            receivableSimpleListVo.setEnterpriseName(list1.get(i*3+2));
+
+//            String quantity =(list2.get(i*4) == null || list2.get(i*4).equals("") )? "0": list2.get(i*4);
+            long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
+
+            receivableSimpleListVo.setProductQuantity(quantity);
+            receivableSimpleListVo.setIsseAmt(Long.parseLong(list2.get(i*4+1)));
+            receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
+            receivableSimpleListVo.setStatus(Integer.parseInt(list2.get(i*4+3)));
+            receivableSimpleList.add(receivableSimpleListVo);
+        }
+        BaseResult<Object> result = new BaseResult<>();
+        result.returnWithValue(code, receivableSimpleList);
 
         return result;
     }

@@ -1,13 +1,13 @@
-package com.hyperchain.dal.entity;
+package com.hyperchain.controller.vo;
 
 /**
  * Created by liangyue on 2017/4/12.
  */
-public class OperationRecord {
+public class OperationRecordVo {
     int state;
     long operateTime;
 
-    public OperationRecord(int state, long operateTime) {
+    public OperationRecordVo(int state, long operateTime) {
         this.state = state;
         this.operateTime = operateTime;
     }

@@ -12,7 +12,8 @@ public class OrderOverVo {
     private long productQuantity;
     private long productUnitPrice;
     private long productTotalPrice;
-    private String payerRepo;
+    private String payerRepoName;
+    private String payeeRepoName;
     private String payerBank;
     private String payerBankAccount;
     private int payingMethod;
@@ -24,6 +25,22 @@ public class OrderOverVo {
     private int repoStatus;
     private int receStatus;
     private int wayBillStatus;
+
+    public String getPayerRepoName() {
+        return payerRepoName;
+    }
+
+    public void setPayerRepoName(String payerRepoName) {
+        this.payerRepoName = payerRepoName;
+    }
+
+    public String getPayeeRepoName() {
+        return payeeRepoName;
+    }
+
+    public void setPayeeRepoName(String payeeRepoName) {
+        this.payeeRepoName = payeeRepoName;
+    }
 
     public int getPayingMethod() {
         return payingMethod;
@@ -118,14 +135,6 @@ public class OrderOverVo {
 
     public void setProductTotalPrice(long productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
-    }
-
-    public String getPayerRepo() {
-        return payerRepo;
-    }
-
-    public void setPayerRepo(String payerRepo) {
-        this.payerRepo = payerRepo;
     }
 
     public String getPayerBank() {
