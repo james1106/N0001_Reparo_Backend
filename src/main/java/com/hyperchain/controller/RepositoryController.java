@@ -1,6 +1,8 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import com.hyperchain.ESDKUtil;
+import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.TokenUtil;
@@ -163,6 +165,30 @@ public class RepositoryController {
 
         // 调用合约查询账户，获取返回结果
         return repositoryService.getRepoBusiHistoryList(contractKey, params);
+    }
+
+
+    @LogInterceptor
+    @ApiOperation(value = "查询仓单信息列表", notes = "查询仓单信息列表")
+    @ResponseBody
+    @RequestMapping(value = "getRepoCertInfoList",method = RequestMethod.GET)
+    public BaseResult<Object> getRepoCertInfoList(HttpServletRequest request) throws Exception {
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if(CommonUtil.isEmpty(userEntity)){
+            BaseResult result = new BaseResult();
+            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+            return  result;
+        }
+//        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        Object[] params = new Object[0];
+        // 调用合约查询账户，获取返回结果
+        return repositoryService.getRepoCertInfoList(contractKey, params);
     }
 
 }

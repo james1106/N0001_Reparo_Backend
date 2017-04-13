@@ -13,4 +13,5 @@ public interface RepositoryService {
 
     BaseResult<Object> getRepoBusiInfo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoBusiHistoryList(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> getRepoCertInfoList(ContractKey contractKey, Object[] contractParams);
 }
