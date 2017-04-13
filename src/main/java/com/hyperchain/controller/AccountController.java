@@ -104,9 +104,9 @@ public class AccountController extends BaseController{
     }
 
     @LogInterceptor
-    @ApiOperation(value = "获取所有企业名称", notes = "获取所有企业名称")
+    @ApiOperation(value = "根据角色获取所有企业名称", notes = "获取所有企业名称")
     @ResponseBody
-    @RequestMapping(value = "/allCompanyEnterpriseName", method = RequestMethod.GET)
+    @RequestMapping(value = "/allEnterpriseName", method = RequestMethod.GET)
     public BaseResult<Object> getAllEnterpriseName(
             @ApiParam(value = "角色code", required = true) @RequestParam("roleCode") int roleCode,
             HttpServletRequest request) {

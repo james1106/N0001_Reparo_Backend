@@ -301,4 +301,30 @@ public class ReceivableController {
         return receivableService.receivableSimpleDeatilList(contractKey, params);
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "根据应收款编号查应收款详情(包含流水信息)", notes = "根据应收款编号查应收款详情(包含流水信息)")
+    @ResponseBody
+    @RequestMapping(value = "receivableInfoWithSerial",method = RequestMethod.POST)//路径
+    public BaseResult<Object> getReceivableAllInfoWithSerial(
+            //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
+            @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId,
+            HttpServletRequest request//http请求实体
+    ) throws Exception {
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        Object[] params = new Object[2];
+        params[0] = receivableNo;
+        params[1] = operatorAcctId;
+
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.getReceivableAllInfoWithSerial(contractKey, params);
+    }
+
 }

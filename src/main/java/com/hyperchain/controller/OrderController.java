@@ -194,8 +194,7 @@ public class OrderController {
         UserEntity payeeRepoEntity = userEntityRepository.findByCompanyName(payeeRepoName);
         if(CommonUtil.isEmpty(payeeRepoEntity)){
             BaseResult result = new BaseResult();
-            Code code = Code.COMPANY_NOT_BE_REGISTERED;
-            result.returnWithoutValue(code);
+            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
             return  result;
         }
         String payeeRepoAddress = payeeRepoEntity.getAddress();
@@ -253,9 +252,13 @@ public class OrderController {
             HttpServletRequest request
     ) throws Exception {
         //todo 之后address要从token中获取,如果查询不到数据，则返回无效用户
-//        String payerAddress = "c841cff583353b651b98fdd9ab72ec3fac98fac4";
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if(CommonUtil.isEmpty(userEntity)){
+            BaseResult result = new BaseResult();
+            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+            return  result;
+        }
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
 
         String privateKey = userEntity.getPrivateKey();
