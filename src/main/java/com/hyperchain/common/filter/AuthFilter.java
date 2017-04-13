@@ -124,6 +124,8 @@ public class AuthFilter implements javax.servlet.Filter {
                 return true;
             case "http://localhost:8080/reparo/v1/account/login":
                 return true;
+            case "http://localhost:8088/module/login.html":
+                return true;
             default:
                 return false;
         }
