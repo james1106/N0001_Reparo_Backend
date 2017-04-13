@@ -16,6 +16,7 @@ public interface ReceivableService {
     BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> receivableSimpleDeatilList(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> cash(ContractKey contractKey, Object[] contractParams, String receivableNo);
 
 //    0x0000000000000000000000000000000000000000000000000000000000000000
 //            0000000000000000000000000000000000000000000000000000000000000060

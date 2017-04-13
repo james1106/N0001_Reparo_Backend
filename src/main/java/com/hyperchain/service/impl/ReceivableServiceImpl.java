@@ -205,6 +205,30 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
+    //兑付
+    @Override
+    public BaseResult<Object> cash(ContractKey contractKey, Object[] contractParams, String receivableNo) {
+        String methodName = "cash";
+        String[] resultMapKey = new String[]{};
+        BaseResult result = new BaseResult();
+
+        ContractResult contractResult = null;
+        try {
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+        result.returnWithValue(code, receivableNo);
+        return result;//这个result是返回给前端的
+
+    }
+
     //单张应收款详情
     @Override
     public BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams) {
