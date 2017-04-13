@@ -1116,8 +1116,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
     }
 
-}
-contract RepositoryContract{
+}contract RepositoryContract{
 //仓单结构体
     struct RepoCert{
         bytes32 incomeCert  ;// 入库凭证
@@ -1703,6 +1702,7 @@ contract RepositoryContract{
         return string(c);
     }
 }
+
 
 contract OrderContract{
     address owner;

@@ -262,4 +262,31 @@ public class RepositoryController {
         return repositoryService.getRepoCertInfoList(contractKey, params);
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "查询仓储列表", notes = "查询仓储列表,1-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)，2-出库管理（5-待出库,6-已出库），3-仓储机构（不区分状态）")
+    @ResponseBody
+    @RequestMapping(value = "getRepoBusiList",method = RequestMethod.GET)
+    public BaseResult<Object> getRepoBusiList(
+            @ApiParam(value = "用户角色", required = true) @RequestParam String role,
+            HttpServletRequest request) throws Exception {
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if(CommonUtil.isEmpty(userEntity)){
+            BaseResult result = new BaseResult();
+            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+            return  result;
+        }
+//        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        Object[] params = new Object[2];
+        params[0] = address;
+        params[1] = role;
+        // 调用合约查询账户，获取返回结果
+        return repositoryService.getRepoBusiInfoList(contractKey, params);
+    }
+
 }
