@@ -22,10 +22,44 @@ public class TransactionDetailVo {
     private long productTotalPrice;
     private String payerRepo;
     private String payeeRepo;
-    private String repoCertNo;
-    private String repoBusinessNo;
     private int payingMethod;
+    private String payerRepoBusinessNo;//买家仓储流水号
+    private String payeeRepoBusinessNo;//卖家仓储流水号
+    private String payerRepoCertNo;    //买家仓单编号
+    private String payeeRepoCertNo;    //卖家仓单编号
     private List<OperationRecordVo> operationRecordVoList;
+
+    public String getPayerRepoBusinessNo() {
+        return payerRepoBusinessNo;
+    }
+
+    public void setPayerRepoBusinessNo(String payerRepoBusinessNo) {
+        this.payerRepoBusinessNo = payerRepoBusinessNo;
+    }
+
+    public String getPayeeRepoBusinessNo() {
+        return payeeRepoBusinessNo;
+    }
+
+    public void setPayeeRepoBusinessNo(String payeeRepoBusinessNo) {
+        this.payeeRepoBusinessNo = payeeRepoBusinessNo;
+    }
+
+    public String getPayerRepoCertNo() {
+        return payerRepoCertNo;
+    }
+
+    public void setPayerRepoCertNo(String payerRepoCertNo) {
+        this.payerRepoCertNo = payerRepoCertNo;
+    }
+
+    public String getPayeeRepoCertNo() {
+        return payeeRepoCertNo;
+    }
+
+    public void setPayeeRepoCertNo(String payeeRepoCertNo) {
+        this.payeeRepoCertNo = payeeRepoCertNo;
+    }
 
     public List<OperationRecordVo> getOperationRecordVoList() {
         return operationRecordVoList;
@@ -115,22 +149,6 @@ public class TransactionDetailVo {
 
     public void setPayeeRepo(String payeeRepo) {
         this.payeeRepo = payeeRepo;
-    }
-
-    public String getRepoCertNo() {
-        return repoCertNo;
-    }
-
-    public void setRepoCertNo(String repoCertNo) {
-        this.repoCertNo = repoCertNo;
-    }
-
-    public String getRepoBusinessNo() {
-        return repoBusinessNo;
-    }
-
-    public void setRepoBusinessNo(String repoBusinessNo) {
-        this.repoBusinessNo = repoBusinessNo;
     }
 
     public long getProductUnitPrice() {
