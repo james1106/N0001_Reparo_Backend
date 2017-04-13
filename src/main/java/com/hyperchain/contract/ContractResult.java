@@ -51,4 +51,13 @@ public class ContractResult {
     public void setValue(List<Object> value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "ContractResult{" +
+                "code=" + code +
+                ", value=" + value +
+                ", valueMap=" + valueMap +
+                '}';
+    }
 }

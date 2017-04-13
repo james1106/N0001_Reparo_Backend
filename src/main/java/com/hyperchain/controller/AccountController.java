@@ -1,11 +1,13 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.common.util.TokenUtil;
+import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.service.AccountService;
 import com.wordnik.swagger.annotations.Api;
@@ -30,7 +32,7 @@ import java.security.GeneralSecurityException;
 @Api(value = "Account", description = "用户管理", position = 1)
 @Controller
 @RequestMapping("/v1/account")
-public class AccountController {
+public class AccountController extends BaseController{
 
     @Autowired
     AccountService accountService;
@@ -38,7 +40,7 @@ public class AccountController {
     @LogInterceptor
     @ApiOperation(value = "获取验证码", notes = "获取验证码")
     @ResponseBody
-    @RequestMapping(value = "/security_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/securityCode", method = RequestMethod.GET)
     public BaseResult<Object> getSecurityCode(
             @ApiParam(value = "手机号", required = true) @RequestParam("phone") String phone) {
         //TODO 获取验证码controller
@@ -99,6 +101,16 @@ public class AccountController {
             @ApiParam(value = "验证码id", required = true) @RequestParam("securityCodeId") String securityCodeId) {
         //TODO 找回密码controller
         return null;
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "获取所有企业名称", notes = "获取所有企业名称")
+    @ResponseBody
+    @RequestMapping(value = "/allCompanyEnterpriseName", method = RequestMethod.GET)
+    public BaseResult<Object> getAllEnterpriseName(
+            @ApiParam(value = "角色code", required = true) @RequestParam("roleCode") int roleCode,
+            HttpServletRequest request) {
+        return accountService.findAllEnterpriseNameByRoleCode(roleCode);
     }
 
     @LogInterceptor

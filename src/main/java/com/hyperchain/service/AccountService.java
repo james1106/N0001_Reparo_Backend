@@ -43,4 +43,6 @@ public interface AccountService {
     BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response);
 
     BaseResult<Object> forgetPassword(String phone, String newPassword, String securityCode, String securityCodeId);
+
+    BaseResult<Object> findAllEnterpriseNameByRoleCode(int roleCode);
 }

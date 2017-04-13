@@ -1,6 +1,12 @@
 package com.hyperchain.service;
 
+import com.hyperchain.common.exception.ContractInvokeFailException;
+import com.hyperchain.common.exception.PasswordIllegalParam;
+import com.hyperchain.common.exception.PrivateKeyIllegalParam;
+import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.exception.PropertiesLoadException;
+import com.hyperchain.exception.ReadFileException;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -16,19 +22,21 @@ public interface WayBillService {
                                                   String logisticsEnterpriseName,
                                                   String senderEnterpriseName,
                                                   String receiverEnterpriseName,
-                                                  int productName,
-                                                  String productQuantity,
+                                                  String productName,
+                                                  long productQuantity,
                                                   long productValue,
                                                   String senderRepoEnterpriseName,
                                                   String senderRepoCertNo,
                                                   String receiverRepoEnterpriseName,
                                                   String receiverRepoBusinessNo,
-                                                  HttpServletRequest request);
+                                                  HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
 
-    BaseResult<Object> generateConfirmedWaybill(String orderNo, HttpServletRequest request);
+    BaseResult<Object> generateConfirmedWaybill(String orderNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
 
-    BaseResult<Object> getAllRelatedWayBillDetail(HttpServletRequest request);
+    BaseResult<Object> getAllRelatedWayBillDetail(HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
 
-    BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request);
+    BaseResult<Object> getWayBillDetailByOrderNo(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
+
+    BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
 
 }

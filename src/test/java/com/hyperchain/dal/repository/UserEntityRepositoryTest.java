@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
  * Created by ldy on 2017/4/5.
  */
@@ -16,7 +18,7 @@ public class UserEntityRepositoryTest extends SpringBaseTest{
     UserEntityRepository userEntityRepository;
 
     @Test
-    public void save() throws Exception {
+    public void test() throws Exception {
 
         //插入
         UserEntity userEntity = new UserEntity();
@@ -62,6 +64,26 @@ public class UserEntityRepositoryTest extends SpringBaseTest{
         userEntityRepository.delete(updatedUserEntity);
         UserEntity deleted = userEntityRepository.findByAddress("address" + randomString);
         Assert.assertEquals(null, deleted);
+    }
+
+    @Test
+    public void findByRoleCode() {
+        List<UserEntity> companyUserEntityList = userEntityRepository.findByRoleCode(0);
+        for (UserEntity companyUserEntity : companyUserEntityList) {
+            System.out.println("企业名称：" + companyUserEntity.getCompanyName());
+        }
+        List<UserEntity> logisticsUserEntityList = userEntityRepository.findByRoleCode(1);
+        for (UserEntity logisticsUser : logisticsUserEntityList) {
+            System.out.println("物流名称：" + logisticsUser.getCompanyName());
+        }
+        List<UserEntity> repoUserEntityList = userEntityRepository.findByRoleCode(2);
+        for (UserEntity repoUserEntity : repoUserEntityList) {
+            System.out.println("仓储名称：" + repoUserEntity.getCompanyName());
+        }
+        List<UserEntity> financialUserEntityList = userEntityRepository.findByRoleCode(3);
+        for (UserEntity financialUserEntity : financialUserEntityList) {
+            System.out.println("银行名称：" + financialUserEntity.getCompanyName());
+        }
     }
 
 

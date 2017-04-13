@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -199,6 +200,18 @@ public class AccountServiceImpl implements AccountService {
     public BaseResult<Object> forgetPassword(String phone, String newPassword, String securityCode, String securityCodeId) {
         // TODO 找回密码、修改密码、修改用户信息（暂时不做）
         return null;
+    }
+
+    @Override
+    public BaseResult<Object> findAllEnterpriseNameByRoleCode(int roleCode) {
+        List<UserEntity> userEntityList = userEntityRepository.findByRoleCode(roleCode);
+        List<String> nameList = new ArrayList<>();
+        for (UserEntity userEntity : userEntityList) {
+            nameList.add(userEntity.getCompanyName());
+        }
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(Code.SUCCESS, nameList);
+        return baseResult;
     }
 
     /**
