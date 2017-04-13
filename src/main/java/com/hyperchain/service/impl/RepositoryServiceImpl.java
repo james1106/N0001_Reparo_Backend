@@ -8,6 +8,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.RepositoryService;
 import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.UserEntity;
@@ -26,6 +27,10 @@ import static com.hyperchain.contract.ContractUtil.*;
  */
 @Service
 public class RepositoryServiceImpl implements RepositoryService{
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
     @Override
     public BaseResult<Object> incomeApply(ContractKey contractKey, Object[] contractParams,String repoBusiNo) {
         String methodName = "incomeApply";
@@ -187,6 +192,49 @@ public class RepositoryServiceImpl implements RepositoryService{
         //result.returnWithValue(code, repoBusuVoList);
          result.returnWithValue(code, repoBusinessVo);
          return result;
+    }
+
+    @Override
+    public BaseResult<Object> getRepoCertInfoList(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "getRepoCertInfoList";
+        String[] resultMapKey = new String[]{"bytesResultList", "uintResultList", "addressResultList"};
+        BaseResult result = new BaseResult();
+
+        ContractResult contractResult = null;
+        Code code = null;
+        try {
+            contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            code = contractResult.getCode();
+            if(code != Code.SUCCESS){
+                result.returnWithoutValue(code);
+            }
+
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        List<String> bytesResultList = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> uintResultList = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> addressResultList = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+
+        int length = addressResultList.size();
+        List<RepoCertVo> repoCertVos = new ArrayList<>();
+        for(int i = 0; i < length; i++){
+            String repoBusinessNo = bytesResultList.get(i*3);
+            String productName = bytesResultList.get(i*3+1);
+            String repoEnterpriseAddress = bytesResultList.get(i*3+2).equals("x0000000000000000000000000000000000000000") ? "" : bytesResultList.get(i*3+2).substring(1);
+            int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
+            int repoBusiStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
+            String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+            RepoCertVo repoCertVo = new RepoCertVo(repoBusinessNo, productName, productQuantitiy, repoBusiStatus, repoEnterpriseName);
+            repoCertVos.add(repoCertVo);
+        }
+        result.returnWithValue(code, repoCertVos);
+        return result;
     }
 
 }

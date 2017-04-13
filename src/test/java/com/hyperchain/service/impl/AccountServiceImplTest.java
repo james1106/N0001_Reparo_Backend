@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,8 +21,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by ldy on 2017/4/7.
@@ -53,7 +50,7 @@ public class AccountServiceImplTest extends SpringBaseTest {
                 "859051",
                 4,
                 "certType",
-                "1111",
+                "1111" ,
                 "11111" + randomString, //unique
                 "class",
                 "acctSvcr",
