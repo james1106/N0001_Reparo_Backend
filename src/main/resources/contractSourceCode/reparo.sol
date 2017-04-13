@@ -2144,30 +2144,36 @@ contract OrderContract{
       return orderDetailMap[orderNo].productQuantity;
   }
 
-  /***********************根据订单编号更新订单的某状态******************************/
-  function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState)returns(uint){
-      Order order = orderDetailMap[orderNo];
-      if(stateType == "txState"){
-          order.orderState.txState = newState;
-          return 0;
-      }
-      if(stateType == "payerRepoBusiState"){
-          order.orderState.payerRepoBusiState = newState;
-          return 0;
-      }
-      if(stateType == "payeeRepoBusiState"){
-          order.orderState.payeeRepoBusiState = newState;
-          return 0;
-      }
+/***********************根据订单编号更新订单的某状态******************************/
+    function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState)returns(uint){
+        Order order = orderDetailMap[orderNo];
+        if(stateType == "txState"){
+            order.orderState.txState = newState;
+            return 0;
+        }
+        if(stateType == "payerRepoBusiState"){
+            order.orderState.payerRepoBusiState = newState;
+            return 0;
+        }
+        if(stateType == "payeeRepoBusiState"){
+            order.orderState.payeeRepoBusiState = newState;
+            return 0;
+        }
 
-      if(stateType == "wayBillState"){
-          order.orderState.wayBillState = newState;
-          return 0;
-      }
-      if(stateType == "receState"){
-        order.orderState.receState = newState;
-        return 0;
-      }
-  }
+        if(stateType == "wayBillState"){
+
+            order.orderState.wayBillState = newState;
+            if(newState == RECEIVED){
+                if(order.orderState.payerRepoBusiState == INCOMED){
+                    order.orderState.txState = COMPLETED;
+                }
+            }
+            return 0;
+        }
+        if(stateType == "receState"){
+            order.orderState.receState = newState;
+            return 0;
+        }
+    }
 
 }
