@@ -234,7 +234,7 @@ public class ReceivableController {
         params[4] = response;
 
         // 调用合约查询账户，获取返回结果
-        return receivableService.cash(contractKey, params, receivableNo);
+        return receivableService.cash(contractKey, params, serialNo);
     }
 
     @LogInterceptor

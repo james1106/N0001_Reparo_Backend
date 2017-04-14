@@ -622,6 +622,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivable.cashedAmount = cashedAmount;
         receivable.status = 1;
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
+        //newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
         return (0);
     }
