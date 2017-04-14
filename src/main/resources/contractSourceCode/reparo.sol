@@ -455,6 +455,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          }
          */
         Receivable receivable = receivableDetailMap[receivableNo];
+        if(receivable.status == 1){
+            return (1038);
+        }
         receivable.lastStatus = receivable.status;
         receivable.status = 41;
         receivable.secondOwner = replyerAcctId;
