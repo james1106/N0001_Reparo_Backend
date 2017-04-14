@@ -12,6 +12,8 @@ public interface RepositoryService {
     BaseResult<Object> incomeApplyResponse(ContractKey contractKey, Object[] contractParams);
 
     BaseResult<Object> incomeConfirm(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> outcomeResponse(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> outcomeConfirm(ContractKey contractKey, Object[] contractParams);
 
     BaseResult<Object> getRepoBusiInfo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoBusiHistoryList(ContractKey contractKey, Object[] contractParams);
@@ -20,6 +22,6 @@ public interface RepositoryService {
 
     BaseResult<Object> getRepoCertDetail(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoCertInfoList(ContractKey contractKey, Object[] contractParams);
-    BaseResult<Object> getRepoBusiInfoList(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> getRepoBusiInfoList(ContractKey contractKey, Object[] contractParams,int role);
 
 }

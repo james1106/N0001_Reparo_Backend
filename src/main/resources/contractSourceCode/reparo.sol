@@ -20,7 +20,7 @@
  *=========仓单状态=======
  0 UNDEFINED  未定义
  1 TRANSABLE 可流转
- 2 FREED冻结中
+ 2 FREE冻结中
  3 INVALID已失效
  ==========仓单状态=======
 
@@ -47,7 +47,7 @@
  49     已全额贴现 ALL_DISCOUNTED
  ==========应收款状态=======
  * */
-
+//可调用的接口,对外暴露
 
 contract AccountContract {
 
@@ -1213,6 +1213,16 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 }
 contract RepositoryContract{
     OrderContract orderContract;
+
+    uint REPO_BUSI_WATING_INCOME_RESPONSE = 1;//入库待响应
+    uint REPO_BUSI_WATING_INCOME = 2;//待入库
+    uint REPO_BUSI_INCOMED = 3;//已入库
+    uint REPO_BUSI_WATING_OUTCOME = 5;//待出库
+    uint REPO_BUSI_OUTCOMED = 6;//已出库
+
+    uint REPO_CERT_TRANSABLE = 1;//可流转
+    uint REPO_CERT_FREEZED = 2;//冻结中
+    uint REPO_CERT_INVALID = 3;//已失效
 //仓单结构体
     struct RepoCert{
         bytes32 incomeCert  ;// 入库凭证
@@ -1380,11 +1390,11 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(businessTransNo);
         //更改仓储状态为1（入库待响应）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(orderNo, "payerRepoBusiState", 1);
+        orderContract.updateOrderState(orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE);
 
         //仓储业务详情
         businessDetailMap[businessTransNo].repoBusinessNo = repoBusinessNo;
-        businessDetailMap[businessTransNo].repoBusiStatus = 1;//RepoBusiStatus.WATING_INCOME_RESPONSE;
+        businessDetailMap[businessTransNo].repoBusiStatus = REPO_BUSI_WATING_INCOME_RESPONSE;//RepoBusiStatus.WATING_INCOME_RESPONSE;
         businessDetailMap[businessTransNo].businessTransNo = businessTransNo;
         businessDetailMap[businessTransNo].orderNo = orderNo;
         businessDetailMap[businessTransNo].storerAddress = storerAddress;
@@ -1430,7 +1440,7 @@ contract RepositoryContract{
         //businessDetailMap[businessTransNo].
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = 2;//
+        repoBusinsess.repoBusiStatus = REPO_BUSI_WATING_INCOME_RESPONSE;//
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateOperateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
@@ -1439,7 +1449,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
         //更改仓储状态为2（待入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", 2);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE);
 
 
         //waittodo 待补充 修改订单中的买家仓储状态
@@ -1462,16 +1472,23 @@ contract RepositoryContract{
 
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = 3;//RepoBusiStatus.INCOMED;
+        repoBusinsess.repoBusiStatus = REPO_BUSI_INCOMED;//RepoBusiStatus.INCOMED;
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
-        //更改仓储状态为3（已入库）
+
+        //记录仓单历史
+        RepoCertOperationRecord opRecode = repoCertRecordMap[repoCertNo];
+        opRecode.repoCertState.push(REPO_CERT_TRANSABLE);
+        opRecode.operationTime.push(operateTime);
+
+
+        //更改订单仓储状态为3（已入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", 3);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_INCOMED);
 
 
         return repoCertNoApply( repoBusinessNo, repoCertNo, operateTime) ;
@@ -1479,7 +1496,9 @@ contract RepositoryContract{
     }
 
 //出库申请-企业
-    function outcomeApply(bytes32 repoBusinessNo,       //  仓储业务编号
+    function outcomeApply(
+        address orderContractAddress,//订单合约地址，用来更改仓储状态
+        bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
         uint operateOperateTime   //  操作时间(时间戳)
@@ -1500,29 +1519,128 @@ contract RepositoryContract{
         return (0);
     }
 
-//出库回复-待出库
-    function outcomeResponse(bytes32 repoBusinessNo,       //  仓储业务编号
-        bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
-        bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 4
+    function bytes32ToString(bytes32 x)returns (string) {
+        bytes memory bytesString = new bytes(32);
+        uint charCount = 0;
+        for (uint j = 0; j < 32; j++) {
+            byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+            if (char != 0) {
+                bytesString[charCount] = char;
+                charCount++;
+            }
+        }
+    }
+
+//出库回复-待出库,卖家确认订单时仓储状态改为待出库
+    function outcomeResponse(
+        address orderContractAddress,//订单合约地址，用来更改仓储状态
+        bytes32 repoCertNo,       //  仓单编号
         uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
-        //businessDetailMap[businessTransNo].
+        //获取仓储业务编号
+        RepoCert repoCert =  repoCertDetailMap[repoCertNo];
+        bytes32  repoBusinessNo = repoCert.repoBusinessNo;
+        //获取上一个流转号
+
+        string memory s1 = bytes32ToString(repoBusinessNo);
+        string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
+
+         string memory conStr = concatString(s1, s2);
+         bytes32 lastBusinessTransNo = stringToBytes32(conStr);
+
+         //获取新的流转号
+         string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
+         conStr = concatString(s1, s3);
+         bytes32 currBusinessTransNo = stringToBytes32(conStr);
+
+        //bytes32 lastBusinessTransNo;
+        //bytes32 currBusinessTransNo;
+        //更新仓储状态为待出库
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = 5;//RepoBusiStatus.INCOMED;
+        repoBusinsess.repoBusiStatus = REPO_BUSI_WATING_OUTCOME;//RepoBusiStatus.INCOMED;
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateOperateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+
+        //记录仓单操作历史
+        RepoCertOperationRecord opRecode = repoCertRecordMap[repoCertNo];
+        opRecode.repoCertState.push(REPO_CERT_FREEZED);
+        opRecode.operationTime.push(operateOperateTime);
+        //更新仓单状态为冻结中
+        //RepoCert repoCert =  repoCertDetailMap[repoCertNo];
+        repoCert.repoCertStatus = REPO_CERT_FREEZED;
+
+
+        //更新订单中的卖家状态为 REPO_BUSI_WATING_OUTCOME
+        orderContract = OrderContract(orderContractAddress);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME);
+
         return (0);
     }
 
+        struct slice {
+            uint _len;
+            uint _ptr;
+        }
+
+        function toSlice(string self) internal returns (slice) {
+            uint ptr;
+            assembly {
+                ptr := add(self, 0x20)
+            }
+            return slice(bytes(self).length, ptr);
+        }
+
+        function memcpy(uint dest, uint src, uint len) private {
+            for(; len >= 32; len -= 32) {
+                assembly {
+                    mstore(dest, mload(src))
+                }
+                dest += 32;
+                src += 32;
+            }
+
+            uint mask = 256 ** (32 - len) - 1;
+            assembly {
+                let srcpart := and(mload(src), not(mask))
+                let destpart := and(mload(dest), mask)
+                mstore(dest, or(destpart, srcpart))
+            }
+        }
+
+        function concat(slice self, slice other) internal returns (string) {
+            var ret = new string(self._len + other._len);
+            uint retptr;
+            assembly { retptr := add(ret, 32) }
+            memcpy(retptr, self._ptr, self._len);
+            memcpy(retptr + self._len, other._ptr, other._len);
+            return ret;
+        }
+        //（1）两个字符串拼接
+        function concatString(string _a,
+            string _b) internal returns (string) {
+            return (concat(toSlice(_a), toSlice(_b)));
+        }
+
+
+        function stringToBytes32(string memory source)returns (bytes32 result) {
+            assembly {
+                result := mload(add(source, 32))
+            }
+        }
+
+
+
 //出库确认-已出库
-    function outcomeConfirm(bytes32 repoBusinessNo,       //  仓储业务编号
+    function outcomeConfirm(
+        address orderContractAddress,//
+        bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 4
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 5
         uint operateOperateTime   //  操作时间(时间戳)
@@ -1539,13 +1657,25 @@ contract RepositoryContract{
          */
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = 3;//RepoBusiStatus.INCOMED;
+        repoBusinsess.repoBusiStatus = REPO_BUSI_OUTCOMED;//RepoBusiStatus.INCOMED;
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateOperateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+
+        //记录仓单操作历史
+        bytes32 repoCertNo = repoBusiToCertMap[repoBusinessNo];
+        RepoCertOperationRecord opRecode = repoCertRecordMap[repoCertNo];
+        opRecode.repoCertState.push(REPO_CERT_INVALID);
+        opRecode.operationTime.push(operateOperateTime);
+        //更新仓单状态为失效
+        RepoCert repoCert =  repoCertDetailMap[repoCertNo];
+        repoCert.repoCertStatus = REPO_CERT_INVALID;
+        //更新订单中的卖家状态为 REPO_CERT_INVALID
+        orderContract = OrderContract(orderContractAddress);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_CERT_INVALID);
         return (0);
     }
 
@@ -1583,7 +1713,7 @@ contract RepositoryContract{
             currentRepoBusinsess.norms,
             currentRepoBusinsess.productTotalPrice,
             currentRepoBusinsess.productLocation,
-            1
+            REPO_CERT_TRANSABLE
         );
         return (0,repoCertNo);
     }
@@ -1773,23 +1903,7 @@ contract RepositoryContract{
         return TheString;
     }
 
-//单个bytes32转化为string
-    function bytes32ToString(bytes32 x) internal returns (string) {
-        bytes memory bytesString = new bytes(32);
-        uint charCount = 0;
-        for (uint j = 0; j < 32; j++) {
-            byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
-            if (char != 0) {
-                bytesString[charCount] = char;
-                charCount++;
-            }
-        }
-        bytes memory bytesStringTrimmed = new bytes(charCount);
-        for (j = 0; j < charCount; j++) {
-            bytesStringTrimmed[j] = bytesString[j];
-        }
-        return string(bytesStringTrimmed);
-    }
+
 
 //合并两个string为一个string
     function sewingTwoString(string a,string b) internal returns(string){
@@ -2311,3 +2425,5 @@ enum PayingMethod {
     }
 
 }
+
+

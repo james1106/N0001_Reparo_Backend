@@ -22,9 +22,16 @@ public class RepoBusinessVo {
     private String logisticsEntepsName;
     private String waybillNo;
     private List<OperationRecordVo> operationRecordVoList;
-    private String orderVo;
+    private String orderNo;
     private int repoCertStatus;
 
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
     public int getRepoCertStatus() {
         return repoCertStatus;
     }
@@ -40,17 +47,6 @@ public class RepoBusinessVo {
 
     public void setOpgTimeOfCurStatus(Long opgTimeOfCurStatus) {
         this.opgTimeOfCurStatus = opgTimeOfCurStatus;
-    }
-
-
-
-
-    public String getOrderVo() {
-        return orderVo;
-    }
-
-    public void setOrderVo(String orderVo) {
-        this.orderVo = orderVo;
     }
 
 
