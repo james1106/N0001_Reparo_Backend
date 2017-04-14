@@ -141,17 +141,19 @@ public class OrderController {
         orderParams[8] = orderGenerateTime;
         // 调用合约查询账户，获取返回结果
 
-        Object[] repoParams = new Object[10];
-        repoParams[0] = repoBusinessNo;
-        repoParams[1] = repoBusinessNo + "0"; //仓储业务流转号
-        repoParams[2] = orderNo;
-        repoParams[3] = payerAddress; // 存货人
-        repoParams[4] = payerRepoAddress; //保管人
-        repoParams[5] = orderGenerateTime; //操作时间
-        repoParams[6] = productName; //  仓储物名称
-        repoParams[7] =   productQuantity;     //  仓储物数量
-        repoParams[8] =    productUnitPrice;     //  货品单价(分)
-        repoParams[9] =      productTotalPrice ;    //  货品合计金额(分)
+        Object[] repoParams = new Object[11];
+        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        repoParams[0] = orderContractAddress;
+        repoParams[1] = repoBusinessNo;
+        repoParams[2] = repoBusinessNo + "0"; //仓储业务流转号
+        repoParams[3] = orderNo;
+        repoParams[4] = payerAddress; // 存货人
+        repoParams[5] = payerRepoAddress; //保管人
+        repoParams[6] = orderGenerateTime; //操作时间
+        repoParams[7] = productName; //  仓储物名称
+        repoParams[8] = productQuantity;     //  仓储物数量
+        repoParams[9] = productUnitPrice;     //  货品单价(分)
+        repoParams[10] = productTotalPrice ;    //  货品合计金额(分)
         // 调用合约查询账户，获取返回结果
 
         BaseResult createOrderResult = orderService.createOrder(contractKey, orderParams, orderNo);
