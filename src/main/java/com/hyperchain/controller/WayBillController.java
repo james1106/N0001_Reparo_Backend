@@ -77,14 +77,15 @@ public class WayBillController extends BaseController{
     }
 
     @LogInterceptor
-    @ApiOperation(value = "查询所有与自己相关的运单信息", notes = "查询所有与自己相关的运单信息")
+    @ApiOperation(value = "物流公司更新运单状态为已送达", notes = "物流公司更新运单状态为已送达")
     @ResponseBody
-    @RequestMapping(value = "/allWayBillDetail", method = RequestMethod.GET)
-    public BaseResult<Object> getAllRelatedWayBillDetail(
+    @RequestMapping(value = "/receivedStatus", method = RequestMethod.PUT)
+    public BaseResult<Object> updateWayBillStatusToReceived(
+            @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
             HttpServletRequest request,
             HttpServletResponse response)
             throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
-        return wayBillService.getAllRelatedWayBillDetail(request);
+        return wayBillService.updateWayBillStatusToReceived(orderNo, request);
     }
 
     @LogInterceptor
@@ -102,13 +103,12 @@ public class WayBillController extends BaseController{
     @LogInterceptor
     @ApiOperation(value = "查询所有与自己相关的运单信息", notes = "查询所有与自己相关的运单信息")
     @ResponseBody
-    @RequestMapping(value = "/receivedStatus", method = RequestMethod.PUT)
-    public BaseResult<Object> updateWayBillStatusToReceived(
-            @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
+    @RequestMapping(value = "/allWayBillDetail", method = RequestMethod.GET)
+    public BaseResult<Object> getAllRelatedWayBillDetail(
             HttpServletRequest request,
             HttpServletResponse response)
             throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
-        return wayBillService.updateWayBillStatusToReceived(orderNo, request);
+        return wayBillService.getAllRelatedWayBillDetail(request);
     }
 
 }

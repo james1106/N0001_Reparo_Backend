@@ -105,7 +105,6 @@ contract WayBillContract {
     uint ROLE_REPOSITORY = 2;
     uint ROLE_FINANCIAL = 3;
 
-
     AccountContract accountContract;
     WayBillContract wayBillContract;
     ReceivableContract receivableContract;
@@ -144,6 +143,7 @@ contract WayBillContract {
     uint CODE_PERMISSION_DENIED = 1; //用户无权限
     uint CODE_INVALID_USER = 2; //用户不存在
     uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
+    uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
 //生成待确认运单
     function generateUnConfirmedWayBill(uint[] integers, address[] addrs, bytes32[] strs, address accountContractAddr, address receivableContractAddress) returns (uint code){
@@ -163,7 +163,7 @@ contract WayBillContract {
     // bytes32 receiverRepoBusinessNo = strs[3];
     // bytes32 statusTransId = strs[4];
         bytes32 wayBillNo;
-        bytes32[] logisticsInfo;
+        bytes32[] memory logisticsInfo;
 
     //TODO ：运单上的每一个address都要判断用户是否存在？（发货者、收货者、物流、发货仓储、收货仓储）
 
@@ -174,9 +174,7 @@ contract WayBillContract {
         if(accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false || msg.sender != addrs[1]){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
-
         if(statusTransIdToWayBillDetail[strs[4]].productName != ""){ //运单已经存在
-        //if(orderNoToStatusTransIdList[strs[0]][0] != ""){ //运单已经存在
             return CODE_WAY_BILL_ALREADY_EXIST;
         }
     //TODO 查应收款状态是否为承兑已签收（订单状态是否为已确认已经先判断），否则无权限
@@ -197,8 +195,8 @@ contract WayBillContract {
     function generateWayBill(bytes32 orderNo, bytes32 statusTransId, bytes32 wayBillNo, uint sendTime, address accountContractAddr) returns (uint code){
         accountContract = AccountContract (accountContractAddr);
 
-        bytes32[] statusTransIdList = orderNoToStatusTransIdList[orderNo];
-        WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]];
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        WayBill memory oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]];
 
     //权限控制
         if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
@@ -243,8 +241,11 @@ contract WayBillContract {
         }
 
     //获取运单最新信息
-        bytes32[] statusTransIdList = orderNoToStatusTransIdList[orderNo];
-        WayBill waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        if (statusTransIdList.length == 0) {
+            return (CODE_WAY_BILL_NO_DATA,ints, strs, addrs, logisticsInfo, waybillStatus);
+        }
+        WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
     //bytes32 orderNo = waybill.orderNo;
     // bytes32 wayBillNo = waybill.wayBillNo;
@@ -312,9 +313,12 @@ contract WayBillContract {
     /*运单号, 下单时间, 物流公司, 物流当前状态, 更新时间*/
         accountContract = AccountContract (accountContractAddr);
 
+        if (statusTransIdList.length == 0) {
+            return (wayBillNo,requestTime, logisticsAddress, waybillStatus, operateTime);
+        }
     //获取运单最新信息
-        bytes32[] statusTransIdList = orderNoToStatusTransIdList[orderNo];
-        WayBill waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
         requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
         return (waybill.wayBillNo, requestTime, waybill.logisticsAddress, waybill.waybillStatus, waybill.operateTime);
     }
@@ -335,7 +339,10 @@ contract WayBillContract {
         }
 
     //获取运单最新信息
-        bytes32[] statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        if (statusTransIdList.length == 0) {
+            return CODE_WAY_BILL_NO_DATA;
+        }
         WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
         if(oldWaybill.waybillStatus != WAYBILL_SENDING){//用户无权限（状态流转）
@@ -362,8 +369,8 @@ contract WayBillContract {
         }
 
     //获取运单最新信息
-        bytes32[] statusTransIdList = orderNoToStatusTransIdList[orderNo];
-        WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
+        WayBill memory oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
         if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){//用户无权限（状态流转）
             return CODE_PERMISSION_DENIED;

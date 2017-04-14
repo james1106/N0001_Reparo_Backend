@@ -157,6 +157,37 @@ public class WayBillServiceImpl implements WayBillService {
         return baseResult;
     }
 
+    @Override
+    public BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //用户信息
+        String address = TokenUtil.getAddressFromCookie(request);
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        //合约名称
+        String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
+        String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
+        String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+
+        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        String updateToReceivedMethodName = "updateWayBillStatusToReceived";
+        Object[] updateToReceivedMethodParams = new Object[6];
+        updateToReceivedMethodParams[0] = orderNo; //orderNo
+        updateToReceivedMethodParams[1] = orderNo + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
+        updateToReceivedMethodParams[2] = new Date().getTime(); //operateTime
+        updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
+        updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
+        updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
+        String[] updateToReceivedResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        System.out.println("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
+
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithoutValue(updateToReceivedResult.getCode());
+        return baseResult;
+    }
+
     /**
      * 获取所有用户相关运单详情列表
      *
@@ -238,37 +269,6 @@ public class WayBillServiceImpl implements WayBillService {
         WayBillDetailVo wayBillDetailVo = parseContractResultToWayBillDetailVo(waybillContractResult);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithValue(waybillContractResult.getCode(), wayBillDetailVo);
-        return baseResult;
-    }
-
-    @Override
-    public BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //用户信息
-        String address = TokenUtil.getAddressFromCookie(request);
-        UserEntity userEntity = userEntityRepository.findByAddress(address);
-        String accountJson = userEntity.getPrivateKey();
-        String accountName = userEntity.getAccountName();
-        //合约名称
-        String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
-        String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
-        String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
-
-        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
-        String updateToReceivedMethodName = "updateWayBillStatusToReceived";
-        Object[] updateToReceivedMethodParams = new Object[6];
-        updateToReceivedMethodParams[0] = orderNo; //orderNo
-        updateToReceivedMethodParams[1] = orderNo + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
-        updateToReceivedMethodParams[2] = new Date().getTime(); //operateTime
-        updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
-        updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
-        updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
-        String[] updateToReceivedResultMapKey = new String[]{};
-        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        System.out.println("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
-
-        BaseResult<Object> baseResult = new BaseResult<>();
-        baseResult.returnWithoutValue(updateToReceivedResult.getCode());
         return baseResult;
     }
 
