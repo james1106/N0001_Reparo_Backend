@@ -118,6 +118,12 @@ public enum Code {
             case 2008:
                 return BANKACCOUNT_NOT_EXIST;
 
+            case 3000:
+                return WAY_BILL_ALREADY_EXIST;
+            case 3001:
+                return WAY_BILL_NO_DATA;
+            case 3050:
+                return WAY_BILL_CONTENT_INVALID;
 
             case 5002:
                 return ACCOUNT_ALREADY_EXIST;
