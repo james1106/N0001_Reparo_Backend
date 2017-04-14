@@ -23,4 +23,10 @@ public class BaseConstant {
     public static final String CONTRACT_NAME_REPOSITORY = "RepositoryContract";
     public static final String CONTRACT_NAME_ORDER = "OrderContract";
 
+    public static final String REPO_BUSI_WATING_INCOME_RESPONSE= "1";//入库待响应
+    public static final String REPO_BUSI_WATING_INCOME= "2";//待入库
+    public static final String REPO_BUSI_INCOMED = "3";//已入库
+    public static final String REPO_BUSI_WATING_OUTCOME = "5";//待出库
+    public static final String REPO_BUSI_OUTCOMED = "6";//已出库
+
 }

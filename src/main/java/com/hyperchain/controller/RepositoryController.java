@@ -26,6 +26,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_INCOMED;
+import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOME;
+import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOME_RESPONSE;
+import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_OUTCOME;
+import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_OUTCOMED;
+
 /**
  * Created by chenxiaoyang on 2017/4/11.
  */
@@ -42,11 +48,7 @@ public class RepositoryController {
     @Autowired
     RepositoryService repositoryService;
 
-    public static final String REPO_BUSI_WATING_INCOME_RESPONSE= "1";//入库待响应
-    public static final String REPO_BUSI_WATING_INCOME= "2";//待入库
-    public static final String REPO_BUSI_INCOMED = "3";//已入库
-    public static final String REPO_BUSI_WATING_OUTCOME = "5";//待出库
-    public static final String REPO_BUSI_OUTCOMED = "6";//已出库
+
 
     @LogInterceptor
     @ApiOperation(value = "入库申请", notes = "生成仓储业务信息")
@@ -163,7 +165,7 @@ public class RepositoryController {
     @LogInterceptor
     @ApiOperation(value = "入库确认", notes = "仓储机构进行入库确认")
     @ResponseBody
-    @RequestMapping(value = "incomeConfirm",method = RequestMethod.POST)
+    @RequestMapping(value = "incomeConfirm",method = RequestMethod.PUT)
     public BaseResult<Object> incomeConfirm(
             @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo,
             HttpServletRequest request
@@ -195,9 +197,80 @@ public class RepositoryController {
     }
 
     @LogInterceptor
+    @ApiOperation(value = "仓储机构确认是否同意出库", notes = "仓储机构确认是否同意出库")
+    @ResponseBody
+    @RequestMapping(value = "outcomeResponse",method = RequestMethod.PUT)
+    public BaseResult<Object> outcomeResponse(
+            @ApiParam(value = "仓单编号", required = true) @RequestParam String repoCertNo,
+            HttpServletRequest request
+    ) throws Exception {
+
+        BaseResult result = new BaseResult();
+        Code code;
+        long operateTime = System.currentTimeMillis();
+
+        //用户信息
+        String address = TokenUtil.getAddressFromCookie(request);
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
+        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        Object[] params = new Object[3];
+        params[0] = orderContractAddress;
+        params[1] = repoCertNo;
+        params[2] = operateTime;
+        /*
+        params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
+        params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
+        params[5] = operateTime; //操作时间
+        */
+        // 调用合约查询账户，获取返回结果
+        return repositoryService.outcomeResponse(contractKey, params);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "仓储机构-确认出库", notes = "仓储机构确认出库，置状态为已出库")
+    @ResponseBody
+    @RequestMapping(value = "outcomeConfirm",method = RequestMethod.PUT)
+    public BaseResult<Object> outcomeConfirm(
+            @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo,
+            HttpServletRequest request
+    ) throws Exception {
+
+        BaseResult result = new BaseResult();
+        Code code;
+        long operateTime = System.currentTimeMillis();
+
+        //用户信息
+        String address = TokenUtil.getAddressFromCookie(request);
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
+        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        Object[] params = new Object[4];
+        params[0] = orderContractAddress;
+        params[1] = repoBusinessNo;
+        params[2] = repoBusinessNo + REPO_BUSI_WATING_OUTCOME;
+        params[3] = repoBusinessNo + REPO_BUSI_OUTCOMED;
+        /*
+        params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
+        params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
+        params[5] = operateTime; //操作时间
+        */
+        // 调用合约查询账户，获取返回结果
+        return repositoryService.outcomeConfirm(contractKey, params);
+    }
+
+    @LogInterceptor
     @ApiOperation(value = "查询仓储详情+仓储流转历史", notes = "查询仓储详情+仓储流转历史")
     @ResponseBody
-    @RequestMapping(value = "getRepoBusiHistoryList",method = RequestMethod.POST)
+    @RequestMapping(value = "getRepoBusiHistoryList",method = RequestMethod.GET)
     public BaseResult<Object> getRepoBusiHistoryList(
             @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo,
             HttpServletRequest request
@@ -221,7 +294,7 @@ public class RepositoryController {
     @LogInterceptor
     @ApiOperation(value = "查询仓单详情", notes = "查询仓单详情")
     @ResponseBody
-    @RequestMapping(value = "getRepoCert",method = RequestMethod.POST)
+    @RequestMapping(value = "getRepoCert",method = RequestMethod.GET)
     public BaseResult<Object> getRepoCert(
             @ApiParam(value = "仓单编号", required = true) @RequestParam String repoCertNo,
             HttpServletRequest request
@@ -239,10 +312,6 @@ public class RepositoryController {
         // 调用合约查询账户，获取返回结果
         return repositoryService.getRepoCertDetail(contractKey, params);
     }
-
-
-
-
 
     @LogInterceptor
     @ApiOperation(value = "查询仓单信息列表", notes = "查询仓单信息列表")
@@ -274,7 +343,7 @@ public class RepositoryController {
     @ResponseBody
     @RequestMapping(value = "getRepoBusiList",method = RequestMethod.GET)
     public BaseResult<Object> getRepoBusiList(
-            @ApiParam(value = "用户角色", required = true) @RequestParam String role,
+            @ApiParam(value = "用户角色", required = true) @RequestParam int role,
             HttpServletRequest request) throws Exception {
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
@@ -289,11 +358,12 @@ public class RepositoryController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        Object[] params = new Object[2];
+        Object[] params = new Object[1];
         params[0] = address;
-        params[1] = role;
+
+        //params[1] = role;
         // 调用合约查询账户，获取返回结果
-        return repositoryService.getRepoBusiInfoList(contractKey, params);
+        return repositoryService.getRepoBusiInfoList(contractKey, params,role);
     }
 
 }
