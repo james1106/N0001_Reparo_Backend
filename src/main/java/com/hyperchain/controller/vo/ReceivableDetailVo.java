@@ -54,7 +54,7 @@ public class ReceivableDetailVo {
         this.lastStatus = lastStatus;
     }
 
-    private String pyeeLinkman;
+    private String pyeeLinkMan;
 
     public String getPyerLinkMan() {
         return pyerLinkMan;
@@ -64,12 +64,12 @@ public class ReceivableDetailVo {
         this.pyerLinkMan = pyerLinkMan;
     }
 
-    public String getPyeeLinkman() {
-        return pyeeLinkman;
+    public String getPyeeLinkMan() {
+        return pyeeLinkMan;
     }
 
-    public void setPyeeLinkman(String pyeeLinkman) {
-        this.pyeeLinkman = pyeeLinkman;
+    public void setPyeeLinkMan(String pyeeLinkMan) {
+        this.pyeeLinkMan = pyeeLinkMan;
     }
 
     public long getDiscountInHandAmount() {

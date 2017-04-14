@@ -10,11 +10,11 @@ public interface ReceivableService {
     BaseResult<Object> signOutApply(ContractKey contractKey, Object[] contractParams, String receivableNo);//第二个是合约的入参
     BaseResult<Object> signOutReply(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> discountApply(ContractKey contractKey, Object[] contractParams, String receivableNo);
-    BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams, String newReceivableNo);
     BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRecordBySerialNo(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams);
-    BaseResult<Object> receivableSimpleDeatilList(ContractKey contractKey, Object[] contractParams);
+    BaseResult<Object> receivableSimpleDetailList(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> cash(ContractKey contractKey, Object[] contractParams, String receivableNo);
 

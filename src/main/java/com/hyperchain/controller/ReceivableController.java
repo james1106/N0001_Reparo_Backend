@@ -164,46 +164,43 @@ public class ReceivableController {
         return receivableService.discountApply(contractKey, params, receivableNo);
     }
 
-//    @LogInterceptor
-//    @ApiOperation(value = "贴现回复", notes = "贴现回复")
-//    @ResponseBody
-//    @RequestMapping(value = "discountReply",method = RequestMethod.POST)//路径
-//    public BaseResult<Object> discountReply(
-////            @ApiParam(value = "回复人私钥", required = true) @RequestParam String ReplyerAddress,
-//            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
-//            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
-//            @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
-//            @ApiParam(value = "回复到手金额", required = true) @RequestParam long discountInHandAmount,//回复到手金额
+    @LogInterceptor
+    @ApiOperation(value = "贴现回复", notes = "贴现回复")
+    @ResponseBody
+    @RequestMapping(value = "discountReply",method = RequestMethod.POST)//路径
+    public BaseResult<Object> discountReply(
+//            @ApiParam(value = "回复人私钥", required = true) @RequestParam String ReplyerAddress,
+            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
+            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
+            @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
+            @ApiParam(value = "回复到手金额", required = true) @RequestParam long discountInHandAmount,//回复到手金额
 //            @ApiParam(value = "贴现申请时的流水号", required = true) @RequestParam long discountApplySerialNo,//贴现申请时的流水号
-//            HttpServletRequest request//http请求实体
-//    ) throws Exception {
-//
-//        long discountReplyTime = System.currentTimeMillis();
-//        String serialNo = "124" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);//贴现回复流水号124
-//        String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);//新生成的应收款编号
-//
-////        ContractKey contractKey = new ContractKey(replyerAddress);
-//        String address = TokenUtil.getAddressFromCookie(request);//用户address
-//        UserEntity userEntity = userEntityRepository.findByAddress(address);
-//        String privateKey = userEntity.getPrivateKey();
-//        String accountName = userEntity.getAccountName();
-//        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
-//
-//
-//
-//        Object[] params = new Object[8];
-//        params[0] = receivableNo;
-//        params[1] = replyerAcctId;
-//        params[2] = response;
-//        params[3] = serialNo;
-//        params[4] = discountReplyTime;
-//        params[5] = newReceivableNo;
-//        params[6] = discountInHandAmount;
+            HttpServletRequest request//http请求实体
+    ) throws Exception {
+
+        long discountReplyTime = System.currentTimeMillis();
+        String serialNo = "124" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);//贴现回复流水号124
+        String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);//新生成的应收款编号
+
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        Object[] params = new Object[7];
+        params[0] = receivableNo;
+        params[1] = replyerAcctId;
+        params[2] = response;
+        params[3] = serialNo;
+        params[4] = discountReplyTime;
+        params[5] = newReceivableNo;
+        params[6] = discountInHandAmount;
 //        params[7] = discountApplySerialNo;
-//
-//        // 调用合约查询账户，获取返回结果
-//        return receivableService.discountReply(contractKey, params, receivableNo);
-//    }
+
+        // 调用合约查询账户，获取返回结果
+        return receivableService.discountReply(contractKey, params, newReceivableNo);
+    }
 
     @LogInterceptor
     @ApiOperation(value = "兑付", notes = "兑付")
@@ -315,8 +312,8 @@ public class ReceivableController {
     @LogInterceptor
     @ApiOperation(value = "买方／卖方应收款列表", notes = "买方／卖方应收款列表")
     @ResponseBody
-    @RequestMapping(value = "receivableSimpleDeatilList",method = RequestMethod.POST)//路径
-    public BaseResult<Object> receivableSimpleDeatilList(
+    @RequestMapping(value = "receivableSimpleDetailList",method = RequestMethod.POST)//路径
+    public BaseResult<Object> receivableSimpleDetailList(
             //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
             @ApiParam(value = "用户角色", required = true) @RequestParam int roleCode,//0是买家、1是卖家
             HttpServletRequest request
@@ -343,7 +340,7 @@ public class ReceivableController {
         params[3] = accountContractAddress;
 
         // 调用合约查询账户，获取返回结果
-        return receivableService.receivableSimpleDeatilList(contractKey, params);
+        return receivableService.receivableSimpleDetailList(contractKey, params);
     }
 
     @LogInterceptor

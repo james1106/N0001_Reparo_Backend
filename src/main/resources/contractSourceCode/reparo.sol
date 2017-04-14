@@ -465,7 +465,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 //贴现回复
-    function discountResponse(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, bytes32 discountApplySerialNo) returns(uint) {
+    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount) returns(uint) {
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -491,7 +491,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
             return (1);
         }
         receivable.discountInHandAmount = discountInHandAmount;
-        subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo, discountApplySerialNo);
+        subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo);
         holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
@@ -499,6 +499,30 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return (0);
     }
 
+    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo) internal {
+        Receivable receivable = receivableDetailMap[receivableNo];
+        uint oriAmount = receivable.isseAmt;
+        if(responseType == ResponseType.NO){
+            receivable.status = receivable.lastStatus;
+        }else{
+            Receivable newReceivable = receivableDetailMap[newReceivableNo];
+                copyValue(receivableNo, newReceivableNo);
+                newReceivable.receivableNo = newReceivableNo;
+                receivable.lastStatus = receivable.status;
+                receivable.status = 49;//已全额贴现
+                receivable.discounted = DiscountedStatus.YES;
+                receivable.signInDt = time;
+                newReceivable.lastStatus = 41;
+                newReceivable.status = 46;//贴现已签收
+                newReceivable.signInDt = time;
+                newReceivable.firstOwner = receivable.secondOwner;
+                newReceivable.secondOwner = "";
+                newReceivable.discounted = DiscountedStatus.YES;
+                newReceivable.signInDt = time;
+        }
+    }
+
+/*
     function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo, bytes32 discountApplySerialNo) internal {
         Receivable receivable = receivableDetailMap[receivableNo];
         ReceivableRecord receivableRecord = receivableRecordMap[discountApplySerialNo];
@@ -544,7 +568,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         }
     }
-
+*/
 //判断全额 或 部分
     function judgeOperateOption(bytes32 receivableNum, uint dealAmount) internal returns (bool){
         Receivable receivable = receivableDetailMap[receivableNum];
@@ -798,7 +822,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         );
     }
 
-    //买家、卖家应收款列表
+
     function getReceivableAllList(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
         Receivable receivable = receivableDetailMap[receivableNo];
@@ -880,7 +904,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         );
     }
 
-    function receivableSimpleDeatilList(uint roleCode, bytes32 acctId, address orderAddress, address accountAddress) returns (uint, bytes32[], uint[]) {
+    function receivableSimpleDetailList(uint roleCode, bytes32 acctId, address orderAddress, address accountAddress) returns (uint, bytes32[], uint[]) {
         bytes32[] memory receivableNos;
         if(roleCode == 0){//买家(付款人)
             receivableNos = pyerToReceivableMap[acctId];

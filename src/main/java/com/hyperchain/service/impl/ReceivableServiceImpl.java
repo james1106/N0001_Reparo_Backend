@@ -185,15 +185,15 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     //贴现回复
     @Override
-    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
+    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams, String newReceivableNo) {
         String methodName = "discountReply";
         String[] resultMapKey = new String[]{};
         BaseResult result = new BaseResult();
-
+        ContractResult contractResult = null;
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
-            Code code = contractResult.getCode();
-            result.returnWithoutValue(code);
+            contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+//            Code code = contractResult.getCode();
+//            result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -201,6 +201,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
         }
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+        result.returnWithValue(code, newReceivableNo);
         return result;//这个result是返回给前端的
 
     }
@@ -344,7 +347,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
         receivableDetailVo.setDiscounted(discounted);
         receivableDetailVo.setNote(note);
-        receivableDetailVo.setPyeeLinkman(pyeeLinkman);
+        receivableDetailVo.setPyeeLinkMan(pyeeLinkman);
         receivableDetailVo.setPyerLinkMan(pyerLinkMan);
 
 
@@ -472,7 +475,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
         receivableDetailVo.setDiscounted(discounted);
         receivableDetailVo.setNote(note);
-        receivableDetailVo.setPyeeLinkman(pyeeLinkman);
+        receivableDetailVo.setPyeeLinkMan(pyeeLinkman);
         receivableDetailVo.setPyerLinkMan(pyerLinkMan);
 
         receivableDetailVoList.add(receivableDetailVo);
@@ -621,8 +624,8 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     //返回买卖方应收款列表
     @Override
-    public BaseResult<Object> receivableSimpleDeatilList(ContractKey contractKey, Object[] contractParams) {
-        String contractMethodName = "receivableSimpleDeatilList";
+    public BaseResult<Object> receivableSimpleDetailList(ContractKey contractKey, Object[] contractParams) {
+        String contractMethodName = "receivableSimpleDetailList";
         String[] resultMapKey = new String[]{"list1", "list2"};
         ContractResult contractResult = null;
         Code code = null;
