@@ -2879,17 +2879,6 @@ public class WayBillContractTest extends SpringBaseTest {
         requestContractMethodParams[2] = requestStrs;
         requestContractMethodParams[3] = accountContractAddr;
         requestContractMethodParams[4] = receivableContractAddr;
-        for(int i = 0 ; i < requestLongs.length; i++) {
-            System.out.println("第0个参数：" + requestLongs[i]);
-        }
-        for(int i = 0 ; i < requestAddrs.length; i++) {
-            System.out.println("第1个参数：" + requestAddrs[i]);
-        }
-        for(int i = 0 ; i < requestStrs.length; i++) {
-            System.out.println("第2个参数：" + requestStrs[i]);
-        }
-        System.out.println("第3个参数：" + accountContractAddr);
-        System.out.println("第4个参数：" + receivableContractAddr);
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);

@@ -39,6 +39,7 @@ public enum Code {
 
     //运单部分
     WAY_BILL_ALREADY_EXIST(3000, "订单对应的运单已经存在"),
+    WAY_BILL_NO_DATA(3001, "该用户暂无数据"),
     WAY_BILL_CONTENT_INVALID(3050, "运单内容不合法"),
 
     //应收款部分
