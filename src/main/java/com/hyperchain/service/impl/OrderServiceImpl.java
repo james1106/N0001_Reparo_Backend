@@ -81,7 +81,6 @@ public class OrderServiceImpl implements OrderService{
             passwordIllegalParam.printStackTrace();
         }
 
-
         BaseResult<Object> result = new BaseResult<>();
         Map<String, Object> orderDetailMap = new HashMap();
 //         将合约结果转化为接口返回数据
@@ -126,6 +125,14 @@ public class OrderServiceImpl implements OrderService{
         int payerRepoBusiState = partParams2.get(5).equals("") ? 0: Integer.parseInt(partParams2.get(5));
         int payeeRepoBusiState = partParams2.get(6).equals("") ? 0: Integer.parseInt(partParams2.get(6));
 
+        //物流信息详情
+        String wayBillNo = partParams1.get(9);//物流单号
+        String logisticCompany = addressList.get(4);//物流公司
+
+        long wayBillGenerateTime = partParams2.get(7).equals("") ? 0 : Long.parseLong(partParams2.get(7));
+        int wayBillLatestStatus = partParams2.get(8).equals("") ? 0 : Integer.parseInt(partParams2.get(8));
+        long wayBillUpdateTime = partParams2.get(9).equals("") ? 0 : Long.parseLong(partParams2.get(9));
+
         //以下为应收账款概要信息
 
 
@@ -138,18 +145,6 @@ public class OrderServiceImpl implements OrderService{
 //        long coupon = Long.parseLong(partParams2.get(7));
 //        int receLatestStatus = Integer.parseInt(partParams2.get(8));
 //        long receUpdateTime = Long.parseLong(partParams2.get(9));
-
-        //以下为物流概要信息
-//        String wayBillNo = partParams1.get(13);
-//        String logisticCompany = partParams1.get(14);
-//        long wayBillGenerateTime = Long.parseLong(partParams2.get(10));
-//        int wayBillLatestStatus = Integer.parseInt(partParams2.get(11));
-//        long wayBillUpdateTime = Long.parseLong(partParams2.get(12));
-
-//        long repoGenerateTime = Long.parseLong(partParams2.get(13));
-//        int repoLatestStatus = Integer.parseInt(partParams2.get(14));
-//        long repoUpdateTime2 = Long.parseLong(partParams2.get(15));
-
 
         TransactionDetailVo txDetailVo = new TransactionDetailVo();
         List<OperationRecordVo> txRecordList = new ArrayList<>();
@@ -191,11 +186,11 @@ public class OrderServiceImpl implements OrderService{
         receOverVo.setReceUpdateTime(0);
 
         WayBillOverInfo wayBillOverInfo = new WayBillOverInfo();
-        wayBillOverInfo.setLogisticCompany("");
-        wayBillOverInfo.setWayBillGenerateTime(0);
-        wayBillOverInfo.setWayBillLatestStatus(0);
-        wayBillOverInfo.setWayBillNo("");
-        wayBillOverInfo.setWayBillUpdateTime(0);
+        wayBillOverInfo.setLogisticCompany(logisticCompany);
+        wayBillOverInfo.setWayBillGenerateTime(wayBillGenerateTime);
+        wayBillOverInfo.setWayBillLatestStatus(wayBillLatestStatus);
+        wayBillOverInfo.setWayBillNo(wayBillNo);
+        wayBillOverInfo.setWayBillUpdateTime(wayBillUpdateTime);
 
         RepoOverVo repoOverVo = new RepoOverVo();
         repoOverVo.setPayerRepoCertNo(payerRepoCertNo);

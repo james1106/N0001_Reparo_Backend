@@ -44,7 +44,7 @@ public class AccountServiceImplTest extends SpringBaseTest {
         String randomString = TestUtil.getRandomString();
         BaseResult<Object> result = accountService.register("account" + randomString, //unique
                 "123",
-                "企业" + randomString, //unique
+                "大企业" + randomString, //unique
                 "1881881" + randomString, //unique
                 0,
                 "859051",
