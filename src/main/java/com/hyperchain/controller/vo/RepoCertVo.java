@@ -1,21 +1,34 @@
 package com.hyperchain.controller.vo;
 
+import java.util.List;
+
 /**
- * Created by liangyue on 2017/4/13.
+ * Created by chenxiaoyang on 2017/4/13.
+ * 仓单详情即仓单流水数据
  */
 public class RepoCertVo {
-    private String repoBusinessNo;
-    private String productName;
-    private int productQuantitiy;
-    private int repoBusiStatus;
-    private String repoEnterpriseName;
 
-    public RepoCertVo(String repoBusinessNo, String productName, int productQuantitiy, int repoBusiStatus, String repoEnterpriseName) {
-        this.repoBusinessNo = repoBusinessNo;
-        this.productName = productName;
-        this.productQuantitiy = productQuantitiy;
-        this.repoBusiStatus = repoBusiStatus;
-        this.repoEnterpriseName = repoEnterpriseName;
+    private String repoCertNo;//仓单编号
+    private String repoBusinessNo;//仓储业务编号
+    private String productName;//产品名称
+    private String measureUnit;//计量单位
+    private String productLocation;//产品所在位置
+    private String repoEnterpriseAddress;//仓储公司address
+    private String repoEnterpriseName;//仓储公司名称
+    private String storerAddress;//存货人address
+    private String holderAddress;//持有人address
+    private List<OperationRecordVo> repoCertHisList;
+    private long productQuantity;//产品数量
+    private long productTotalPrice;//产品总价
+    private long repoCreateDate;//仓单生成时间
+    private  int repoCertStatus;//仓单状态
+
+    public int getRepoCertStatus() {
+        return repoCertStatus;
+    }
+
+    public void setRepoCertStatus(int repoCertStatus) {
+        this.repoCertStatus = repoCertStatus;
     }
 
     public String getRepoEnterpriseName() {
@@ -24,6 +37,41 @@ public class RepoCertVo {
 
     public void setRepoEnterpriseName(String repoEnterpriseName) {
         this.repoEnterpriseName = repoEnterpriseName;
+    }
+
+    public long getProductQuantity() {
+        return productQuantity;
+    }
+
+    public void setProductQuantity(long productQuantity) {
+        this.productQuantity = productQuantity;
+    }
+
+    public long getProductTotalPrice() {
+        return productTotalPrice;
+    }
+
+    public void setProductTotalPrice(long productTotalPrice) {
+        this.productTotalPrice = productTotalPrice;
+    }
+
+    public long getRepoCreateDate() {
+        return repoCreateDate;
+    }
+
+    public void setRepoCreateDate(long repoCreateDate) {
+        this.repoCreateDate = repoCreateDate;
+    }
+
+
+
+
+    public String getRepoCertNo() {
+        return repoCertNo;
+    }
+
+    public void setRepoCertNo(String repoCertNo) {
+        this.repoCertNo = repoCertNo;
     }
 
     public String getRepoBusinessNo() {
@@ -42,20 +90,52 @@ public class RepoCertVo {
         this.productName = productName;
     }
 
-    public int getProductQuantitiy() {
-        return productQuantitiy;
+    public String getMeasureUnit() {
+        return measureUnit;
     }
 
-    public void setProductQuantitiy(int productQuantitiy) {
-        this.productQuantitiy = productQuantitiy;
+    public void setMeasureUnit(String measureUnit) {
+        this.measureUnit = measureUnit;
     }
 
-    public int getRepoBusiStatus() {
-        return repoBusiStatus;
+    public String getProductLocation() {
+        return productLocation;
     }
 
-    public void setRepoBusiStatus(int repoBusiStatus) {
-        this.repoBusiStatus = repoBusiStatus;
+    public void setProductLocation(String productLocation) {
+        this.productLocation = productLocation;
+    }
+
+    public String getRepoEnterpriseAddress() {
+        return repoEnterpriseAddress;
+    }
+
+    public void setRepoEnterpriseAddress(String repoEnterpriseAddress) {
+        this.repoEnterpriseAddress = repoEnterpriseAddress;
+    }
+
+    public String getStorerAddress() {
+        return storerAddress;
+    }
+
+    public void setStorerAddress(String storerAddress) {
+        this.storerAddress = storerAddress;
+    }
+
+    public String getHolderAddress() {
+        return holderAddress;
+    }
+
+    public void setHolderAddress(String holderAddress) {
+        this.holderAddress = holderAddress;
+    }
+
+    public List<OperationRecordVo> getRepoCertHisList() {
+        return repoCertHisList;
+    }
+
+    public void setRepoCertHisList(List<OperationRecordVo> repoCertHisList) {
+        this.repoCertHisList = repoCertHisList;
     }
 
 }

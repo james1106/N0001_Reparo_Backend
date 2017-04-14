@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Created by chenxiaoyang on 2017/4/12.
+ * 仓储详情及仓储流水数据
  */
 public class RepoBusinessVo {
     /*private String businessTransNo;
@@ -11,7 +12,7 @@ public class RepoBusinessVo {
         private String operateOperateTime;*/
     private String repoBusiNo;
     private int curRepoBusiStatus;
-    private String opgTimeOfCurStatus;
+    private Long opgTimeOfCurStatus;
     private String repoEnterpriceName;
     private String repoCertNo;
     private String productName;
@@ -21,6 +22,37 @@ public class RepoBusinessVo {
     private String logisticsEntepsName;
     private String waybillNo;
     private List<OperationRecordVo> operationRecordVoList;
+    private String orderVo;
+    private int repoCertStatus;
+
+    public int getRepoCertStatus() {
+        return repoCertStatus;
+    }
+
+    public void setRepoCertStatus(int repoCertStatus) {
+        this.repoCertStatus = repoCertStatus;
+    }
+
+
+    public Long getOpgTimeOfCurStatus() {
+        return opgTimeOfCurStatus;
+    }
+
+    public void setOpgTimeOfCurStatus(Long opgTimeOfCurStatus) {
+        this.opgTimeOfCurStatus = opgTimeOfCurStatus;
+    }
+
+
+
+
+    public String getOrderVo() {
+        return orderVo;
+    }
+
+    public void setOrderVo(String orderVo) {
+        this.orderVo = orderVo;
+    }
+
 
 
     public String getMeasureUnit() {
@@ -46,13 +78,6 @@ public class RepoBusinessVo {
         this.curRepoBusiStatus = curRepoBusiStatus;
     }
 
-    public String getOpgTimeOfCurStatus() {
-        return opgTimeOfCurStatus;
-    }
-
-    public void setOpgTimeOfCurStatus(String opgTimeOfCurStatus) {
-        this.opgTimeOfCurStatus = opgTimeOfCurStatus;
-    }
 
     public String getRepoEnterpriceName() {
         return repoEnterpriceName;
