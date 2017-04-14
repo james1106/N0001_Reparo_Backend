@@ -235,12 +235,15 @@ public class OrderController {
         String payerAccountName = payerUserEntity.getAccountName();
         String receAddress = ESDKUtil.getHyperchainInfo("ReceivableContract");
         String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String wbillContractAddress = ESDKUtil.getHyperchainInfo("WayBillContract");
         ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
 
-        Object[] contractParams = new Object[3];
-        contractParams[0] = acctContractAddress;
-        contractParams[1] = receAddress;
-        contractParams[2] = orderNo;
+        Object[] contractParams = new Object[4];
+        contractParams[0] = receAddress;
+        contractParams[1] = wbillContractAddress;
+        contractParams[2] = acctContractAddress;
+        contractParams[3] = orderNo;
+
 
         return orderService.queryOrderDetail(contractKey, contractParams);
     }
