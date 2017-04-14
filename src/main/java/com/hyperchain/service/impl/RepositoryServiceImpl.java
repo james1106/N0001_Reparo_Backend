@@ -27,6 +27,10 @@ import static com.hyperchain.contract.ContractUtil.*;
  */
 @Service
 public class RepositoryServiceImpl implements RepositoryService{
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
     @Override
     public BaseResult<Object> incomeApply(ContractKey contractKey, Object[] contractParams,String repoBusiNo) {
         String methodName = "incomeApply";
@@ -169,7 +173,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         List<String> detailInfoList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
         List<String> detailInfoList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[3]);
 
-       // List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+        // List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
         int length = historyList.size();
         List<OperationRecordVo> opVoList = new ArrayList<>();
         for(int i = 0; i < length / 2; i++){
@@ -221,14 +225,15 @@ public class RepositoryServiceImpl implements RepositoryService{
         repoBusinessVo.setProductQuantity(Long.parseLong(detailInfoList2.get(1)));
         repoBusinessVo.setProductTotalPrice(Long.parseLong(detailInfoList2.get(2)));*/
 
-        repoBusinessVo.setOpgTimeOfCurStatus(detailInfoList2.get(3));
+
+        repoBusinessVo.setOpgTimeOfCurStatus(detailInfoList2.get(3).equals("")? 0 : Long.parseLong(detailInfoList2.get(3)));
 
         repoBusinessVo.setLogisticsEntepsName(detailInfoList3.get(0));
         repoBusinessVo.setRepoEnterpriceName(detailInfoList3.get(1));
 
         //result.returnWithValue(code, repoBusuVoList);
-         result.returnWithValue(code, repoBusinessVo);
-         return result;
+        result.returnWithValue(code, repoBusinessVo);
+        return result;
     }
 
 
@@ -282,9 +287,14 @@ public class RepositoryServiceImpl implements RepositoryService{
         /*repoCertVo.setProductQuantity((String) contractResult.getValue().get(2));
         repoCertVo.setProductTotalPrice((String) contractResult.getValue().get(3));
         repoCertVo.setRepoCreateDate((String) contractResult.getValue().get(4));*/
-        repoCertVo.setProductQuantity((String) contractResult.getValue().get(2));
-        repoCertVo.setProductTotalPrice((String) contractResult.getValue().get(3));
-        repoCertVo.setRepoCreateDate((String) contractResult.getValue().get(4));
+        int productQuantity = (contractResult.getValue().get(2)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(2));
+        int productTotalPrice = (contractResult.getValue().get(3)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(3));
+        long repoCreateDate = (contractResult.getValue().get(3)).equals("")? 0 : Long.parseLong((String)contractResult.getValue().get(3));
+        //String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+
+        repoCertVo.setProductQuantity(productQuantity);
+        repoCertVo.setProductTotalPrice(productTotalPrice);
+        repoCertVo.setRepoCreateDate(repoCreateDate);
 
         result.returnWithValue(code, repoCertVo);
         return result;
@@ -326,11 +336,80 @@ public class RepositoryServiceImpl implements RepositoryService{
             int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
             int repoBusiStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
-            RepoCertVo repoCertVo = new RepoCertVo(repoBusinessNo, productName, productQuantitiy, repoBusiStatus, repoEnterpriseName);
+            //RepoCertVo repoCertVo = new RepoCertVo(repoBusinessNo, productName, productQuantitiy, repoBusiStatus, repoEnterpriseName);
+            RepoCertVo repoCertVo = new RepoCertVo();
+            repoCertVo.setRepoBusinessNo(repoBusinessNo);
+            repoCertVo.setProductName(productName);
+            repoCertVo.setProductQuantity(productQuantitiy);
+            repoCertVo.setRepoEnterpriseName(repoEnterpriseName);
             repoCertVos.add(repoCertVo);
         }
         result.returnWithValue(code, repoCertVos);
         return result;
     }
+
+    @Override
+    public BaseResult<Object> getRepoBusiInfoList(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "getRepoBusiList";
+        String[] resultMapKey = new String[]{"repoBusiDetail1", "repoBusiDetail2", "repoBusiDetail3"};
+        BaseResult result = new BaseResult();
+
+        ContractResult contractResult = null;
+        Code code = null;
+        try {
+            contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            code = contractResult.getCode();
+            if(code != Code.SUCCESS){
+                result.returnWithoutValue(code);
+            }
+
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        List<String> repoBusiDetail1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> repoBusiDetail2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> repoBusiDetail3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
+
+        int length = repoBusiDetail3.size();
+        List<RepoBusinessVo> repoBusinessVos = new ArrayList<>();
+
+        for(int i = 0; i < length; i++){
+            /*String repoBusinessNo = bytesResultList.get(i*3);
+            String productName = bytesResultList.get(i*3+1);
+            String repoEnterpriseAddress = bytesResultList.get(i*3+2).equals("x0000000000000000000000000000000000000000") ? "" : bytesResultList.get(i*3+2).substring(1);
+            int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
+            int repoBusiStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
+            String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+            //RepoCertVo repoCertVo = new RepoCertVo(repoBusinessNo, productName, productQuantitiy, repoBusiStatus, repoEnterpriseName);
+            RepoCertVo repoCertVo = new RepoCertVo();
+            repoCertVo.setRepoBusinessNo(repoBusinessNo);
+            repoCertVo.setProductName(productName);
+            repoCertVo.setProductQuantity(productQuantitiy);
+            repoCertVo.setRepoEnterpriseName(repoEnterpriseName);*/
+            RepoBusinessVo repoBusiVo  = new RepoBusinessVo();
+            repoBusiVo.setRepoBusiNo(repoBusiDetail1.get(i*5));
+            repoBusiVo.setOrderVo(repoBusiDetail1.get(i*5 +1));
+            repoBusiVo.setRepoCertNo(repoBusiDetail1.get(i*5 +2));
+            repoBusiVo.setProductName(repoBusiDetail1.get(i*5 +3));
+            repoBusiVo.setMeasureUnit(repoBusiDetail1.get(i*5 +4));
+
+            repoBusiVo.setCurRepoBusiStatus(repoBusiDetail2.get(i*4).equals("")? 0 : Integer.parseInt(repoBusiDetail2.get(i*4)));
+            repoBusiVo.setRepoCertStatus(repoBusiDetail2.get(i*4 +1).equals("")? 0 : Integer.parseInt(repoBusiDetail2.get(i*4+1)));
+            repoBusiVo.setProductQuantity(repoBusiDetail2.get(i*4+2).equals("")? 0 : Long.parseLong(repoBusiDetail2.get(i*4+2)));
+            repoBusiVo.setOpgTimeOfCurStatus(repoBusiDetail2.get(i*4+2).equals("")? 0 : Long.parseLong((repoBusiDetail2.get(i*4+2))));
+
+            repoBusiVo.setRepoEnterpriceName(repoBusiDetail3.get(i));
+
+            repoBusinessVos.add(repoBusiVo);
+        }
+        result.returnWithValue(code, repoBusinessVos);
+        return result;
+    }
+
 
 }

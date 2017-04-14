@@ -14,36 +14,56 @@ public class RepoCertVo {
     private String measureUnit;//计量单位
     private String productLocation;//产品所在位置
     private String repoEnterpriseAddress;//仓储公司address
+    private String repoEnterpriseName;//仓储公司名称
     private String storerAddress;//存货人address
     private String holderAddress;//持有人address
     private List<OperationRecordVo> repoCertHisList;
-    private String productQuantity;//产品数量
-    private String productTotalPrice;//产品总价
-    private String repoCreateDate;//仓单生成时间
+    private long productQuantity;//产品数量
+    private long productTotalPrice;//产品总价
+    private long repoCreateDate;//仓单生成时间
+    private  int repoCertStatus;//仓单状态
 
-    public String getProductQuantity() {
+    public int getRepoCertStatus() {
+        return repoCertStatus;
+    }
+
+    public void setRepoCertStatus(int repoCertStatus) {
+        this.repoCertStatus = repoCertStatus;
+    }
+
+    public String getRepoEnterpriseName() {
+        return repoEnterpriseName;
+    }
+
+    public void setRepoEnterpriseName(String repoEnterpriseName) {
+        this.repoEnterpriseName = repoEnterpriseName;
+    }
+
+    public long getProductQuantity() {
         return productQuantity;
     }
 
-    public void setProductQuantity(String productQuantity) {
+    public void setProductQuantity(long productQuantity) {
         this.productQuantity = productQuantity;
     }
 
-    public String getProductTotalPrice() {
+    public long getProductTotalPrice() {
         return productTotalPrice;
     }
 
-    public void setProductTotalPrice(String productTotalPrice) {
+    public void setProductTotalPrice(long productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
     }
 
-    public String getRepoCreateDate() {
+    public long getRepoCreateDate() {
         return repoCreateDate;
     }
 
-    public void setRepoCreateDate(String repoCreateDate) {
+    public void setRepoCreateDate(long repoCreateDate) {
         this.repoCreateDate = repoCreateDate;
     }
+
+
 
 
     public String getRepoCertNo() {
