@@ -7,6 +7,9 @@ public class OperationRecordVo {
     int state;
     long operateTime;
 
+    public OperationRecordVo() {
+    }
+
     public OperationRecordVo(int state, long operateTime) {
         this.state = state;
         this.operateTime = operateTime;

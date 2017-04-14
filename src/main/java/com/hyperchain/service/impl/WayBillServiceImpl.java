@@ -14,6 +14,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.controller.vo.OperationRecordVo;
 import com.hyperchain.controller.vo.WayBillDetailListVo;
 import com.hyperchain.controller.vo.WayBillDetailVo;
 import com.hyperchain.dal.entity.UserEntity;
@@ -326,41 +327,41 @@ public class WayBillServiceImpl implements WayBillService {
         wayBillDetailVo.setWaybillStatusCode(wayBillStatus);
         wayBillDetailVo.setLogisticsInfo(logisticsInfo);
         if (wayBillStatus == WayBillStatus.REQUESTING.getCode()) {
-            Long[] allOperateTime = new Long[1];
-            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
-            int[] allStatusCode = new int[1];
-            allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
-            wayBillDetailVo.setAllOperateTime(allOperateTime);
-            wayBillDetailVo.setAllStatusCode(allStatusCode);
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[1];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         } else if (wayBillStatus == WayBillStatus.REJECTED.getCode()) {
-            Long[] allOperateTime = new Long[2];
-            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
-            allOperateTime[1] = Long.parseLong(longs.get(5)); //rejectTime
-            int[] allStatusCode = new int[2];
-            allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
-            allStatusCode[1] = WayBillStatus.REJECTED.getCode();
-            wayBillDetailVo.setAllOperateTime(allOperateTime);
-            wayBillDetailVo.setAllStatusCode(allStatusCode);
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[2];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(5))); //rejectTime
+            operationRecordVos[1].setState(WayBillStatus.REJECTED.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         } else if (wayBillStatus == WayBillStatus.SENDING.getCode()) {
-            Long[] allOperateTime = new Long[2];
-            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
-            allOperateTime[1] = Long.parseLong(longs.get(4)); //sendTime
-            int[] allStatusCode = new int[2];
-            allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
-            allStatusCode[1] = WayBillStatus.SENDING.getCode();
-            wayBillDetailVo.setAllOperateTime(allOperateTime);
-            wayBillDetailVo.setAllStatusCode(allStatusCode);
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[2];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
+            operationRecordVos[1].setState(WayBillStatus.SENDING.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         } else if (wayBillStatus == WayBillStatus.RECEIVED.getCode()) {
-            Long[] allOperateTime = new Long[3];
-            allOperateTime[0] = Long.parseLong(longs.get(2)); //requestTime
-            allOperateTime[1] = Long.parseLong(longs.get(4)); //sendTime
-            allOperateTime[2] = Long.parseLong(longs.get(3)); //receiveTime
-            int[] allStatusCode = new int[3];
-            allStatusCode[0] = WayBillStatus.REQUESTING.getCode();
-            allStatusCode[1] = WayBillStatus.SENDING.getCode();
-            allStatusCode[2] = WayBillStatus.RECEIVED.getCode();
-            wayBillDetailVo.setAllOperateTime(allOperateTime);
-            wayBillDetailVo.setAllStatusCode(allStatusCode);
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[3];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[2] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
+            operationRecordVos[1].setState(WayBillStatus.SENDING.getCode());
+            operationRecordVos[2].setOperateTime(Long.parseLong(longs.get(3))); //receiveTime
+            operationRecordVos[2].setState(WayBillStatus.RECEIVED.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         }
         return wayBillDetailVo;
     }
