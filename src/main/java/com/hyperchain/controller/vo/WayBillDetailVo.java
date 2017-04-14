@@ -20,8 +20,7 @@ public class WayBillDetailVo {
     private Long productQuantity;
     private Long productValue;
     private int waybillStatusCode;
-    private Long[] allOperateTime;
-    private int[] allStatusCode;
+    private OperationRecordVo[] operationRecordVo;
     private List<String> logisticsInfo;
 
     public WayBillDetailVo() {
@@ -131,20 +130,12 @@ public class WayBillDetailVo {
         this.waybillStatusCode = waybillStatusCode;
     }
 
-    public Long[] getAllOperateTime() {
-        return allOperateTime;
+    public OperationRecordVo[] getOperationRecordVo() {
+        return operationRecordVo;
     }
 
-    public void setAllOperateTime(Long[] allOperateTime) {
-        this.allOperateTime = allOperateTime;
-    }
-
-    public int[] getAllStatusCode() {
-        return allStatusCode;
-    }
-
-    public void setAllStatusCode(int[] allStatusCode) {
-        this.allStatusCode = allStatusCode;
+    public void setOperationRecordVo(OperationRecordVo[] operationRecordVo) {
+        this.operationRecordVo = operationRecordVo;
     }
 
     public List<String> getLogisticsInfo() {
@@ -171,8 +162,7 @@ public class WayBillDetailVo {
                 ", productQuantity=" + productQuantity +
                 ", productValue=" + productValue +
                 ", waybillStatusCode=" + waybillStatusCode +
-                ", allOperateTime=" + Arrays.toString(allOperateTime) +
-                ", allStatusCode=" + Arrays.toString(allStatusCode) +
+                ", operationRecordVo=" + Arrays.toString(operationRecordVo) +
                 ", logisticsInfo=" + logisticsInfo +
                 '}';
     }
