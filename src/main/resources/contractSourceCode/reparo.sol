@@ -363,8 +363,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
-        //pyerToReceivableMap[pyer].push(receivableNo);
-        //pyeeToReceivableMap[pyee].push(receivableNo);
+        pyerToReceivableMap[pyer].push(receivableNo);
+        pyeeToReceivableMap[pyee].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
 
         return (0);
@@ -422,8 +422,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         }
         receivable.signInDt = time;
 
-        pyerToReceivableMap[receivable.pyer].push(receivableNo);
-        pyeeToReceivableMap[receivable.pyee].push(receivableNo);
+        //pyerToReceivableMap[receivable.pyer].push(receivableNo);
+        //pyeeToReceivableMap[receivable.pyee].push(receivableNo);
         accptrToReceivableMap[receivable.accptr].push(receivableNo);
         signerToReceivableMap[receivable.signer].push(receivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
