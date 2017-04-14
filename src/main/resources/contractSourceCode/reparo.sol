@@ -904,6 +904,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         );
     }
 
+    //获取买卖方列表
     function receivableSimpleDetailList(uint roleCode, bytes32 acctId, address orderAddress, address accountAddress) returns (uint, bytes32[], uint[]) {
         bytes32[] memory receivableNos;
         if(roleCode == 0){//买家(付款人)
