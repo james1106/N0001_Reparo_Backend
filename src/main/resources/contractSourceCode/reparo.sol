@@ -138,7 +138,7 @@ contract AccountContract {
 }
 
 contract ReceivableContract{
-    //==============================test===add by liangyue=================================//
+//==============================test===add by liangyue=================================//
     function getReceInfo(bytes32 orderNo) returns(uint[5] resultUint, bytes32[4] resultBytes){
         resultUint[0] = 111111;
         resultUint[1] = 111111;
@@ -151,7 +151,7 @@ contract ReceivableContract{
         resultBytes[3] = "hhhhh";
         return(resultUint, resultBytes);
     }
-    //==============================test====================================
+//==============================test====================================
 //应收款
     struct Receivable {
         bytes32 receivableNo;//应收款编号
@@ -351,9 +351,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          return (1031);
          }
          */
-         if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
-         return (1030);
-         }
+        if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
+            return (1030);
+        }
 
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
@@ -475,9 +475,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
-         if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
-         return (1030);
-         }
+        if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
+            return (1030);
+        }
         /*
          if(judgeAccount(msg.sender)){
          return(2);
@@ -747,49 +747,49 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         uint[] memory uintInfo = new uint[](8);
         bytes32[] memory bytesInfo1 = new bytes32[](11);
-    //bytes32[] memory bytesInfo2 = new bytes32[](4);
-    /*
-     if(judgeAccount(msg.sender)){
-     return (2,
-     bytesInfo1,
-     //bytesInfo2,
-     uintInfo,
-     discounted,
-     note
-     );
-     }
-     */
+        //bytes32[] memory bytesInfo2 = new bytes32[](4);
+        /*
+         if(judgeAccount(msg.sender)){
+         return (2,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         discounted,
+         note
+         );
+         }
+         */
         if(receivableNo == ""){
             return (3,
-            bytesInfo1,
-            //bytesInfo2,
-            uintInfo,
-            discounted,
-            note
+                    bytesInfo1,
+                    //bytesInfo2,
+                    uintInfo,
+                    discounted,
+                    note
             );
         }
 
         if(receivable.receivableNo == 0x0) {
             return(1005,
-            bytesInfo1,
-            //bytesInfo2,
-            uintInfo,
-            discounted,
-            note
+                    bytesInfo1,
+                    //bytesInfo2,
+                    uintInfo,
+                    discounted,
+                    note
             );
         }
 
-    /*
-     if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
-     return(1,
-     bytesInfo1,
-     //bytesInfo2,
-     uintInfo,
-     discounted,
-     note
-     );
-     }
-     */
+        /*
+         if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
+         return(1,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         discounted,
+         note
+         );
+         }
+         */
         uintInfo[0] = receivable.isseAmt;
         uintInfo[1] = receivable.cashedAmount;
         uintInfo[2] = receivable.isseDt;
@@ -814,11 +814,11 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
 
         return (0,
-        bytesInfo1,
-        //acctSvcrNameAndEnterpriseName(receivableNo),
-        uintInfo,
-        discounted,
-        note
+                bytesInfo1,
+                //acctSvcrNameAndEnterpriseName(receivableNo),
+                uintInfo,
+                discounted,
+                note
         );
     }
 
@@ -1211,30 +1211,32 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         if(receivableRecord.serialNo == 0x0) {
             return(1013,
-            serialNo,
-            receivableNo,
-            applicantAcctId,
-            replyerAcctId,
-            ResponseType.NULL,
-            0,
-            operateType,
-            0,
-            receivableStatus);
+                serialNo,
+                receivableNo,
+                applicantAcctId,
+                replyerAcctId,
+                ResponseType.NULL,
+                0,
+                operateType,
+                0,
+                receivableStatus);
         }
         return(0,
-        receivableRecord.serialNo,
-        receivableRecord.receivableNo,
-        receivableRecord.applicantAcctId,
-        receivableRecord.replyerAcctId,
-        receivableRecord.responseType,
-        receivableRecord.time,
-        receivableRecord.operateType,
-        receivableRecord.dealAmount,
-        receivableRecord.receivableStatus);
+            receivableRecord.serialNo,
+            receivableRecord.receivableNo,
+            receivableRecord.applicantAcctId,
+            receivableRecord.replyerAcctId,
+            receivableRecord.responseType,
+            receivableRecord.time,
+            receivableRecord.operateType,
+            receivableRecord.dealAmount,
+            receivableRecord.receivableStatus);
 
     }
 
-}contract RepositoryContract{
+}
+contract RepositoryContract{
+    OrderContract orderContract;
 //仓单结构体
     struct RepoCert{
         bytes32 incomeCert  ;// 入库凭证
@@ -1279,7 +1281,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         uint[] repoCertState;
         uint[] operationTime;
     }
-    //仓单编号 => 仓单操作记录列表
+//仓单编号 => 仓单操作记录列表
     mapping(bytes32=> RepoCertOperationRecord) repoCertRecordMap;
 
 
@@ -1301,72 +1303,17 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 //仓单编号 -> 仓单详情
     mapping(bytes32=> RepoCert) repoCertDetailMap;
 
-    //仓储业务编号 => 仓单编号
+//仓储业务编号 => 仓单编号
     mapping(bytes32=> bytes32) repoBusiToCertMap;
 
-    //查询我的仓储列表 0-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)，1-出库管理（5-待出库,6-已出库），3-仓储机构（不区分状态）
-    function getRepoBusiList(address userAddress,uint role) returns (uint,bytes32[] repoBusiDetail1,uint[] repoBusiDetail2,address[] repoBusiDetail3){
-        bytes32[] memory repoBusiNoList = usrRepoBusinessMap[userAddress];
-        RepoBusiness memory repoBusinsess ;
-        RepoCert memory repoCert;
-        bytes32   repoCertNo;
-        uint length = repoBusiNoList.length;
-        /*
-         bytes32[length*5]  repoBusiDetail1 ;
-         uint[length*4]     repoBusiDetail2 ;
-         address[length]    repoBusiDetail3;//仓储公司
-         */
-        /*
-         bytes32[]  repoBusiDetail1 ; //repoBusinessNo,orderNo,repoCertNo,productName,measureUnit
-         uint[]     repoBusiDetail2 ; //repoBusiStatus,repoCertStatus,productQuantitiy,operateOperateTime
-         address[]  repoBusiDetail3;//仓储公司
-         */
-        bool flag = false;
-        uint returnNum = 0;
-        for(uint index = 0; index < length; index++){
-            flag = false;
-            repoBusinsess = businessDetailMap[repoBusiNoList[index]];//获取仓储结构体
-            repoCert      = repoCertDetailMap[repoBusiNoList[index]];//仓单信息 [repoBusiNoList[index]];
-            //0-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)
-            if(role == 1 && (repoBusinsess.repoBusiStatus == 1
-                || repoBusinsess.repoBusiStatus == 2
-                || repoBusinsess.repoBusiStatus == 3)){
-                flag = true;
-                returnNum ++;
-            }
-            //卖家,1-出库管理（5-待出库,6-已出库）
-            else if(role == 2 && (repoBusinsess.repoBusiStatus == 5
-                || repoBusinsess.repoBusiStatus == 6)){
-                flag = true;
-                returnNum ++;
-            }//3-仓储机构（不区分状态）
-            else if(role == 3){
-                flag = true;
-                returnNum ++;
-            }
-            if (flag) {
-                repoBusiDetail1[returnNum * 5]     = repoBusinsess.repoBusinessNo;
-                repoBusiDetail1[returnNum * 5 + 1] = repoBusinsess.orderNo;
-                repoBusiDetail1[returnNum * 5 + 2] = repoBusinsess.repoCertNo;
-                repoBusiDetail1[returnNum * 5 + 3] = repoBusinsess.productName;
-                repoBusiDetail1[returnNum * 5 + 4] = repoBusinsess.measureUnit;
 
-                repoBusiDetail2[returnNum * 4 ]    = repoBusinsess.repoBusiStatus;
-                repoBusiDetail2[returnNum * 4 + 1] = repoCert.repoCertStatus;//
-                repoBusiDetail2[returnNum * 4 + 2] = repoBusinsess.productQuantitiy;
-                repoBusiDetail2[returnNum * 4 + 3] = repoBusinsess.operateOperateTime;
 
-                repoBusiDetail3[returnNum] = repoBusinsess.repoEnterpriseAddress;
-            }
-        }
-    }
-
-    //查询我的仓单列表
+//查询我的仓单列表
     function getRepoCertInfoList(address userAddress)returns (uint, bytes32[] bytesResult,uint[] uintResult, address[] resultAddress){
         //通过用户地址查询该用户的仓储业务编号列表
         bytes32[] repoCertList =  usrRepoBusinessMap[userAddress];
         uint length = repoCertList.length;
-        bytesResult = new bytes32[](length * 3);
+        bytesResult = new bytes32[](length * 2);
         uintResult = new uint[](length * 2);
         resultAddress = new address[](length);
         for(uint i = 0; i < repoCertList.length; i ++){
@@ -1374,8 +1321,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
             bytes32[] busiTransNoList = businessTransNoMap[repoCertList[i]];
             //对于每个业务流转编号，找到对应的仓储结构体
             RepoBusiness repoBusiess = businessDetailMap[busiTransNoList[busiTransNoList.length - 1]];
-            bytesResult[i*3] = repoBusiess.repoBusinessNo;
-            bytesResult[i*3+1] = repoBusiess.productName;
+            bytesResult[i*2] = repoBusiess.repoBusinessNo;
+            bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
             uintResult[i*2+1] = repoBusiess.repoBusiStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
@@ -1384,10 +1331,61 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 
+//查询我的仓储列表 1-入库管理(仓储状态为1-入库待响应,2-待入库,3-已入库)，2-出库管理（5-待出库,6-已出库），3-仓储机构（不区分状态）
+    function getRepoBusiList(address userAddress)returns (uint,bytes32[] repoBusiDetail1,uint[] repoBusiDetail2,address[] repoBusiDetail3){
+        bytes32[]  repoBusiNoList_2 =usrRepoBusinessMap[userAddress];
+
+        RepoBusiness memory repoBusinsess ;
+        RepoCert memory repoCert;
+
+        repoBusiDetail1 = new bytes32[](repoBusiNoList_2.length * 5);
+        repoBusiDetail2 = new uint[](repoBusiNoList_2.length * 4);
+        repoBusiDetail3 = new address[](repoBusiNoList_2.length);
+        for(uint index = 0; index < repoBusiNoList_2.length; index++){
+            uint n = index;
+
+            uint returnNum = index;
+            bytes32 repoBusinessNo  = repoBusiNoList_2[index];// 获取仓储业务号
+            bytes32 repoBusiTransNo = getNewstTransNo(repoBusinessNo);
+
+            repoBusinsess = businessDetailMap[repoBusiTransNo];//获取仓储结构体
+
+
+            repoCert      = repoCertDetailMap[repoBusiToCertMap[repoBusinessNo]]; //仓单信息
+
+            repoBusiDetail1[returnNum * 5]     = repoBusinsess.repoBusinessNo;
+            repoBusiDetail1[returnNum * 5 + 1] = repoBusinsess.orderNo;
+            repoBusiDetail1[returnNum * 5 + 2] = repoBusinsess.repoCertNo;
+            repoBusiDetail1[returnNum * 5 + 3] = repoBusinsess.productName;
+            repoBusiDetail1[returnNum * 5 + 4] = repoBusinsess.measureUnit;
+
+            repoBusiDetail2[returnNum * 4 ]    = repoBusinsess.repoBusiStatus;
+            repoBusiDetail2[returnNum * 4 + 1] = repoCert.repoCertStatus;
+            repoBusiDetail2[returnNum * 4 + 2] = repoBusinsess.productQuantitiy;
+            repoBusiDetail2[returnNum * 4 + 3] = repoBusinsess.operateOperateTime;
+
+            repoBusiDetail3[returnNum] = repoBusinsess.repoEnterpriseAddress;
+
+        }
+        return(0, repoBusiDetail1, repoBusiDetail2, repoBusiDetail3);
+
+    }
+
+
+
+    function getNewstTransNo(bytes32 repoBusiNo) returns(bytes32){
+        bytes32[] repoBusiTransNoList = businessTransNoMap[repoBusiNo];//获取仓储流转号
+
+        bytes32 repoBusiTransNo = repoBusiTransNoList[repoBusiTransNoList.length-1];
+        return repoBusiTransNo;
+    }
+
 //入库申请  1111,11111,0,"3434","4545",201010100101,"productName",100,100,10000
-    function  incomeApply(bytes32 repoBusinessNo,       //  仓储业务编号
+    function  incomeApply(
+        address orderContractAddress,//订单合约地址，用来更改仓储状态
+        bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 businessTransNo,      //  业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 1
-        bytes32 orderNo,              //  仓储状态
+        bytes32 orderNo,              //  订单编号
         address storerAddress,        //  存货人
         address repoEnterpriseAddress,//  保管人(仓储公司)
         uint operateOperateTime,   //  操作时间(时间戳)
@@ -1404,6 +1402,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         usrRepoBusinessMap[repoEnterpriseAddress].push(repoBusinessNo);
         //加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(businessTransNo);
+        //更改仓储状态为1（入库待响应）
+        orderContract = OrderContract(orderContractAddress);
+        orderContract.updateOrderState(orderNo, "payerRepoBusiState", 1);
 
         //仓储业务详情
         businessDetailMap[businessTransNo].repoBusinessNo = repoBusinessNo;
@@ -1441,7 +1442,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 //入库响应-同意入库
-    function incomeResponse(bytes32 repoBusinessNo,       //  仓储业务编号
+    function incomeResponse(
+        address orderContractAddress,//订单合约地址，用来更改仓储状态
+        bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 1
         uint operateOperateTime   //  操作时间(时间戳)
@@ -1458,13 +1461,19 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+        //更改仓储状态为2（待入库）
+        orderContract = OrderContract(orderContractAddress);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", 2);
+
 
         //waittodo 待补充 修改订单中的买家仓储状态
         return (0);
     }
 
 //入库确认-已入库
-    function incomeConfirm(bytes32 repoBusinessNo,       //  仓储业务编号
+    function incomeConfirm(
+        address orderContractAddress,//订单合约地址，用来更改仓储状态
+        bytes32 repoBusinessNo,       //  仓储业务编号
         bytes32 repoCertNo,
         bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
         bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
@@ -1484,6 +1493,10 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
         //将新的操作记录加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
+        //更改仓储状态为3（已入库）
+        orderContract = OrderContract(orderContractAddress);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", 3);
+
 
         return repoCertNoApply( repoBusinessNo, repoCertNo, operateTime) ;
 
@@ -1598,7 +1611,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         );
         return (0,repoCertNo);
     }
-    //仓储业务历史列表
+//仓储业务历史列表
     /* bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
      uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4-出库待响应,5-待出库,6-已出库）
 
