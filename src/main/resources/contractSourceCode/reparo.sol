@@ -363,8 +363,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
-        pyerToReceivableMap[pyer].push(receivableNo);
-        pyeeToReceivableMap[pyee].push(receivableNo);
+        //pyerToReceivableMap[pyer].push(receivableNo);
+        //pyeeToReceivableMap[pyee].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
 
         return (0);
@@ -622,9 +622,99 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivable.cashedAmount = cashedAmount;
         receivable.status = 1;
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
+        receivableTransferHistoryMap[receivableNo].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
         return (0);
     }
+
+    //带有应收款流水信息的应收款更具体详情
+    function getReceivableAllInfoWithSerial(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
+        Account account = accountMap[msg.sender];
+        Receivable receivable = receivableDetailMap[receivableNo];
+        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
+
+        uint[] memory uintInfo = new uint[](historySerialNos.length * 2 + 8);
+        bytes32[] memory bytesInfo1 = new bytes32[](11);
+        //uint[] memory uintSerials = new uint[](historySerialNos.length * 2 + 8);
+        /*
+         if(judgeAccount(msg.sender)){
+         return (2,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         uintSerials,
+         discounted,
+         note
+         );
+         }
+         */
+        if(receivableNo == ""){
+            return (3,
+                    bytesInfo1,
+                    uintInfo,
+
+                    discounted,
+                    note
+            );
+        }
+
+        if(receivable.receivableNo == 0x0) {
+            return(1005,
+                    bytesInfo1,
+                    uintInfo,
+
+                    discounted,
+                    note
+            );
+        }
+
+        /*
+         if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
+         return(1,
+         bytesInfo1,
+         uintInfo,
+         uintSerials,
+         discounted,
+         note
+         );
+         }
+         */
+
+        ReceivableRecord memory receivableRecord;
+        for(uint i = 0; i < historySerialNos.length; i++){
+            receivableRecord = receivableRecordMap[historySerialNos[i]];
+            uintInfo[i*2] = receivableRecord.receivableStatus;
+            uintInfo[i*2+1] = receivableRecord.time;
+        }
+        uintInfo[historySerialNos.length*2] = receivable.isseAmt;
+        uintInfo[historySerialNos.length*2 + 1] = receivable.cashedAmount;
+        uintInfo[historySerialNos.length*2 + 2] = receivable.isseDt;
+        uintInfo[historySerialNos.length*2 + 3] = receivable.signInDt;
+        uintInfo[historySerialNos.length*2 + 4] = receivable.dueDt;
+        uintInfo[historySerialNos.length*2 + 5] = receivable.discountInHandAmount;
+        uintInfo[historySerialNos.length*2 + 6] = receivable.status;
+        uintInfo[historySerialNos.length*2 + 7] = receivable.lastStatus;
+
+        bytesInfo1[0] = receivableNo;
+        bytesInfo1[1] = receivable.orderNo;
+        bytesInfo1[2] = receivable.signer;
+        bytesInfo1[3] = receivable.accptr;
+        bytesInfo1[4] = receivable.pyer;
+        bytesInfo1[5] = receivable.pyee;
+        bytesInfo1[6] = receivable.firstOwner;
+        bytesInfo1[7] = receivable.secondOwner;
+        bytesInfo1[8] = receivable.rate;
+        bytesInfo1[9] = receivable.contractNo;
+        bytesInfo1[10] = receivable.invoiceNo;
+
+        return (0,
+                bytesInfo1,
+                uintInfo,
+                receivable.discounted,
+                receivable.note
+        );
+    }
+
 
 //根据应收款编号查询单张应收款具体信息
     function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
