@@ -742,6 +742,37 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 
+/*receNo int业务编号
+ receGenerateTime long 发起时间
+  receivingSide string 收款方
+  payingSide string 付款方
+  receAmount int 账款金额
+  coupon int 票面利息
+  dueDate string到期日
+  receLatestStatus int 应收账款最新状态
+  receUpdateTime long 更新时间
+*/
+    //给订单部分提供的接口,根据订单编号查询应收账款详情
+    function getReceivableSimpleInfoByOrderNo(bytes32 orderNo) returns (uint, bytes32[], uint[]){
+        bytes32 receivableNo = orderNoToReceivableNoMap[orderNo];
+        Receivable receivable = receivableDetailMap[receivableNo];
+        bytes32[] memory receivableSerials = receivableTransferHistoryMap[receivableNo];
+        ReceivableRecord receivaleRecord1 = receivableRecordMap[receivableSerials[0]];//第一笔流水号，对应签发申请
+        ReceivableRecord receivaleRecord2 = receivableRecordMap[receivableSerials[receivableSerials.length - 1]];//最后一笔流水号，对应最新状态更新时间
+        uint time1 = receivaleRecord1.time;
+        uint time2 = receivaleRecord2.time;
+        bytes32[] memory bytesList = new bytes32[](3);
+        uint[] memory uintList = new uint[](4);
+        bytesList[0] = receivable.pyee;
+        bytesList[1] = receivable.pyer;
+        bytesList[2] = receivable.rate;
+        uintList[0] = time1;
+        uintList[1] = receivable.isseAmt;
+        uintList[2] = receivable.status;
+        uintList[3] = time2;
+        return (0, bytesList, uintList);
+    }
+
 //根据应收款编号查询单张应收款具体信息
     function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
