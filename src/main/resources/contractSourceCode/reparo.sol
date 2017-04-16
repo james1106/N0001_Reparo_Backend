@@ -2605,20 +2605,20 @@ return (CODE_SUCCESS,addressToOrderNoList[msg.sender]);
 }
 
 //根据订单号获取运单详情
-function getWayBill(bytes32 orderNo, address accountContractAddr) returns (uint code, uint[] ints, bytes32[] strs, address[] addrs, bytes32[] logisticsInfo, uint waybillStatus) {
+function getWayBill(bytes32 orderNo, address accountContractAddr) returns (uint code, uint[] ints, bytes32[] strs, address[] addrs, bytes32[] logisticsInfo) {
 accountContract = AccountContract (accountContractAddr);
 //权限控制
 if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
-return (CODE_INVALID_USER,ints, strs, addrs, logisticsInfo, waybillStatus);
+return (CODE_INVALID_USER,ints, strs, addrs, logisticsInfo);
 }
 if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
-return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo, waybillStatus);
+return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo);
 }
 
 //获取运单最新信息
 bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
 if (statusTransIdList.length == 0) {
-return (CODE_WAY_BILL_NO_DATA,ints, strs, addrs, logisticsInfo, waybillStatus);
+return (CODE_WAY_BILL_NO_DATA,ints, strs, addrs, logisticsInfo);
 }
 WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
@@ -2634,28 +2634,14 @@ WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTr
 // address receiverRepoAddress = waybill.receiverRepoAddress;
 // uint productQuantity = waybill.productQuantity;
 // uint productValue = waybill.productValue;
-uint requestTime;
-uint receiveTime;
-uint sendTime;
-uint rejectTime;
-if(waybill.waybillStatus == WAYBILL_REQUESTING){
-requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
-}else if(waybill.waybillStatus == WAYBILL_SENDING){
-requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
-sendTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
-}else if(waybill.waybillStatus == WAYBILL_RECEIVED){
-requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
-sendTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
-receiveTime = statusTransIdToWayBillDetail[statusTransIdList[2]].operateTime;
-}else{ //waybill.waybillStatus == WAYBILL_REJECTED
-requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
-rejectTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
-}
+// uint waitTime;
+// uint requestTime;
+// uint receiveTime;
+// uint sendTime;
+// uint rejectTime;
+var(waitTime, requestTime, sendTime, receiveTime, rejectTime) = getTime(waybill.waybillStatus, statusTransIdList);
 
-waybillStatus = waybill.waybillStatus;
-logisticsInfo = waybill.logisticsInfo;
-
-ints = new uint[](6);
+ints = new uint[](8);
 strs = new bytes32[](5);
 addrs = new address[](5);
 
@@ -2665,6 +2651,8 @@ ints[2] = requestTime;
 ints[3] = receiveTime;
 ints[4] = sendTime;
 ints[5] = rejectTime;
+ints[6] = waitTime;
+ints[7] = waybill.waybillStatus;
 
 strs[0] = orderNo;
 strs[1] = waybill.wayBillNo;
@@ -2678,8 +2666,31 @@ addrs[2] = waybill.receiverAddress;
 addrs[3] = waybill.senderRepoAddress;
 addrs[4] = waybill.receiverRepoAddress;
 
-return (CODE_SUCCESS, ints, strs, addrs, logisticsInfo, waybillStatus);
+return (CODE_SUCCESS, ints, strs, addrs, waybill.logisticsInfo);
 
+}
+
+function getTime(uint status, bytes32[] statusTransIdList) returns(uint waitTime, uint requestTime, uint sendTime, uint receiveTime, uint rejectTime){
+if (status == WAYBILL_WAITING) {
+waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
+requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
+}else if(status == WAYBILL_REQUESTING){
+waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
+requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
+}else if(status== WAYBILL_SENDING){
+waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
+requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
+sendTime = statusTransIdToWayBillDetail[statusTransIdList[2]].operateTime;
+}else if(status == WAYBILL_RECEIVED){
+waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
+requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
+sendTime = statusTransIdToWayBillDetail[statusTransIdList[2]].operateTime;
+receiveTime = statusTransIdToWayBillDetail[statusTransIdList[3]].operateTime;
+}else{ //waybill.waybillStatus == WAYBILL_REJECTED
+waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
+requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
+rejectTime = statusTransIdToWayBillDetail[statusTransIdList[2]].operateTime;
+}
 }
 
 // for other contract
