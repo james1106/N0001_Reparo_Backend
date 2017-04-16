@@ -427,18 +427,18 @@ public class RepositoryServiceImpl implements RepositoryService{
         int length = addressResultList.size();
         List<RepoCertVo> repoCertVos = new ArrayList<>();
         for(int i = 0; i < length; i++){
-            String repoBusinessNo = bytesResultList.get(i*2);
+            String repoacertNo = bytesResultList.get(i*2);
             String productName = bytesResultList.get(i*2+1);
             String repoEnterpriseAddress = addressResultList.get(i).equals("x0000000000000000000000000000000000000000") ? "" : addressResultList.get(i).substring(1);
             int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
-            int repoBusiStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
+            int repoCertStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
             RepoCertVo repoCertVo = new RepoCertVo();
-            repoCertVo.setRepoBusinessNo(repoBusinessNo);
+            repoCertVo.setRepoCertNo(repoacertNo);
             repoCertVo.setProductName(productName);
             repoCertVo.setProductQuantity(productQuantitiy);
             repoCertVo.setRepoEnterpriseName(repoEnterpriseName);
-            repoCertVo.setRepoCertStatus(repoBusiStatus);
+            repoCertVo.setRepoCertStatus(repoCertStatus);
             repoCertVos.add(repoCertVo);
         }
         result.returnWithValue(code, repoCertVos);
