@@ -1283,42 +1283,42 @@ contract RepositoryContract{
     uint REPO_CERT_INVALID = 3;//已失效
 //仓单结构体
     struct RepoCert{
-    bytes32 incomeCert  ;// 入库凭证
-    bytes32 repoCertNo  ;// 仓单编码（待确认生成规则）
-    bytes32 repoBusinessNo  ;// 仓储业务编号
-    address repoEnterpriseAddress   ;// 保管人(仓储公司)
-    address storerAddress   ;// 存货人(用户名)
-    address holderAddress   ;// 持有人：最初为存货人，经过背书转让后，即为受让人(公司名称)
-    uint repoCreateDate  ;// 仓单填发日期
-    bytes32 productName ;// 仓储物名称
-    uint    productQuantitiy    ;// 仓储物数量
-    bytes32 measureUnit ;// 仓储物计量单位
-    bytes32 norms   ;// 仓储物规格(类似10cm*10cm)
-    uint    productTotalPrice   ;// 货品合计金额(分)
-    bytes32 productLocation ;// 仓储物场所（地址，前台填）
-    uint    repoCertStatus  ;// 仓单状态
+        bytes32 incomeCert  ;// 入库凭证
+        bytes32 repoCertNo  ;// 仓单编码（待确认生成规则）
+        bytes32 repoBusinessNo  ;// 仓储业务编号
+        address repoEnterpriseAddress   ;// 保管人(仓储公司)
+        address storerAddress   ;// 存货人(用户名)
+        address holderAddress   ;// 持有人：最初为存货人，经过背书转让后，即为受让人(公司名称)
+        uint repoCreateDate  ;// 仓单填发日期
+        bytes32 productName ;// 仓储物名称
+        uint    productQuantitiy    ;// 仓储物数量
+        bytes32 measureUnit ;// 仓储物计量单位
+        bytes32 norms   ;// 仓储物规格(类似10cm*10cm)
+        uint    productTotalPrice   ;// 货品合计金额(分)
+        bytes32 productLocation ;// 仓储物场所（地址，前台填）
+        uint    repoCertStatus  ;// 仓单状态
     }
 //仓储结构体
     struct RepoBusiness{
-    bytes32 repoBusinessNo  ;// 仓储业务编号
-    bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
-    uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4（取消）-出库待响应,5-待出库,6-已出库）
-    bytes32 orderNo ;// 订单号
-    bytes32 wayBillNo   ;// 运单号
-    bytes32 repoCertNo  ;// 仓单编号
-    address logisticsEnterpriseAddress  ;// 物流公司
-    address repoEnterpriseAddress   ;// 保管人(仓储公司)
-    address storerAddress   ;// 存货人
-    address holderAddress   ;// 持有人：最初为存货人，经过背书转让后，即为受让人(公司名称)
-    bytes32 incomeCert  ;// 入库凭证
-    bytes32 productName ;// 仓储物名称
-    uint    productQuantitiy    ;// 仓储物数量
-    bytes32 measureUnit ;// 仓储物计量单位(如箱)
-    bytes32 norms   ;// 仓储物规格(类似10cm*10cm)暂无
-    uint    productUnitPrice;//货品单价(分)
-    uint    productTotalPrice   ;// 货品合计金额(分)
-    bytes32 productLocation ;// 仓储物场所（地址，前台填）
-    uint operateOperateTime  ;// 操作时间(时间戳)
+        bytes32 repoBusinessNo  ;// 仓储业务编号
+        bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
+        uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4（取消）-出库待响应,5-待出库,6-已出库）
+        bytes32 orderNo ;// 订单号
+        bytes32 wayBillNo   ;// 运单号
+        bytes32 repoCertNo  ;// 仓单编号
+        address logisticsEnterpriseAddress  ;// 物流公司
+        address repoEnterpriseAddress   ;// 保管人(仓储公司)
+        address storerAddress   ;// 存货人
+        address holderAddress   ;// 持有人：最初为存货人，经过背书转让后，即为受让人(公司名称)
+        bytes32 incomeCert  ;// 入库凭证
+        bytes32 productName ;// 仓储物名称
+        uint    productQuantitiy    ;// 仓储物数量
+        bytes32 measureUnit ;// 仓储物计量单位(如箱)
+        bytes32 norms   ;// 仓储物规格(类似10cm*10cm)暂无
+        uint    productUnitPrice;//货品单价(分)
+        uint    productTotalPrice   ;// 货品合计金额(分)
+        bytes32 productLocation ;// 仓储物场所（地址，前台填）
+        uint operateOperateTime  ;// 操作时间(时间戳)
     }
 
     struct RepoCertOperationRecord{
@@ -1354,7 +1354,7 @@ contract RepositoryContract{
 
 //查询我的仓单列表
     function getRepoCertInfoList(address userAddress)returns (uint, bytes32[] bytesResult,uint[] uintResult, address[] resultAddress){
-    //通过用户地址查询该用户的仓储业务编号列表
+        //通过用户地址查询该用户的仓储业务编号列表
         bytes32[] repoCertList =  usrRepoBusinessMap[userAddress];
         uint length = repoCertList.length;
         if(length == 0){
@@ -1364,9 +1364,9 @@ contract RepositoryContract{
         uintResult = new uint[](length * 2);
         resultAddress = new address[](length);
         for(uint i = 0; i < repoCertList.length; i ++){
-        //对于每个仓储流水号，找到业务流转编号列表
+            //对于每个仓储流水号，找到业务流转编号列表
             bytes32[] busiTransNoList = businessTransNoMap[repoCertList[i]];
-        //对于每个业务流转编号，找到对应的仓储结构体
+            //对于每个业务流转编号，找到对应的仓储结构体
             RepoBusiness repoBusiess = businessDetailMap[busiTransNoList[busiTransNoList.length - 1]];
             bytesResult[i*2] = repoBusiess.repoBusinessNo;
             bytesResult[i*2+1] = repoBusiess.productName;
@@ -1501,7 +1501,7 @@ contract RepositoryContract{
         //businessDetailMap[businessTransNo].
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = REPO_BUSI_WATING_INCOME_RESPONSE;//
+        repoBusinsess.repoBusiStatus = REPO_BUSI_WATING_INCOME;//
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateOperateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
@@ -1528,7 +1528,7 @@ contract RepositoryContract{
 ) returns(uint,bytes32){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
-    //businessDetailMap[businessTransNo].
+        //businessDetailMap[businessTransNo].
 
 
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
@@ -1570,7 +1570,7 @@ contract RepositoryContract{
         //businessDetailMap[businessTransNo].
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
-        repoBusinsess.repoBusiStatus = 4;//RepoBusiStatus.INCOMED;
+        repoBusinsess.repoBusiStatus = REPO_BUSI_WATING_OUTCOME;//
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateOperateTime;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
@@ -1608,13 +1608,13 @@ contract RepositoryContract{
         string memory s1 = bytes32ToString(repoBusinessNo);
         string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
 
-         string memory conStr = concatString(s1, s2);
-         bytes32 lastBusinessTransNo = stringToBytes32(conStr);
+        string memory conStr = concatString(s1, s2);
+        bytes32 lastBusinessTransNo = stringToBytes32(conStr);
 
-         //获取新的流转号
-         string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
-         conStr = concatString(s1, s3);
-         bytes32 currBusinessTransNo = stringToBytes32(conStr);
+        //获取新的流转号
+        string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
+        conStr = concatString(s1, s3);
+        bytes32 currBusinessTransNo = stringToBytes32(conStr);
 
         //bytes32 lastBusinessTransNo;
         //bytes32 currBusinessTransNo;
@@ -1645,56 +1645,56 @@ contract RepositoryContract{
         return (0);
     }
 
-        struct slice {
-            uint _len;
-            uint _ptr;
-        }
+    struct slice {
+        uint _len;
+        uint _ptr;
+    }
 
-        function toSlice(string self) internal returns (slice) {
-            uint ptr;
+    function toSlice(string self) internal returns (slice) {
+        uint ptr;
+        assembly {
+            ptr := add(self, 0x20)
+        }
+        return slice(bytes(self).length, ptr);
+    }
+
+    function memcpy(uint dest, uint src, uint len) private {
+        for(; len >= 32; len -= 32) {
             assembly {
-                ptr := add(self, 0x20)
+                mstore(dest, mload(src))
             }
-            return slice(bytes(self).length, ptr);
+            dest += 32;
+            src += 32;
         }
 
-        function memcpy(uint dest, uint src, uint len) private {
-            for(; len >= 32; len -= 32) {
-                assembly {
-                    mstore(dest, mload(src))
-                }
-                dest += 32;
-                src += 32;
-            }
+        uint mask = 256 ** (32 - len) - 1;
+        assembly {
+            let srcpart := and(mload(src), not(mask))
+            let destpart := and(mload(dest), mask)
+            mstore(dest, or(destpart, srcpart))
+        }
+    }
 
-            uint mask = 256 ** (32 - len) - 1;
-            assembly {
-                let srcpart := and(mload(src), not(mask))
-                let destpart := and(mload(dest), mask)
-                mstore(dest, or(destpart, srcpart))
-            }
-        }
-
-        function concat(slice self, slice other) internal returns (string) {
-            var ret = new string(self._len + other._len);
-            uint retptr;
-            assembly { retptr := add(ret, 32) }
-            memcpy(retptr, self._ptr, self._len);
-            memcpy(retptr + self._len, other._ptr, other._len);
-            return ret;
-        }
-        //（1）两个字符串拼接
-        function concatString(string _a,
-            string _b) internal returns (string) {
-            return (concat(toSlice(_a), toSlice(_b)));
-        }
+    function concat(slice self, slice other) internal returns (string) {
+        var ret = new string(self._len + other._len);
+        uint retptr;
+        assembly { retptr := add(ret, 32) }
+        memcpy(retptr, self._ptr, self._len);
+        memcpy(retptr + self._len, other._ptr, other._len);
+        return ret;
+    }
+    //（1）两个字符串拼接
+    function concatString(string _a,
+        string _b) internal returns (string) {
+        return (concat(toSlice(_a), toSlice(_b)));
+    }
 
 
-        function stringToBytes32(string memory source)returns (bytes32 result) {
-            assembly {
-                result := mload(add(source, 32))
-            }
+    function stringToBytes32(string memory source)returns (bytes32 result) {
+        assembly {
+            result := mload(add(source, 32))
         }
+    }
 
 
 

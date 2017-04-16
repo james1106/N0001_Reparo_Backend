@@ -10,20 +10,20 @@ public class RepoBusinessVo {
     /*private String businessTransNo;
         private String repoBusiStatus;
         private String operateOperateTime;*/
-    private String repoBusiNo;
-    private int curRepoBusiStatus;
-    private Long opgTimeOfCurStatus;
-    private String repoEnterpriceName;
-    private String repoCertNo;
-    private String productName;
-    private Long productQuantity;
-    private String measureUnit;
-    private Long productTotalPrice;
-    private String logisticsEntepsName;
-    private String waybillNo;
-    private List<OperationRecordVo> operationRecordVoList;
-    private String orderNo;
-    private int repoCertStatus;
+    private String repoBusiNo; //仓储业务编号
+    private int curRepoBusiStatus;//最新仓储状态
+    private Long opgTimeOfCurStatus;//最新仓储操作时间
+    private String repoEnterpriceName;//仓储机构名称
+    private String repoCertNo;//仓单编号
+    private String productName;//货品名称
+    private Long productQuantity;//货品数量
+    private String measureUnit;//计量单位
+    private Long productTotalPrice;//货品总价
+    private String logisticsEntepsName;//物流公司名称
+    private String waybillNo;//运单号
+    private List<OperationRecordVo> operationRecordVoList;//仓储操作历史列表
+    private String orderNo;//订单号
+    private int repoCertStatus;//仓单状态
 
     public String getOrderNo() {
         return orderNo;
