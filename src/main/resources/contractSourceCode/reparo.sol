@@ -776,15 +776,17 @@ contract ReceivableContract{
         ReceivableRecord receivaleRecord2 = receivableRecordMap[receivableSerials[receivableSerials.length - 1]];//最后一笔流水号，对应最新状态更新时间
         uint time1 = receivaleRecord1.time;
         uint time2 = receivaleRecord2.time;
-        bytes32[] memory bytesList = new bytes32[](3);
-        uint[] memory uintList = new uint[](4);
-        bytesList[0] = receivable.pyee;
-        bytesList[1] = receivable.pyer;
-        bytesList[2] = receivable.rate;
+        bytes32[] memory bytesList = new bytes32[](4);
+        uint[] memory uintList = new uint[](5);
+        bytesList[0] = receivableNo;
+        bytesList[1] = receivable.pyee;
+        bytesList[2] = receivable.pyer;
+        bytesList[3] = receivable.rate;
         uintList[0] = time1;
         uintList[1] = receivable.isseAmt;
         uintList[2] = receivable.status;
         uintList[3] = time2;
+        uintList[4] = receivable.dueDt;
         return (0, bytesList, uintList);
     }
 
