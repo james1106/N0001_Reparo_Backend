@@ -182,7 +182,7 @@ public class WayBillServiceImpl implements WayBillService {
         String[] updateToReceivedResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        System.out.println("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
+        LogUtil.info("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
 
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(updateToReceivedResult.getCode());
@@ -234,10 +234,10 @@ public class WayBillServiceImpl implements WayBillService {
             Object[] waybillContractMethodParams = new Object[2];
             waybillContractMethodParams[0] = orderNoList.get(i); //orderNo
             waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
-            String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
+            String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
             // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
             ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-            System.out.println("调用合约getWayBill返回结果：" + waybillContractResult.toString());
+            LogUtil.info("调用合约getWayBill返回结果：" + waybillContractResult.toString());
             WayBillDetailVo wayBillDetailVo = parseContractResultToWayBillDetailVo(waybillContractResult);
             wayBillDetailVoList.add(wayBillDetailVo);
         }
@@ -263,10 +263,10 @@ public class WayBillServiceImpl implements WayBillService {
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNo; //orderNo
         waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
-        String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
+        String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        System.out.println("调用合约getWayBill返回结果：" + waybillContractResult.toString());
+        LogUtil.info("调用合约getWayBill返回结果：" + waybillContractResult.toString());
         WayBillDetailVo wayBillDetailVo = parseContractResultToWayBillDetailVo(waybillContractResult);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithValue(waybillContractResult.getCode(), wayBillDetailVo);
@@ -284,29 +284,27 @@ public class WayBillServiceImpl implements WayBillService {
         List<String> strs = (List<String>) waybillResultValueMap.get("strs");
         List<String> addrs = (List<String>) waybillResultValueMap.get("addrs");
         List<String> logisticsInfo = (List<String>) waybillResultValueMap.get("logisticsInfo");
-        int wayBillStatus = Integer.parseInt((String) waybillResultValueMap.get("wayBillStatus"));
 
         WayBillDetailVo wayBillDetailVo = new WayBillDetailVo();
-
-//            System.out.println("productQuantity: " + longs.get(0));
-//            System.out.println("productValue: " + longs.get(1));
-//            System.out.println("requestTime: " + longs.get(2));
-//            System.out.println("receiveTime: " + longs.get(3));
-//            System.out.println("sendTime: " + longs.get(4));
-//            System.out.println("rejectTime: " + longs.get(5));
-//            System.out.println("orderNo: " + strs.get(0));
-//            System.out.println("wayBillNo: " + strs.get(1));
-//            System.out.println("productName: " + strs.get(2));
-//            System.out.println("senderRepoCertNo: " + strs.get(3));
-//            System.out.println("receiverRepoBusinessNo: " + strs.get(4));
-//            System.out.println("logisticsAddress: " + addrs.get(0)); //以"0x"开头
-//            System.out.println("senderAddress: " + addrs.get(1)); //以"0x"开头
-//            System.out.println("receiverAddress: " + addrs.get(2));//以"0x"开头
-//            System.out.println("senderRepoAddress: " + addrs.get(3));//以"0x"开头
-//            System.out.println("receiverRepoAddress: " + addrs.get(4));//以"0x"开头
-//            System.out.println("logisticsInfo: " + logisticsInfo);
-//            System.out.println("wayBillStatus: " + wayBillStatus);
-
+//        System.out.println("productQuantity: " + longs.get(0));
+//        System.out.println("productValue: " + longs.get(1));
+//        System.out.println("requestTime: " + longs.get(2));
+//        System.out.println("receiveTime: " + longs.get(3));
+//        System.out.println("sendTime: " + longs.get(4));
+//        System.out.println("rejectTime: " + longs.get(5));
+//        System.out.println("waitTime: " + longs.get(6));
+//        System.out.println("wayBillStatus: " + longs.get(7));
+//        System.out.println("orderNo: " + strs.get(0));
+//        System.out.println("wayBillNo: " + strs.get(1));
+//        System.out.println("productName: " + strs.get(2));
+//        System.out.println("senderRepoCertNo: " + strs.get(3));
+//        System.out.println("receiverRepoBusinessNo: " + strs.get(4));
+//        System.out.println("logisticsAddress: " + addrs.get(0));
+//        System.out.println("senderAddress: " + addrs.get(1));
+//        System.out.println("receiverAddress: " + addrs.get(2));
+//        System.out.println("senderRepoAddress: " + addrs.get(3));
+//        System.out.println("receiverRepoAddress: " + addrs.get(4));
+//        System.out.println("logisticsInfo: " + logisticsInfo);
         wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
         wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
         wayBillDetailVo.setOrderNo(strs.get(0));
@@ -324,43 +322,61 @@ public class WayBillServiceImpl implements WayBillService {
         wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
         UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
         wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
+        int wayBillStatus = Integer.parseInt(longs.get(7));
         wayBillDetailVo.setWaybillStatusCode(wayBillStatus);
         wayBillDetailVo.setLogisticsInfo(logisticsInfo);
-        if (wayBillStatus == WayBillStatus.REQUESTING.getCode()) {
+        if (wayBillStatus == WayBillStatus.WAITING.getCode()) {
             OperationRecordVo[] operationRecordVos = new OperationRecordVo[1];
             operationRecordVos[0] = new OperationRecordVo();
-            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
-            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(6))); //waitTime
+            operationRecordVos[0].setState(WayBillStatus.WAITING.getCode());
+        } else if (wayBillStatus == WayBillStatus.REQUESTING.getCode()) {
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[2];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(6))); //waitTime
+            operationRecordVos[0].setState(WayBillStatus.WAITING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[1].setState(WayBillStatus.REQUESTING.getCode());
             wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         } else if (wayBillStatus == WayBillStatus.REJECTED.getCode()) {
-            OperationRecordVo[] operationRecordVos = new OperationRecordVo[2];
-            operationRecordVos[0] = new OperationRecordVo();
-            operationRecordVos[1] = new OperationRecordVo();
-            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
-            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
-            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(5))); //rejectTime
-            operationRecordVos[1].setState(WayBillStatus.REJECTED.getCode());
-            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
-        } else if (wayBillStatus == WayBillStatus.SENDING.getCode()) {
-            OperationRecordVo[] operationRecordVos = new OperationRecordVo[2];
-            operationRecordVos[0] = new OperationRecordVo();
-            operationRecordVos[1] = new OperationRecordVo();
-            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
-            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
-            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
-            operationRecordVos[1].setState(WayBillStatus.SENDING.getCode());
-            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
-        } else if (wayBillStatus == WayBillStatus.RECEIVED.getCode()) {
             OperationRecordVo[] operationRecordVos = new OperationRecordVo[3];
             operationRecordVos[0] = new OperationRecordVo();
             operationRecordVos[1] = new OperationRecordVo();
             operationRecordVos[2] = new OperationRecordVo();
-            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
-            operationRecordVos[0].setState(WayBillStatus.REQUESTING.getCode());
-            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
-            operationRecordVos[1].setState(WayBillStatus.SENDING.getCode());
-            operationRecordVos[2].setOperateTime(Long.parseLong(longs.get(3))); //receiveTime
-            operationRecordVos[2].setState(WayBillStatus.RECEIVED.getCode());
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(6))); //waitTime
+            operationRecordVos[0].setState(WayBillStatus.WAITING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[1].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[2].setOperateTime(Long.parseLong(longs.get(5))); //rejectTime
+            operationRecordVos[2].setState(WayBillStatus.REJECTED.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
+        } else if (wayBillStatus == WayBillStatus.SENDING.getCode()) {
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[3];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[2] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(6))); //waitTime
+            operationRecordVos[0].setState(WayBillStatus.WAITING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[1].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[2].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
+            operationRecordVos[2].setState(WayBillStatus.SENDING.getCode());
+            wayBillDetailVo.setOperationRecordVo(operationRecordVos);
+        } else if (wayBillStatus == WayBillStatus.RECEIVED.getCode()) {
+            OperationRecordVo[] operationRecordVos = new OperationRecordVo[4];
+            operationRecordVos[0] = new OperationRecordVo();
+            operationRecordVos[1] = new OperationRecordVo();
+            operationRecordVos[2] = new OperationRecordVo();
+            operationRecordVos[3] = new OperationRecordVo();
+            operationRecordVos[0].setOperateTime(Long.parseLong(longs.get(6))); //waitTime
+            operationRecordVos[0].setState(WayBillStatus.WAITING.getCode());
+            operationRecordVos[1].setOperateTime(Long.parseLong(longs.get(2))); //requestTime
+            operationRecordVos[1].setState(WayBillStatus.REQUESTING.getCode());
+            operationRecordVos[2].setOperateTime(Long.parseLong(longs.get(4))); //sendTime
+            operationRecordVos[2].setState(WayBillStatus.SENDING.getCode());
+            operationRecordVos[3].setOperateTime(Long.parseLong(longs.get(3))); //receiveTime
+            operationRecordVos[3].setState(WayBillStatus.RECEIVED.getCode());
             wayBillDetailVo.setOperationRecordVo(operationRecordVos);
         }
         return wayBillDetailVo;

@@ -5,10 +5,11 @@ package com.hyperchain.common.constant;
  */
 public enum WayBillStatus {
     UNDEFINED(0, "未定义"),
-    REQUESTING(1, "发货待响应"),
-    REJECTED(2, "发货被拒绝"),
-    SENDING(3, "已发货"),
-    RECEIVED(4, "已送达");
+    WAITING(1, "待发货"),
+    REQUESTING(2, "发货待响应"),
+    REJECTED(3, "发货被拒绝"),
+    SENDING(4, "已发货"),
+    RECEIVED(5, "已送达");
 
     private String msg;
     private int code;

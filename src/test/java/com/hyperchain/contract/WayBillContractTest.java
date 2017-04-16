@@ -2854,10 +2854,11 @@ public class WayBillContractTest extends SpringBaseTest {
         //初始化运单状态（当应收账款状态为承兑已签收）
         ContractKey initContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
         String initContractMethodName = "initWayBillStatus";
-        Object[] initContractMethodParams = new Object[3];
+        Object[] initContractMethodParams = new Object[4];
         initContractMethodParams[0] = "123订单" + random; //orderNo
-        initContractMethodParams[1] = senderAddress; //senderAddress
-        initContractMethodParams[2] = receiverAddress; //receiverAddress
+        initContractMethodParams[1] = new Date().getTime(); //waitTime
+        initContractMethodParams[2] = senderAddress; //senderAddress
+        initContractMethodParams[3] = receiverAddress; //receiverAddress
         String[] initResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult initContractResult = ContractUtil.invokeContract(initContractKey, initContractMethodName, initContractMethodParams, initResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
@@ -2955,7 +2956,7 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("===========请求订单号：" + waybillContractMethodParams[0]);
 //        waybillContractMethodParams[0] = "123订单" + random; //orderNo
         waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
-        String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
+        String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         System.out.println("调用合约getWayBill返回code：" + waybillContractResult.getCode());
@@ -2966,13 +2967,14 @@ public class WayBillContractTest extends SpringBaseTest {
         List<String> strs = (List<String>) waybillResultValueMap.get("strs");
         List<String> addrs = (List<String>) waybillResultValueMap.get("addrs");
         List<String> logisticsInfo = (List<String>) waybillResultValueMap.get("logisticsInfo");
-        int wayBillStatus = Integer.parseInt((String) waybillResultValueMap.get("wayBillStatus"));
         System.out.println("productQuantity: " + longs.get(0));
         System.out.println("productValue: " + longs.get(1));
         System.out.println("requestTime: " + longs.get(2));
         System.out.println("receiveTime: " + longs.get(3));
         System.out.println("sendTime: " + longs.get(4));
         System.out.println("rejectTime: " + longs.get(5));
+        System.out.println("waitTime: " + longs.get(6));
+        System.out.println("wayBillStatus: " + longs.get(7));
         System.out.println("orderNo: " + strs.get(0));
         System.out.println("wayBillNo: " + strs.get(1));
         System.out.println("productName: " + strs.get(2));
@@ -2984,7 +2986,6 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("senderRepoAddress: " + addrs.get(3));
         System.out.println("receiverRepoAddress: " + addrs.get(4));
         System.out.println("logisticsInfo: " + logisticsInfo);
-        System.out.println("wayBillStatus: " + wayBillStatus);
 
     }
 
