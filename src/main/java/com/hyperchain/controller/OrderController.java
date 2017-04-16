@@ -213,7 +213,27 @@ public class OrderController {
         contractParams[4] = txSerialNo;
         contractParams[5] = txConfirmTime;
         // 调用合约确认订单，获取返回结果
-        return orderService.confirmOrder(contractKey, contractParams);
+        BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
+
+
+        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        Object[] repoParams = new Object[3];
+        repoParams[0] = orderContractAddress;
+        repoParams[1] = payeeRepoCertNo;
+        repoParams[2] = txConfirmTime;
+        // 调用合约查询账户，获取返回结果
+        BaseResult outcomeResult = repositoryService.outcomeResponse(contractKey, repoParams);
+
+        if(confirmOrderResult.getCode() != 0){
+            return confirmOrderResult;
+        }
+        else if(outcomeResult.getCode() != 0){
+            return outcomeResult;
+        }
+        else{
+            BaseResult result = new BaseResult(Code.SUCCESS);
+            return result;
+        }
     }
 
 
