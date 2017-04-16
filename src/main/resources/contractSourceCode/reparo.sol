@@ -427,7 +427,7 @@ contract ReceivableContract{
             address pyeeAddress = callAccountContractGetAddressByAcctId(receivable.pyee, accountAddress);
             address pyerAddress = callAccountContractGetAddressByAcctId(receivable.pyer, accountAddress);
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
-            wayBillCon.initWayBillStatus(receivable.orderNo, pyeeAddress, pyerAddress);
+            wayBillCon.initWayBillStatus(receivable.orderNo, time, pyeeAddress, pyerAddress);
         }
         receivable.signInDt = time;
 
