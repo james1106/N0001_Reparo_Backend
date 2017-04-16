@@ -395,7 +395,7 @@ contract ReceivableContract{
     }
 
 //签发回复
-    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address accountAddress, address wayBillContractAddress) returns (bytes32){
+    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address accountAddress, address wayBillContractAddress) returns (uint){
         /*        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
          return (3);
          }
@@ -422,12 +422,14 @@ contract ReceivableContract{
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
             receivable.status = 3;
+            //return (888);
         }else{
             receivable.status = 26;
             address pyeeAddress = callAccountContractGetAddressByAcctId(receivable.pyee, accountAddress);
             address pyerAddress = callAccountContractGetAddressByAcctId(receivable.pyer, accountAddress);
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(receivable.orderNo, time, pyeeAddress, pyerAddress);
+            return (999);
         }
         receivable.signInDt = time;
 
