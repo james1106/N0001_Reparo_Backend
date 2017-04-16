@@ -1,5 +1,6 @@
 package com.hyperchain.service.impl;
 
+import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
@@ -48,6 +49,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-signOutApply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -114,6 +116,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         try {
             ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-signOutReply返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -136,6 +139,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-discountApply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -192,6 +196,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-discountReply返回结果：" + contractResult.toString());
 //            Code code = contractResult.getCode();
 //            result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
@@ -218,6 +223,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-cash返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -243,6 +249,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-getReceivableAllInfo返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -355,7 +362,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         return result;
     }
 
-    //单张应收款详情
+    //单张应收款详情,包含流水信息
     @Override
     public BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfoWithSerial";
@@ -366,6 +373,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-getReceivableAllInfoWithSerial返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -508,6 +516,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-getRecordBySerialNo返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -559,6 +568,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         return result;
     }
 
+    //拿到单张应收款编号对应的历史流水编号
     @Override
     public BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams) {
 //        System.out.println("=====+++++++ooooo");
@@ -571,6 +581,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-getReceivableHistorySerialNo返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -585,42 +596,12 @@ public class ReceivableServiceImpl implements ReceivableService{
 //        int resultCode = contractResult.getCode().getCode();
         Code code = contractResult.getCode();
 
-//        List<Object> partParams0 = contractResult.getValue();
-//        List<String> partParams0 = (List<String>) contractResult.getValue().get(0);
-//        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
-//        result.returnWithValue(code, partParams0);
         List<String> resutList = (ArrayList)contractResult.getValue().get(0);
         result.returnWithValue(code, resutList);
 
         return result;
-//        List<String> partList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
-//        List<String> partList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
-//        List<String> partList3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
-//        int length = partList3.size();
-//        List<ReceivableRecordDetailVo> receivableVoList = new ArrayList<>();
-//        for(int i = 0; i < length; i++){
-//            ReceivableRecordDetailVo receivableVo = new ReceivableRecordDetailVo();
-//            receivableVo.setSerialNo(partList1.get(i*5+1));
-//            receivableVo.setReceivableNo(partList1.get(i*5));
-//            receivableVo.setApplicantAcctId(partList1.get(i*5+2));
-//            receivableVo.setReplyerAcctId(partList1.get(i*5+3));
-//            receivableVo.setOperateType(partList1.get(i*5+4));
-//
-//            receivableVo.setTime(Long.parseLong(partList2.get(i*2)));
-//            receivableVo.setDealAmount(Long.parseLong(partList3.get(i*5)));
-//            receivableVo.setResponseType(partList3.get(i));
-
-
-           // receivableVo.setReceivableStatus(Long.parseLong(partList3.get(i*5+1)));
-
-
-//            receivableVoList.add(receivableVo);
         }
 
-//        result.returnWithValue(code, receivableVoList);
-//
-//        return result;
-//    }
 
     //返回买卖方应收款列表
     @Override
@@ -631,6 +612,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         Code code = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "ReceivableContract");
+            LogUtil.info("调用合约ReceivableContract-receivableSimpleDetailList返回结果：" + contractResult.toString());
             code = contractResult.getCode();
             if(code != Code.SUCCESS){
                 BaseResult result = new BaseResult();

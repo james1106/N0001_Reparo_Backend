@@ -118,12 +118,18 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        Object[] params = new Object[5];
+        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+        String wayBillContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
+
+
+        Object[] params = new Object[7];
         params[0] = receivableNo;
         params[1] = replyerAcctId;
         params[2] = response;
         params[3] = serialNo;
         params[4] = signOutReplyTime;
+        params[5] = accountContractAddress;
+        params[6] = wayBillContractAddress;
 
         // 调用合约查询账户，获取返回结果
         return receivableService.signOutReply(contractKey, params);

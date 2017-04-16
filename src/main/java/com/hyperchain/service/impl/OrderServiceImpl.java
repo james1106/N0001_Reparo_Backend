@@ -133,18 +133,19 @@ public class OrderServiceImpl implements OrderService{
         int wayBillLatestStatus = partParams2.get(8).equals("") ? 0 : Integer.parseInt(partParams2.get(8));
         long wayBillUpdateTime = partParams2.get(9).equals("") ? 0 : Long.parseLong(partParams2.get(9));
 
-        //以下为应收账款概要信息
+//        以下为应收账款概要信息
 
 
-//        String receNo = partParams1.get(9);
-//        String receivingSide = partParams1.get(10);
-//        String payingSide = partParams1.get(11);
-//        String dueDate = partParams1.get(12);
-//        long receGenerateTime = Long.parseLong(partParams2.get(5));
-//        long receAmount = Long.parseLong(partParams2.get(6));
-//        long coupon = Long.parseLong(partParams2.get(7));
-//        int receLatestStatus = Integer.parseInt(partParams2.get(8));
-//        long receUpdateTime = Long.parseLong(partParams2.get(9));
+        String receNo = partParams1.get(10);
+        String receivingSide = partParams1.get(11);
+        String payingSide = partParams1.get(12);
+        String dueDate = partParams1.get(13);
+
+        long receGenerateTime = partParams2.get(10).equals("") ? 0 : Long.parseLong(partParams2.get(10));
+        long receAmount = partParams2.get(11).equals("") ? 0 : Long.parseLong(partParams2.get(11));
+        long coupon = partParams2.get(12).equals("") ? 0 : Long.parseLong(partParams2.get(12));
+        int receLatestStatus = partParams2.get(13).equals("") ? 0 : Integer.parseInt(partParams2.get(13));
+        long receUpdateTime = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
 
         TransactionDetailVo txDetailVo = new TransactionDetailVo();
         List<OperationRecordVo> txRecordList = new ArrayList<>();
@@ -175,15 +176,15 @@ public class OrderServiceImpl implements OrderService{
         txDetailVo.setPayerRepoCertNo(payerRepoCertNo);
 
         ReceOverVo receOverVo = new ReceOverVo();
-        receOverVo.setReceNo("");
-        receOverVo.setReceivingSide("");
-        receOverVo.setPayingSide("");
-        receOverVo.setDueDate("");
-        receOverVo.setReceGenerateTime(0);
-        receOverVo.setReceAmount(0);
-        receOverVo.setCoupon(0);
-        receOverVo.setReceLatestStatus(0);
-        receOverVo.setReceUpdateTime(0);
+        receOverVo.setReceNo(receNo);
+        receOverVo.setReceivingSide(receivingSide);
+        receOverVo.setPayingSide(payingSide);
+        receOverVo.setDueDate(dueDate);
+        receOverVo.setReceGenerateTime(receGenerateTime);
+        receOverVo.setReceAmount(receAmount);
+        receOverVo.setCoupon(coupon);
+        receOverVo.setReceLatestStatus(receLatestStatus);
+        receOverVo.setReceUpdateTime(receUpdateTime);
 
         WayBillOverInfo wayBillOverInfo = new WayBillOverInfo();
         wayBillOverInfo.setLogisticCompany(logisticCompany);
