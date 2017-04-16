@@ -1,5 +1,6 @@
 package com.hyperchain.service.impl;
 
+import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService{
         try {
             ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "OrderContract");
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约 : OrderContract 方法: createOrder()返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 result.returnWithValue(code, orderId);
             }
@@ -67,6 +69,7 @@ public class OrderServiceImpl implements OrderService{
         Code code = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "OrderContract");
+            LogUtil.info("调用合约 : OrderContract 方法: queryOrderDetail 返回结果：" + contractResult.toString());
             code = contractResult.getCode();
             if(code != Code.SUCCESS){
                 BaseResult result = new BaseResult();
@@ -220,6 +223,7 @@ public class OrderServiceImpl implements OrderService{
         Code code = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, "OrderContract");
+            LogUtil.info("调用合约 : OrderContract 方法: queryAllOrderOverViewInfoList 返回结果：" + contractResult.toString());
             code = contractResult.getCode();
             if(code != Code.SUCCESS){
                 BaseResult result = new BaseResult();
@@ -298,6 +302,7 @@ public class OrderServiceImpl implements OrderService{
         BaseResult result = new BaseResult();
         try {
             ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, contractParams, resultMapKey, "OrderContract");
+            LogUtil.info("调用合约 : OrderContract 方法: confirmOrder 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
