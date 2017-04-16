@@ -1504,8 +1504,7 @@ contract RepositoryContract{
         currentRepoBusinsess.norms,
         currentRepoBusinsess.productTotalPrice,
         currentRepoBusinsess.productLocation,
-        1
-        );
+        1);
         repoCertRecordMap[repoCertNo].repoCertState.push(1);
         repoCertRecordMap[repoCertNo].operationTime.push(operateTime);
 
