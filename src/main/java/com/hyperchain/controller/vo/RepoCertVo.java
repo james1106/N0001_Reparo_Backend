@@ -26,6 +26,10 @@ public class RepoCertVo {
     private  int repoCertStatus;//仓单状态
     private List<OperationRecordVo> recordVos;
 
+    public RepoCertVo(){
+
+    }
+
     public List<OperationRecordVo> getRecordVos() {
         return recordVos;
     }
