@@ -46,6 +46,7 @@ public class RepositoryServiceImpl implements RepositoryService{
 
         try {
             ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: incomeApply 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约incomeApply返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
@@ -74,6 +75,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: incomeResponse 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约incomeResponse返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
@@ -102,6 +104,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: incomeConfirm 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约incomeConfirm返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
@@ -136,6 +139,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: outcomeResponse 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约outcomeResponse返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
@@ -170,6 +174,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: outcomeConfirm 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约outcomeConfirm返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
@@ -204,6 +209,7 @@ public class RepositoryServiceImpl implements RepositoryService{
 
         try {
             ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: getRepoBusinessDetail 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约getRepoBusinessDetail返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
