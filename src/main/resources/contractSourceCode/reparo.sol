@@ -773,6 +773,16 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return (0, bytesList, uintList);
     }
 
+    //根据订单编号判断应收款状态是否为承兑已签收
+    function judgeReceivableStatusAccepted(bytes32 orderNo) returns (bool){
+        bytes32 receivableNo = orderNoToReceivableNoMap[orderNo];
+        Receivable receivable = receivableDetailMap[receivableNo];
+        if(receivable.status == 26){
+            return true;
+        }
+        return false;
+    }
+
 //根据应收款编号查询单张应收款具体信息
     function getReceivableAllInfo(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
         Account account = accountMap[msg.sender];
