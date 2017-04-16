@@ -327,7 +327,7 @@ public class RepositoryServiceImpl implements RepositoryService{
     @Override
     public BaseResult<Object> getRepoCertDetail(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getRepoCertDetail";
-        String[] resultMapKey = new String[]{"detailInfoList1","detailInfoList2"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"bytes32List", "addressList", "uintList"};//给返回值取了个名称
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
@@ -350,6 +350,7 @@ public class RepositoryServiceImpl implements RepositoryService{
 
         List<String> detailInfoList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
         List<String> detailInfoList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> uintList = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
 
 
         /*待补充流转历史
@@ -374,15 +375,24 @@ public class RepositoryServiceImpl implements RepositoryService{
         /*repoCertVo.setProductQuantity((String) contractResult.getValue().get(2));
         repoCertVo.setProductTotalPrice((String) contractResult.getValue().get(3));
         repoCertVo.setRepoCreateDate((String) contractResult.getValue().get(4));*/
-        int productQuantity = (contractResult.getValue().get(2)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(2));
-        int productTotalPrice = (contractResult.getValue().get(3)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(3));
-        long repoCreateDate = (contractResult.getValue().get(3)).equals("")? 0 : Long.parseLong((String)contractResult.getValue().get(3));
+//        int productQuantity = (contractResult.getValue().get(2)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(2));
+//        int productTotalPrice = (contractResult.getValue().get(3)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(3));
+//        long repoCreateDate = (contractResult.getValue().get(3)).equals("")? 0 : Long.parseLong((String)contractResult.getValue().get(3));
         //String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
 
-        repoCertVo.setProductQuantity(productQuantity);
-        repoCertVo.setProductTotalPrice(productTotalPrice);
-        repoCertVo.setRepoCreateDate(repoCreateDate);
+        repoCertVo.setProductQuantity(uintList.indexOf(0));
+        repoCertVo.setProductTotalPrice(uintList.indexOf(1));
+        repoCertVo.setRepoCreateDate(uintList.indexOf(2));
+        List<OperationRecordVo> recordVos = new ArrayList<>();
 
+        int length = (uintList.size()-3) / 2;
+        for(int i = 3; i < length+3; i++){
+            OperationRecordVo recordVo = new OperationRecordVo();
+            recordVo.setState(uintList.indexOf(i));
+            recordVo.setOperateTime(uintList.indexOf(i + length));
+            recordVos.add(recordVo);
+        }
+        repoCertVo.setRecordVos(recordVos);
         result.returnWithValue(code, repoCertVo);
         return result;
     }
