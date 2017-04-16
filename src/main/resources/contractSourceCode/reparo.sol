@@ -767,26 +767,28 @@ contract ReceivableContract{
   receLatestStatus int 应收账款最新状态
   receUpdateTime long 更新时间
 */
-    //给订单部分提供的接口,根据订单编号查询应收账款详情
-    function getReceivableSimpleInfoByOrderNo(bytes32 orderNo) returns (uint, bytes32[], uint[]){
+//给订单部分提供的接口,根据订单编号查询应收账款详情
+    function getReceivableSimpleInfoByOrderNo(bytes32 orderNo) returns (uint, bytes32[4], uint[5]){
         bytes32 receivableNo = orderNoToReceivableNoMap[orderNo];
         Receivable receivable = receivableDetailMap[receivableNo];
         bytes32[] memory receivableSerials = receivableTransferHistoryMap[receivableNo];
-        ReceivableRecord receivaleRecord1 = receivableRecordMap[receivableSerials[0]];//第一笔流水号，对应签发申请
-        ReceivableRecord receivaleRecord2 = receivableRecordMap[receivableSerials[receivableSerials.length - 1]];//最后一笔流水号，对应最新状态更新时间
-        uint time1 = receivaleRecord1.time;
-        uint time2 = receivaleRecord2.time;
-        bytes32[] memory bytesList = new bytes32[](4);
-        uint[] memory uintList = new uint[](5);
-        bytesList[0] = receivableNo;
-        bytesList[1] = receivable.pyee;
-        bytesList[2] = receivable.pyer;
-        bytesList[3] = receivable.rate;
-        uintList[0] = time1;
-        uintList[1] = receivable.isseAmt;
-        uintList[2] = receivable.status;
-        uintList[3] = time2;
-        uintList[4] = receivable.dueDt;
+        if(receivableSerials.length  > 0){
+            ReceivableRecord receivaleRecord1 = receivableRecordMap[receivableSerials[0]];//第一笔流水号，对应签发申请
+            ReceivableRecord receivaleRecord2 = receivableRecordMap[receivableSerials[receivableSerials.length - 1]];//最后一笔流水号，对应最新状态更新时间
+            uint time1 = receivaleRecord1.time;
+            uint time2 = receivaleRecord2.time;
+            bytes32[4] memory bytesList;  //如果按bytes32[] memory bytesInfo1 = new bytes32[](11)写法java接受时返回不定长数组（指合约调合约的情况）
+            uint[5] memory uintList;
+            bytesList[0] = receivableNo;
+            bytesList[1] = receivable.pyee;
+            bytesList[2] = receivable.pyer;
+            bytesList[3] = receivable.rate;
+            uintList[0] = time1;
+            uintList[1] = receivable.isseAmt;
+            uintList[2] = receivable.status;
+            uintList[3] = time2;
+            uintList[4] = receivable.dueDt;
+        }
         return (0, bytesList, uintList);
     }
 
