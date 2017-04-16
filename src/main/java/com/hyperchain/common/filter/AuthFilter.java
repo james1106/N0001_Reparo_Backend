@@ -117,7 +117,7 @@ public class AuthFilter implements javax.servlet.Filter {
 //        httpServletResponse.sendRedirect("http://localhost:8080/reparo/docs/index.html");
     }
 
-    //不需要过滤的uri
+    //不需要过滤的url
     private boolean isNoFilterUri(HttpServletRequest httpServletRequest) {
         String uri = httpServletRequest.getRequestURI().toString();
         switch (uri) {

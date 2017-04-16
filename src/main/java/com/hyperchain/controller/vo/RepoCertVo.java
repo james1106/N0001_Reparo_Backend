@@ -22,6 +22,15 @@ public class RepoCertVo {
     private long productTotalPrice;//产品总价
     private long repoCreateDate;//仓单生成时间
     private  int repoCertStatus;//仓单状态
+    private List<OperationRecordVo> recordVos;
+
+    public List<OperationRecordVo> getRecordVos() {
+        return recordVos;
+    }
+
+    public void setRecordVos(List<OperationRecordVo> recordVos) {
+        this.recordVos = recordVos;
+    }
 
     public int getRepoCertStatus() {
         return repoCertStatus;
