@@ -2556,7 +2556,6 @@ return CODE_PERMISSION_DENIED;
 if(statusTransIdToWayBillDetail[strs[4]].productName != ""){ //运单已经存在
 return CODE_WAY_BILL_ALREADY_EXIST;
 }
-//TODO 查应收款状态是否为承兑已签收（订单状态是否为已确认已经先判断），否则无权限
 
 //生成未确认运单
 statusTransIdToWayBillDetail[strs[4]] = WayBill(strs[0], strs[4], wayBillNo, addrs[0], addrs[1], addrs[2], strs[1], integers[2], integers[1], integers[0], addrs[4], strs[2], addrs[3], strs[3], logisticsInfo, WAYBILL_REQUESTING);
@@ -2737,10 +2736,13 @@ if(oldWaybill.waybillStatus != WAYBILL_SENDING){//用户无权限（状态流转
 return CODE_PERMISSION_DENIED;
 }
 
+
 statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_RECEIVED);
 //
 orderNoToStatusTransIdList[orderNo].push(statusTransId);
 //
+//TODO 调用订单合约更新订单状态为已完成
+orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
 return (CODE_SUCCESS);
 }
 

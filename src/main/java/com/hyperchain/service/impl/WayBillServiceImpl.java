@@ -22,6 +22,7 @@ import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.exception.PropertiesLoadException;
 import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.WayBillService;
+import org.apache.velocity.util.ArrayListWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
