@@ -17,11 +17,39 @@ public class RepoCertVo {
     private String repoEnterpriseName;//仓储公司名称
     private String storerAddress;//存货人address
     private String holderAddress;//持有人address
-    private List<OperationRecordVo> repoCertHisList;
+    private String storerName;//存货人
+    private String holderName;//持有人
+    private List<OperationRecordVo> repoCertHisList;//仓单流水记录
     private long productQuantity;//产品数量
     private long productTotalPrice;//产品总价
     private long repoCreateDate;//仓单生成时间
     private  int repoCertStatus;//仓单状态
+    private List<OperationRecordVo> recordVos;
+
+    public List<OperationRecordVo> getRecordVos() {
+        return recordVos;
+    }
+
+    public void setRecordVos(List<OperationRecordVo> recordVos) {
+        this.recordVos = recordVos;
+    }
+
+
+    public String getStorerName() {
+        return storerName;
+    }
+
+    public void setStorerName(String storerName) {
+        this.storerName = storerName;
+    }
+
+    public String getHolderName() {
+        return holderName;
+    }
+
+    public void setHolderName(String holderName) {
+        this.holderName = holderName;
+    }
 
     public int getRepoCertStatus() {
         return repoCertStatus;

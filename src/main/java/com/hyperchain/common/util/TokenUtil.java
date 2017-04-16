@@ -56,6 +56,7 @@ public class TokenUtil {
                     try {
                         JSONObject jsonObject = JSONObject.parseObject(tokenInfo);
                         String address = jsonObject.getString("address"); //用户地址
+                        LogUtil.debug("拿到address:" + address);
                         return address;
                     } catch (JSONException e) {
                         LogUtil.info("token json解析失败");
