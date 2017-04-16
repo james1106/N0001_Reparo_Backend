@@ -380,16 +380,16 @@ public class RepositoryServiceImpl implements RepositoryService{
 //        long repoCreateDate = (contractResult.getValue().get(3)).equals("")? 0 : Long.parseLong((String)contractResult.getValue().get(3));
         //String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
 
-        repoCertVo.setProductQuantity(uintList.indexOf(0));
-        repoCertVo.setProductTotalPrice(uintList.indexOf(1));
-        repoCertVo.setRepoCreateDate(uintList.indexOf(2));
+        repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
+        repoCertVo.setProductTotalPrice(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1)));
+        repoCertVo.setRepoCreateDate(uintList.get(2).equals("") ? 0 : Long.parseLong(uintList.get(2)));
         List<OperationRecordVo> recordVos = new ArrayList<>();
 
         int length = (uintList.size()-3) / 2;
         for(int i = 3; i < length+3; i++){
             OperationRecordVo recordVo = new OperationRecordVo();
-            recordVo.setState(uintList.indexOf(i));
-            recordVo.setOperateTime(uintList.indexOf(i + length));
+            recordVo.setState(uintList.get(i).equals("")? 0 : Integer.parseInt(uintList.get(i)));
+            recordVo.setOperateTime(uintList.get(i + length).equals("")? 0 : Long.parseLong(uintList.get(i + length)));
             recordVos.add(recordVo);
         }
         repoCertVo.setRecordVos(recordVos);
