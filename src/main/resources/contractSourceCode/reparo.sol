@@ -775,7 +775,7 @@ contract ReceivableContract{
     }
 
     //根据订单编号判断应收款状态是否为承兑已签收
-    function judgeReceivableStatusAccepted(bytes32 orderNo) returns (bool){
+    function judgeReceivableStatusAcceptedByOrderNo(bytes32 orderNo) returns (bool){
         bytes32 receivableNo = orderNoToReceivableNoMap[orderNo];
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.status == 26){
