@@ -1437,7 +1437,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
         //更改仓储状态为2（待入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME);
 
 
         //waittodo 待补充 修改订单中的买家仓储状态
