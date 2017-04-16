@@ -395,7 +395,7 @@ contract ReceivableContract{
     }
 
 //签发回复
-    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time) returns (bytes32){
+    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address accountAddress, address wayBillContractAddress) returns (bytes32){
         /*        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
          return (3);
          }
@@ -424,6 +424,10 @@ contract ReceivableContract{
             receivable.status = 3;
         }else{
             receivable.status = 26;
+            address pyeeAddress = callAccountContractGetAddressByAcctId(receivable.pyee, accountAddress);
+            address pyerAddress = callAccountContractGetAddressByAcctId(receivable.pyer, accountAddress);
+            WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
+            wayBillCon.initWayBillStatus(receivable.orderNo, pyeeAddress, pyerAddress);
         }
         receivable.signInDt = time;
 
@@ -435,6 +439,11 @@ contract ReceivableContract{
         newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         return (0);
+    }
+
+    function callAccountContractGetAddressByAcctId(bytes32 acctId, address accountAddress) returns (address){
+        AccountContract accountCon = AccountContract(accountAddress);
+        return accountCon.getAddressByAcctId(acctId);
     }
 
 //贴现申请
@@ -779,7 +788,7 @@ contract ReceivableContract{
         return (0, bytesList, uintList);
     }
 
-    //根据订单编号判断应收款状态是否为承兑已签收
+    //根据订单编号判断应收款状态是否为承兑已签收,暂不用
     function judgeReceivableStatusAcceptedByOrderNo(bytes32 orderNo) returns (bool){
         bytes32 receivableNo = orderNoToReceivableNoMap[orderNo];
         Receivable receivable = receivableDetailMap[receivableNo];
@@ -861,88 +870,6 @@ contract ReceivableContract{
         bytesInfo1[10] = receivable.invoiceNo;
 
 
-
-        return (0,
-                bytesInfo1,
-                //acctSvcrNameAndEnterpriseName(receivableNo),
-                uintInfo,
-                discounted,
-                note
-        );
-    }
-
-//买家、卖家应收款列表
-    function getReceivableAllList(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
-        Account account = accountMap[msg.sender];
-        Receivable receivable = receivableDetailMap[receivableNo];
-
-        uint[] memory uintInfo = new uint[](8);
-        bytes32[] memory bytesInfo1 = new bytes32[](11);
-        //bytes32[] memory bytesInfo2 = new bytes32[](4);
-        /*
-         if(judgeAccount(msg.sender)){
-         return (2,
-         bytesInfo1,
-         //bytesInfo2,
-         uintInfo,
-         discounted,
-         note
-         );
-         }
-         */
-        if(receivableNo == ""){
-            return (3,
-                    bytesInfo1,
-                    //bytesInfo2,
-                    uintInfo,
-                    discounted,
-                    note
-            );
-        }
-
-        if(receivable.receivableNo == 0x0) {
-            return(1005,
-                    bytesInfo1,
-                    //bytesInfo2,
-                    uintInfo,
-                    discounted,
-                    note
-            );
-        }
-
-        /*
-         if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
-         return(1,
-         bytesInfo1,
-         //bytesInfo2,
-         uintInfo,
-         discounted,
-         note
-         );
-         }
-         */
-        uintInfo[0] = receivable.isseAmt;
-        uintInfo[1] = receivable.cashedAmount;
-        uintInfo[2] = receivable.isseDt;
-        uintInfo[3] = receivable.signInDt;
-        uintInfo[4] = receivable.dueDt;
-        uintInfo[5] = receivable.discountInHandAmount;
-        uintInfo[6] = receivable.status;
-        uintInfo[7] = receivable.lastStatus;
-
-        bytesInfo1[0] = receivableNo;
-        bytesInfo1[1] = receivable.orderNo;
-        bytesInfo1[2] = receivable.signer;
-        bytesInfo1[3] = receivable.accptr;
-        bytesInfo1[4] = receivable.pyer;
-        bytesInfo1[5] = receivable.pyee;
-        bytesInfo1[6] = receivable.firstOwner;
-        bytesInfo1[7] = receivable.secondOwner;
-        bytesInfo1[8] = receivable.rate;
-        bytesInfo1[9] = receivable.contractNo;
-        bytesInfo1[10] = receivable.invoiceNo;
-
-        //bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
 
         return (0,
                 bytesInfo1,
