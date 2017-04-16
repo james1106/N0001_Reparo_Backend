@@ -47,6 +47,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约incomeApply返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 result.returnWithValue(code, repoBusiNo);
             }
@@ -74,6 +75,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约incomeResponse返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 //result.returnWithValue(code);
                 result.returnWithoutValue(code);
@@ -101,6 +103,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约incomeConfirm返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 //List<String> dataList = (List<String>) contractResult.getValue();
                 //result.returnWithoutValue(code);
@@ -134,6 +137,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约outcomeResponse返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 //List<String> dataList = (List<String>) contractResult.getValue();
                 //result.returnWithoutValue(code);
@@ -167,6 +171,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             ContractResult contractResult;
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约outcomeConfirm返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 //List<String> dataList = (List<String>) contractResult.getValue();
                 //result.returnWithoutValue(code);
@@ -200,6 +205,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             Code code = contractResult.getCode();
+            LogUtil.info("调用合约getRepoBusinessDetail返回结果：" + contractResult.toString());
             if(code == Code.SUCCESS){
                 //result.returnWithValue(code);
                 result.returnWithoutValue(code);
@@ -228,6 +234,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         BaseResult<Object> result = new BaseResult<>();
         try {
             contractResult = invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            //LogUtil.info("调用合约getRepoBusiDtlAndHistoryList返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -333,6 +340,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         ContractResult contractResult = null;
         try {
             contractResult = invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约getRepoCertDetail返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -408,6 +416,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         try {
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             code = contractResult.getCode();
+            LogUtil.info("调用合约getRepoCertInfoList返回结果：" + contractResult.toString());
             if(code != Code.SUCCESS){
                 result.returnWithoutValue(code);
             }
