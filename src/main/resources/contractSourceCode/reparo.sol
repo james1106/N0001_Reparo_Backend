@@ -2572,7 +2572,7 @@ uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
 uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
 //生成待发货运单（初始化状态为待发货、待发货时间）。内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
-function initWayBillStatus(bytes32 orderNo, address senderAddress, address receiverAddress){
+function initWayBillStatus(bytes32 orderNo, uint waitTime, address senderAddress, address receiverAddress) returns (uint code){
 //拼接statusTransId
 string memory s1 = bytes32ToString(orderNo);
 string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));
@@ -2585,12 +2585,14 @@ address senderRepoAddress;
 bytes32[] memory logisticsInfo;
 
 //生成未确认运单
-statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, "", logisticsAddress, senderAddress, receiverAddress, "", 0, 0, 0, senderRepoAddress, "", receiverRepoAddress, "", logisticsInfo, WAYBILL_WAITING);
+statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, "", logisticsAddress, senderAddress, receiverAddress, "", 0, 0, waitTime, senderRepoAddress, "", receiverRepoAddress, "", logisticsInfo, WAYBILL_WAITING);
 //
 orderNoToStatusTransIdList[orderNo].push(statusTransId);
 //
 addressToOrderNoList[senderAddress].push(orderNo);
 addressToOrderNoList[receiverAddress].push(orderNo);
+
+return (CODE_SUCCESS);
 }
 
 //生成待确认运单
