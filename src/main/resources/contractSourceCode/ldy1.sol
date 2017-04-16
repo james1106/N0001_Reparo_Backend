@@ -85,6 +85,10 @@ contract AccountContract {
         return accountMap[addr].enterpriseName;
     }
 
+    function getAddressByAcctId(bytes32 acctId) returns (address addr){
+        return acctIdToAddress[acctId];
+    }
+
 }
 
 
@@ -93,10 +97,11 @@ contract WayBillContract {
 // enum WAYBILL_{ REQUESTING, REJECTED, SENDING, RECEIVED }
 //运单状态（发货待响应、发货被拒绝，已发货，已送达）
     uint WAYBILL_UNDEFINED = 0;
-    uint WAYBILL_REQUESTING = 1;
-    uint WAYBILL_REJECTED = 2;
-    uint WAYBILL_SENDING = 3;
-    uint WAYBILL_RECEIVED = 4;
+    uint WAYBILL_WAITING = 1;
+    uint WAYBILL_REQUESTING = 2;
+    uint WAYBILL_REJECTED = 3;
+    uint WAYBILL_SENDING = 4;
+    uint WAYBILL_RECEIVED = 5;
 
 //RCOMPANY融资企业, LOGISTICS物流公司,STORAGE仓储公司,BANK金融机构
 // enum RoleCode {COMPANY, LOGISTICS, REPOSITORY, FINANCIAL}
@@ -145,6 +150,30 @@ contract WayBillContract {
     uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
     uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
+//生成待发货运单（初始化状态为待发货、待发货时间）。内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
+    function initWayBillStatus(bytes32 orderNo, address senderAddress, address receiverAddress) returns (uint code){
+    //拼接statusTransId
+        string memory s1 = bytes32ToString(orderNo);
+        string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));
+        string memory conStr = concatString(s1, s2);
+        bytes32 statusTransId = stringToBytes32(conStr);
+    //其他参数
+        address logisticsAddress;
+        address receiverRepoAddress;
+        address senderRepoAddress;
+        bytes32[] memory logisticsInfo;
+
+    //生成未确认运单
+        statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, "", logisticsAddress, senderAddress, receiverAddress, "", 0, 0, 0, senderRepoAddress, "", receiverRepoAddress, "", logisticsInfo, WAYBILL_WAITING);
+    //
+        orderNoToStatusTransIdList[orderNo].push(statusTransId);
+    //
+        addressToOrderNoList[senderAddress].push(orderNo);
+        addressToOrderNoList[receiverAddress].push(orderNo);
+
+        return (CODE_SUCCESS);
+    }
+
 //生成待确认运单
     function generateUnConfirmedWayBill(uint[] integers, address[] addrs, bytes32[] strs, address accountContractAddr, address receivableContractAddress) returns (uint code){
         accountContract = AccountContract (accountContractAddr);
@@ -184,8 +213,6 @@ contract WayBillContract {
     //
         orderNoToStatusTransIdList[strs[0]].push(strs[4]);
     //
-        addressToOrderNoList[addrs[1]].push(strs[0]);
-        addressToOrderNoList[addrs[2]].push(strs[0]);
         addressToOrderNoList[addrs[0]].push(strs[0]);
 
         return CODE_SUCCESS; //成功
@@ -391,6 +418,71 @@ contract WayBillContract {
     }
 
 //备注：用户权限控制：用户是否存在，用户身份操作权限，业务状态流转权限
+
+///////////////////////开始字符串拼接///////////////////////
+    struct slice {
+    uint _len;
+    uint _ptr;
+    }
+
+    function toSlice(string self) internal returns (slice) {
+        uint ptr;
+        assembly {
+        ptr := add(self, 0x20)
+}
+return slice(bytes(self).length, ptr);
+}
+
+function memcpy(uint dest, uint src, uint len) private {
+for(; len >= 32; len -= 32) {
+assembly {
+mstore(dest, mload(src))
+}
+dest += 32;
+src += 32;
+}
+
+uint mask = 256 ** (32 - len) - 1;
+assembly {
+let srcpart := and(mload(src), not(mask))
+let destpart := and(mload(dest), mask)
+mstore(dest, or(destpart, srcpart))
+}
+}
+
+function concat(slice self, slice other) internal returns (string) {
+var ret = new string(self._len + other._len);
+uint retptr;
+assembly { retptr := add(ret, 32) }
+memcpy(retptr, self._ptr, self._len);
+memcpy(retptr + self._len, other._ptr, other._len);
+return ret;
+}
+//（1）两个字符串拼接
+function concatString(string _a,
+string _b) internal returns (string) {
+return (concat(toSlice(_a), toSlice(_b)));
+}
+
+
+function stringToBytes32(string memory source)returns (bytes32 result) {
+assembly {
+result := mload(add(source, 32))
+}
+}
+
+function bytes32ToString(bytes32 x)returns (string) {
+bytes memory bytesString = new bytes(32);
+uint charCount = 0;
+for (uint j = 0; j < 32; j++) {
+byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+if (char != 0) {
+bytesString[charCount] = char;
+charCount++;
+}
+}
+}
+//////////////////////结束字符串拼接///////////////////
 
 }
 

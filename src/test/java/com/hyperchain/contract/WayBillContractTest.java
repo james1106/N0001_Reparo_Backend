@@ -1,7 +1,6 @@
 package com.hyperchain.contract;
 
 import com.hyperchain.ESDKUtil;
-import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.WayBillStatus;
@@ -10,16 +9,13 @@ import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
-import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.exception.PropertiesLoadException;
 import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import com.hyperchain.test.TestUtil;
 import com.hyperchain.test.base.SpringBaseTest;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -1724,7 +1720,7 @@ public class WayBillContractTest extends SpringBaseTest {
                         return null;
                     }
                 }
-                );
+        );
         System.out.println("物流公司注册返回结果：" + result2.toString());
         Assert.assertEquals(result2.getCode(), Code.SUCCESS.getCode());
         UserEntity logisticsAccountEntity = userEntityRepository.findByAccountName("account" + randomString2);
@@ -2853,11 +2849,27 @@ public class WayBillContractTest extends SpringBaseTest {
         String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
+        String random = TestUtil.getRandomString();
+
+        //初始化运单状态（当应收账款状态为承兑已签收）
+        ContractKey initContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
+        String initContractMethodName = "initWayBillStatus";
+        Object[] initContractMethodParams = new Object[3];
+        initContractMethodParams[0] = "123订单" + random; //orderNo
+        initContractMethodParams[1] = senderAddress; //senderAddress
+        initContractMethodParams[2] = receiverAddress; //receiverAddress
+        String[] initResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult initContractResult = ContractUtil.invokeContract(initContractKey, initContractMethodName, initContractMethodParams, initResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        System.out.println("调用合约initWayBillStatus返回code：" + initContractResult.getCode());
+        System.out.println("调用合约initWayBillStatus返回结果：" + initContractResult.toString());
+        Assert.assertEquals(Code.SUCCESS, initContractResult.getCode());
+
+
         //卖家企业发货申请，生成未完善运单
         ContractKey requestContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
         String requestContractMethodName = "generateUnConfirmedWayBill";
         Object[] requestContractMethodParams = new Object[5];
-        String random = TestUtil.getRandomString();
         Long[] requestLongs = new Long[3];
         requestLongs[0] = new Date().getTime(); //requestTime
         requestLongs[1] = new Long(100000); //productValue
@@ -2930,7 +2942,7 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("调用合约listWayBillOrderNo返回code：" + listOrderNoContractResult.getCode());
         System.out.println("调用合约getWayBill返回结果：" + listOrderNoContractResult.toString());
         Assert.assertEquals(Code.SUCCESS, listOrderNoContractResult.getCode());
-        List<String> orderNoList= (List<String>) listOrderNoContractResult.getValue().get(0); //注意：getValue()返回的是所有结果的List！如果只有一个结果，须取下标为0的结果！
+        List<String> orderNoList = (List<String>) listOrderNoContractResult.getValue().get(0); //注意：getValue()返回的是所有结果的List！如果只有一个结果，须取下标为0的结果！
         for (int i = 0; i < orderNoList.size(); i++) {
             System.out.println("运单订单号" + i + " : " + orderNoList.get(i));
         }
