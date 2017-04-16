@@ -65,7 +65,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString = TestUtil.getRandomString();
         BaseResult<Object> result = accountService.register("account" + randomString, //unique
                 "123",
-                "企业" + randomString, //unique
+                "卖家" + randomString, //unique
                 "1881881" + randomString, //unique
                 0,
                 "859051",
@@ -623,7 +623,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString1 = TestUtil.getRandomString();
         BaseResult<Object> result1 = accountService.register("account" + randomString1, //unique
                 "123",
-                "企业" + randomString1, //unique
+                "买家" + randomString1, //unique
                 "1881881" + randomString1, //unique
                 0,
                 "859051",
@@ -1739,7 +1739,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString3 = TestUtil.getRandomString();
         BaseResult<Object> result3 = accountService.register("account" + randomString3, //unique
                 "123",
-                "仓储" + randomString3, //unique
+                "发货仓储" + randomString3, //unique
                 "1881881" + randomString3, //unique
                 2,
                 "859051",
@@ -2293,7 +2293,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String randomString4 = TestUtil.getRandomString();
         BaseResult<Object> result4 = accountService.register("account" + randomString4, //unique
                 "123",
-                "仓储" + randomString4, //unique
+                "收货仓储" + randomString4, //unique
                 "1881881" + randomString4, //unique
                 2,
                 "859051",
@@ -2940,7 +2940,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String waybillContractMethodName = "getWayBill";
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNoList.get(orderNoList.size() - 1); //orderNo
-        System.out.println("===========请求订单号（正确？）：" + waybillContractMethodParams[0]);
+        System.out.println("===========请求订单号：" + waybillContractMethodParams[0]);
 //        waybillContractMethodParams[0] = "123订单" + random; //orderNo
         waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
         String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo", "wayBillStatus"};
