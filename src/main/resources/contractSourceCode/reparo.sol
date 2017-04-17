@@ -442,9 +442,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         if(receivable.status != 21){
             return (1006);
         }
-        /*        if(replyerAcctId != receivable.accptr){
-         return (1);
-         }*/
+         if(replyerAcctId != receivable.accptr){
+            return (1);
+         }
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
             receivable.status = 3;
