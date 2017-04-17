@@ -24,6 +24,16 @@ public class RepoBusinessVo {
     private List<OperationRecordVo> operationRecordVoList;//仓储操作历史列表
     private String orderNo;//订单号
     private int repoCertStatus;//仓单状态
+    private String holderEnterpriseName;//持有人
+
+
+    public String getHolderEnterpriseName() {
+        return holderEnterpriseName;
+    }
+
+    public void setHolderEnterpriseName(String holderEnterpriseName) {
+        this.holderEnterpriseName = holderEnterpriseName;
+    }
 
     public String getOrderNo() {
         return orderNo;
