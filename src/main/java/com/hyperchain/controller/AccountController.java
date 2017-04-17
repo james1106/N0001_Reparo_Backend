@@ -113,6 +113,8 @@ public class AccountController extends BaseController{
         return accountService.findAllEnterpriseNameByRoleCode(roleCode);
     }
 
+
+
     @LogInterceptor
     @ApiOperation(value = "测试从cookie获取address", notes = "测试从cookie获取address")
     @ResponseBody

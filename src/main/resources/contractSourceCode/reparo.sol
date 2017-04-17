@@ -382,9 +382,9 @@ enum DiscountedStatus {NO, YES} //贴现标志位
          return (1031);
          }
          */
-        if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
-            return (1030);
-        }
+        //if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
+        //    return (1030);
+        //}
 
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
@@ -455,7 +455,6 @@ enum DiscountedStatus {NO, YES} //贴现标志位
             address pyerAddress = callAccountContractGetAddressByAcctId(receivable.pyer, accountAddress);
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(receivable.orderNo, time, pyeeAddress, pyerAddress);
-            return (999);
         }
         receivable.signInDt = time;
 
@@ -2601,9 +2600,9 @@ contract WayBillContract {
         if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return (CODE_INVALID_USER,ints, strs, addrs, logisticsInfo);
         }
-        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
-            return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo);
-        }
+        //if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
+        //    return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo);
+        //}
 
 //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
@@ -2663,7 +2662,6 @@ contract WayBillContract {
     function getTime(uint status, bytes32[] statusTransIdList) returns(uint waitTime, uint requestTime, uint sendTime, uint receiveTime, uint rejectTime){
         if (status == WAYBILL_WAITING) {
             waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
-            requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;
         }else if(status == WAYBILL_REQUESTING){
             waitTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
             requestTime = statusTransIdToWayBillDetail[statusTransIdList[1]].operateTime;

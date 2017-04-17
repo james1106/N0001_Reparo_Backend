@@ -147,6 +147,8 @@ public class OrderServiceImpl implements OrderService{
         long receGenerateTime = partParams2.get(10).equals("") ? 0 : Long.parseLong(partParams2.get(10));
         long receAmount = partParams2.get(11).equals("") ? 0 : Long.parseLong(partParams2.get(11));
         long coupon = partParams2.get(12).equals("") ? 0 : Long.parseLong(partParams2.get(12));
+        String str = partParams2.get(13);
+        String a;
         int receLatestStatus = partParams2.get(13).equals("") ? 0 : Integer.parseInt(partParams2.get(13));
         long receUpdateTime = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
 
