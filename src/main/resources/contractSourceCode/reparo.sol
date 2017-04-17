@@ -1316,7 +1316,7 @@ contract RepositoryContract{
 
         repoBusiDetail1 = new bytes32[](repoBusiNoList_2.length * 5);
         repoBusiDetail2 = new uint[](repoBusiNoList_2.length * 4);
-        repoBusiDetail3 = new address[](repoBusiNoList_2.length);
+        repoBusiDetail3 = new address[](repoBusiNoList_2.length * 2);
         for(uint index = 0; index < repoBusiNoList_2.length; index++){
             uint n = index;
 
@@ -1340,7 +1340,8 @@ contract RepositoryContract{
             repoBusiDetail2[returnNum * 4 + 2] = repoBusinsess.productQuantitiy;
             repoBusiDetail2[returnNum * 4 + 3] = repoBusinsess.operateOperateTime;
 
-            repoBusiDetail3[returnNum] = repoBusinsess.repoEnterpriseAddress;
+            repoBusiDetail3[returnNum * 2] = repoBusinsess.repoEnterpriseAddress;
+            repoBusiDetail3[returnNum * 2 + 1] = repoBusinsess.holderAddress;
 
         }
         return(0, repoBusiDetail1, repoBusiDetail2, repoBusiDetail3);
