@@ -23,5 +23,6 @@ public interface RepositoryService {
     BaseResult<Object> getRepoCertDetail(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoCertInfoList(ContractKey contractKey, Object[] contractParams);
     BaseResult<Object> getRepoBusiInfoList(ContractKey contractKey, Object[] contractParams,int role);
+    BaseResult<Object> createRepoCertForRepoeEnterprise(ContractKey contractKey, Object[] contractParams);
 
-}
+    }

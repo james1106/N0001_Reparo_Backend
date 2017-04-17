@@ -1486,6 +1486,74 @@ contract RepositoryContract{
 
     }
 
+    //仓储机构生成仓单, 货品入库时生成，与订单无关,注意与incomeConfirm()的区别
+    function  createRepoCertForRepoEnter(
+        bytes32 repoBusinessNo,       //  仓储业务编号
+        bytes32 repoCertNo, //仓单编码
+        bytes32 businessTransNo,      //  仓储业务业务流转编号
+        address storerAddress,        //  存货人=持有人holderAddress
+        address repoEnterpriseAddress,//  保管人(仓储公司)
+        bytes32 measureUnit ,// 仓储物计量单位
+        bytes32 productName,  //  仓储物名称
+        bytes32 productLocation,//
+        uint[4] productIntInfo  //0-productQuantitiy ,1-productUnitPrice ,2-productTotalPrice ,3-operateOperateTime
+    /*uint    productQuantitiy,     //  仓储物数量
+     uint    productUnitPrice,     //  货品单价(分)
+     uint    productTotalPrice ,    //  货品合计金额(分)
+     uint    operateOperateTime   //  操作时间(时间戳)
+     */
+) returns(uint) {
+        //waittodo待补充验证存货人，仓储公司是否有效，账户合约提供接口
+
+        //加入存货人的列表
+        usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
+        //加入仓储公司的列表
+        usrRepoBusinessMap[repoEnterpriseAddress].push(repoBusinessNo);
+        //加入业务流转编号列表
+        businessTransNoMap[repoBusinessNo].push(businessTransNo);
+
+        usrRepoCertListMap[storerAddress].push(repoCertNo);//持有人仓单列表
+        usrRepoCertListMap[repoEnterpriseAddress].push(repoCertNo);//仓储公司仓单列表
+
+
+
+        repoCertDetailMap[repoCertNo] = RepoCert("",
+            repoCertNo,
+            repoBusinessNo,
+            repoEnterpriseAddress,
+            storerAddress,
+            storerAddress,
+            productIntInfo[3],
+            productName,
+            productIntInfo[0],
+            measureUnit,
+            "",
+            productIntInfo[2],
+            productLocation,
+            REPO_CERT_TRANSABLE
+        );
+        //记录仓单历史
+        RepoCertOperationRecord opRecode = repoCertRecordMap[repoCertNo];
+        opRecode.repoCertState.push(REPO_CERT_TRANSABLE);
+        opRecode.operationTime.push(productIntInfo[3]);
+
+        //仓储业务详情
+        businessDetailMap[businessTransNo].repoBusinessNo = repoBusinessNo;
+        businessDetailMap[businessTransNo].repoBusiStatus = REPO_BUSI_INCOMED;
+        businessDetailMap[businessTransNo].businessTransNo = businessTransNo;
+        businessDetailMap[businessTransNo].storerAddress = storerAddress;
+        businessDetailMap[businessTransNo].holderAddress = storerAddress;
+        businessDetailMap[businessTransNo].repoEnterpriseAddress = repoEnterpriseAddress;
+        businessDetailMap[businessTransNo].operateOperateTime = productIntInfo[3];
+        businessDetailMap[businessTransNo].productName = productName;
+        businessDetailMap[businessTransNo].productQuantitiy = productIntInfo[0];
+        businessDetailMap[businessTransNo].productUnitPrice = productIntInfo[1];
+        businessDetailMap[businessTransNo].productTotalPrice = productIntInfo[2];
+        businessDetailMap[businessTransNo].repoCertNo = repoCertNo;
+
+        return (0);
+    }
+
 //出库申请-企业
     function outcomeApply(
         address orderContractAddress,//订单合约地址，用来更改仓储状态
