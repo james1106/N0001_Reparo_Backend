@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.hyperchain.common.constant.BaseConstant.*;
+
 /**
  * Created by liangyue on 2017/4/7.
  */
@@ -116,7 +118,7 @@ public class OrderController {
         String orderNo = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900)+100);
         String txSerialNo = orderNo + "00";
         String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
-        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
 
         List<String> orderParamlist= new ArrayList<>();
         orderParamlist.add(orderNo);
@@ -142,10 +144,10 @@ public class OrderController {
         // 调用合约查询账户，获取返回结果
 
         Object[] repoParams = new Object[11];
-        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         repoParams[0] = orderContractAddress;
         repoParams[1] = repoBusinessNo;
-        repoParams[2] = repoBusinessNo + "0"; //仓储业务流转号
+        repoParams[2] = repoBusinessNo + REPO_BUSI_WATING_INCOME_RESPONSE; //仓储业务流转号
         repoParams[3] = orderNo;
         repoParams[4] = payerAddress; // 存货人
         repoParams[5] = payerRepoAddress; //保管人
@@ -204,7 +206,7 @@ public class OrderController {
 
         long txConfirmTime = System.currentTimeMillis();
         String txSerialNo = orderNo + "01";
-        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
         Object[] contractParams = new Object[6];
         contractParams[0] = acctContractAddress;
         contractParams[1] = orderNo;
@@ -216,7 +218,7 @@ public class OrderController {
         BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
 
 
-        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         Object[] repoParams = new Object[3];
         repoParams[0] = orderContractAddress;
         repoParams[1] = payeeRepoCertNo;
@@ -253,9 +255,9 @@ public class OrderController {
 
         String payerPrivateKey = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        String receAddress = ESDKUtil.getHyperchainInfo("ReceivableContract");
-        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
-        String wbillContractAddress = ESDKUtil.getHyperchainInfo("WayBillContract");
+        String receAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_RECEIVABLE);
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
+        String wbillContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_WAYBILL);
         ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
 
         Object[] contractParams = new Object[4];
@@ -284,7 +286,7 @@ public class OrderController {
             result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
             return  result;
         }
-        String acctContractAddress = ESDKUtil.getHyperchainInfo("AccountContract");
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
 
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
