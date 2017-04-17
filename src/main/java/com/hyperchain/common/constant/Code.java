@@ -5,6 +5,7 @@ package com.hyperchain.common.constant;
  */
 public enum Code {
     //通用部分
+    UNDEFINED(-1, "未定义"),
     SUCCESS(0, "成功"),
     PERMISSION_DENIED(1, "权限拒绝"),
     INVALID_USER(2, "账户不存在，该用户可能未注册或已失效"),
@@ -101,6 +102,32 @@ public enum Code {
                 return INVALID_USER;
             case 3:
                 return PARAMETER_EMPTY;
+
+            case 1032:
+                return SERIALNO_EXIST;
+            case 1019:
+                return ISSEAMT_ERROR;
+            case 1007:
+                return ACCTID_ADDRESS_ERROR;
+            case 1004:
+                return REPLYER_ACCOUNT_ERROR;
+            case 1031:
+                return REPLYER_ACCOUNT_INVALID;
+            case 1030:
+                return RECEIVABLENO_EXITS;
+            case 1020:
+                return RESPONSETYPE_ERROR;
+            case 1006:
+                return RECCEIVABLE_STATUS_ERROR;
+            case 1016:
+                return CASHEDAMOUNT_ERROR;
+            case 1005:
+                return RECEIVABLE_NOT_EXITS;
+            case 1010:
+                return CASH_TIME_ERROR;
+            case 1013:
+                return RECEIVABLE_RECORD_NOT_EXITS;
+
             case 2001:
                 return ORDER_NOT_EXIST;
             case 2002:
@@ -129,7 +156,7 @@ public enum Code {
                 return ACCOUNT_ALREADY_EXIST;
 
             default:
-                return SUCCESS;
+                return UNDEFINED;
         }
     }
 

@@ -36,7 +36,6 @@ public class ReceivableContractTest extends SpringBaseTest{
         //账户信息存储到区块链
         ContractKey contractKey = new ContractKey(accountJson, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
 
-        //卖家企业发货申请，生成未完善运单
         String requestContractMethodName = "signOutApply";
         Object[] requestContractMethodParams = new Object[12];
         String receNo = "rece";
@@ -73,23 +72,57 @@ public class ReceivableContractTest extends SpringBaseTest{
         System.out.println("调用合约签发申请返回code：" + requestContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, requestContractResult.getCode());
 
-        //应收款列表
-        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
-        String accountJson1 = keyInfo1.get(1); //含address 私钥
+        //签发回复
+        List<String> keyInfo2 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson2 = keyInfo2.get(1); //含address 私钥
 
         //账户信息存储到区块链
-        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
-        String confirmContractMethodName = "receivableSimpleDeatilList";
-        Object[] confirmContractMethodParams = new Object[4];
-        confirmContractMethodParams[0] = 0; //orderNo
-        confirmContractMethodParams[1] = "pyer"; //statusTransId: orderNo + WayBillStatus
-        confirmContractMethodParams[2] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
-        confirmContractMethodParams[3] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
-        String[] confirmResultMapKey = new String[]{};
+        ContractKey contractKey2 = new ContractKey(accountJson2, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+
+        String requestContractMethodName2 = "signOutReply";
+        Object[] requestContractMethodParams2= new Object[7];
+        String receivableNo2 = "rece";
+        String replyerAcctId2 = "replyerAcctId";
+        int response2 = 0;
+        String serialNo2 = "serialNo";
+        int time2 = 20170416;
+        String accountContractAddress2 = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+        String wayBillContractAddress2 = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
+
+        requestContractMethodParams2[0] = receivableNo2;
+        requestContractMethodParams2[1] = replyerAcctId2;
+        requestContractMethodParams2[2] = response2;
+        requestContractMethodParams2[3] = serialNo2;
+        requestContractMethodParams2[4] = time2;
+        requestContractMethodParams2[5] = accountContractAddress2;
+        requestContractMethodParams2[6] = wayBillContractAddress2;
+
+
+        String[] requestResultMapKey2 = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
-        System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
-        System.out.println("调用合约签发申请返回list：" + confirmContractResult);
-        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+        ContractResult requestContractResult2 = ContractUtil.invokeContract(contractKey2, requestContractMethodName2, requestContractMethodParams2, requestResultMapKey2, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约签发回复返回code：" + requestContractResult2.getCode());
+        Assert.assertEquals(Code.SUCCESS, requestContractResult2.getCode());
+
+
+//
+//        //应收款列表
+//        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+//        String accountJson1 = keyInfo1.get(1); //含address 私钥
+//
+//        //账户信息存储到区块链
+//        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+//        String confirmContractMethodName = "receivableSimpleDeatilList";
+//        Object[] confirmContractMethodParams = new Object[4];
+//        confirmContractMethodParams[0] = 0; //orderNo
+//        confirmContractMethodParams[1] = "pyer"; //statusTransId: orderNo + WayBillStatus
+//        confirmContractMethodParams[2] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+//        confirmContractMethodParams[3] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
+//        String[] confirmResultMapKey = new String[]{};
+//        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+//        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+//        System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
+//        System.out.println("调用合约签发申请返回list：" + confirmContractResult);
+//        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
     }
 }
