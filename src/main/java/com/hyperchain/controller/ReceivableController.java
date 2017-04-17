@@ -3,6 +3,7 @@ package com.hyperchain.controller;
 import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
+import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by YanYufei on 2017/4/9.
@@ -168,6 +166,38 @@ public class ReceivableController {
 
         // 调用合约查询账户，获取返回结果
         return receivableService.discountApply(contractKey, params, receivableNo);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "贴现金融机构列表", notes = "贴现金融机构列表")
+    @ResponseBody
+    @RequestMapping(value = "discountApplyBankList",method = RequestMethod.POST)//路径
+    public BaseResult<Object> discountApplyBankList(
+            //@ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
+//            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
+//            @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
+//            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
+//            @ApiParam(value = "申请贴现金额", required = true) @RequestParam long discountApplyAmount,//申请贴现金额
+            HttpServletRequest request
+    ) throws Exception {
+
+//        String address = TokenUtil.getAddressFromCookie(request);//用户address
+//        UserEntity userEntity = userEntityRepository.findByAddress(address);
+//        String privateKey = userEntity.getPrivateKey();
+//        String accountName = userEntity.getAccountName();
+//        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+//        Map<Integer, String> bankNameMap = new HashMap<>();
+////        bankNameMap.put(new Long(3456), "zheshangyinhang");
+//        bankNameMap.put(3456, "zheshangyinhang");
+//
+//
+//        // 调用合约查询账户，获取返回结果
+//        BaseResult result = new BaseResult();
+//        result.returnWithValue(Code.SUCCESS, bankNameMap);
+
+
+        return receivableService.discountApplyBankList();
     }
 
     @LogInterceptor

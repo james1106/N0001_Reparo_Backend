@@ -150,6 +150,7 @@ public class WayBillServiceImpl implements WayBillService {
         confirmContractMethodParams[3] = new Date().getTime(); //sendTime
         confirmContractMethodParams[4] = accountContractAddr; //accountContractAddr
         String[] confirmResultMapKey = new String[]{};
+        LogUtil.info("调用合约generateWayBill入参：" + confirmContractMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         LogUtil.info("调用合约generateWayBill返回结果：" + confirmContractResult.toString());
@@ -181,6 +182,7 @@ public class WayBillServiceImpl implements WayBillService {
         updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
         updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
         String[] updateToReceivedResultMapKey = new String[]{};
+        LogUtil.info("调用合约pdateWayBillStatusToReceived入参：" + updateToReceivedMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         LogUtil.info("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
@@ -214,7 +216,7 @@ public class WayBillServiceImpl implements WayBillService {
         String[] listOrderNoResultMapKey = new String[]{"orderNoList"};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约getWayBill返回结果：" + listOrderNoContractResult.toString());
+        LogUtil.info("调用合约listWayBillOrderNo返回结果：" + listOrderNoContractResult.toString());
         List<String> orderNoList = (List<String>)listOrderNoContractResult.getValue().get(0);
 
         //查询订单号列表失败
@@ -306,26 +308,35 @@ public class WayBillServiceImpl implements WayBillService {
 //        System.out.println("senderRepoAddress: " + addrs.get(3));
 //        System.out.println("receiverRepoAddress: " + addrs.get(4));
 //        System.out.println("logisticsInfo: " + logisticsInfo);
-        wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
-        wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
+
+        if(Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()){ //只有发货待确认(卖家填完发货申请单)之后才有的数据
+            wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
+            wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
+            wayBillDetailVo.setProductName(strs.get(2));
+            wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
+            wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));
+            UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
+            wayBillDetailVo.setLogisticsEnterpriseName(logisticsUserEntity.getCompanyName());
+            UserEntity senderRepoUserEntity = userEntityRepository.findByAddress(addrs.get(3).substring(1, addrs.get(3).length()));
+            wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
+            UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
+            wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
+        }
+        if (Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode() &&
+                Integer.parseInt(longs.get(7)) != WayBillStatus.REQUESTING.getCode() &&
+                Integer.parseInt(longs.get(7)) != WayBillStatus.REJECTED.getCode()) { //只有已发货（物流确认生成运单）之后才有的数据
+            wayBillDetailVo.setWayBillNo(strs.get(1));
+            wayBillDetailVo.setLogisticsInfo(logisticsInfo);
+        }
+        //所有状态都有的数据
         wayBillDetailVo.setOrderNo(strs.get(0));
-        wayBillDetailVo.setWayBillNo(strs.get(1));
-        wayBillDetailVo.setProductName(strs.get(2));
-        wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
-        wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));
-        UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
-        wayBillDetailVo.setLogisticsEnterpriseName(logisticsUserEntity.getCompanyName());
         UserEntity senderUserEntity = userEntityRepository.findByAddress(addrs.get(1).substring(1, addrs.get(1).length()));
         wayBillDetailVo.setSenderEnterpriseName(senderUserEntity.getCompanyName());
         UserEntity receiverUserEntity = userEntityRepository.findByAddress(addrs.get(2).substring(1, addrs.get(2).length()));
         wayBillDetailVo.setReceiverEnterpriseName(receiverUserEntity.getCompanyName());
-        UserEntity senderRepoUserEntity = userEntityRepository.findByAddress(addrs.get(3).substring(1, addrs.get(3).length()));
-        wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
-        UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
-        wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
+        //历史状态
         int wayBillStatus = Integer.parseInt(longs.get(7));
         wayBillDetailVo.setWaybillStatusCode(wayBillStatus);
-        wayBillDetailVo.setLogisticsInfo(logisticsInfo);
         if (wayBillStatus == WayBillStatus.WAITING.getCode()) {
             OperationRecordVo[] operationRecordVos = new OperationRecordVo[1];
             operationRecordVos[0] = new OperationRecordVo();

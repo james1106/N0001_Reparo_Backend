@@ -1,5 +1,8 @@
 package com.hyperchain.controller.vo;
 
+import com.hyperchain.common.constant.WayBillStatus;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,21 +10,21 @@ import java.util.List;
  * Created by ldy on 2017/4/13.
  */
 public class WayBillDetailVo {
-    private String orderNo;
-    private String wayBillNo;
-    private String logisticsEnterpriseName;
-    private String senderEnterpriseName;
-    private String receiverEnterpriseName;
-    private String senderRepoEnterpriseName;
-    private String receiverRepoEnterpriseName;
-    private String senderRepoCertNo;
-    private String receiverRepoBusinessNo;
-    private String productName;
-    private Long productQuantity;
-    private Long productValue;
-    private int waybillStatusCode;
-    private OperationRecordVo[] operationRecordVo;
-    private List<String> logisticsInfo;
+    private String orderNo = "";
+    private String wayBillNo = "";
+    private String logisticsEnterpriseName = "";
+    private String senderEnterpriseName = "";
+    private String receiverEnterpriseName = "";
+    private String senderRepoEnterpriseName = "";
+    private String receiverRepoEnterpriseName = "";
+    private String senderRepoCertNo = "";
+    private String receiverRepoBusinessNo = "";
+    private String productName = "";
+    private Long productQuantity = new Long("0");
+    private Long productValue = new Long("0");
+    private int waybillStatusCode = WayBillStatus.UNDEFINED.getCode();
+    private OperationRecordVo[] operationRecordVo = new OperationRecordVo[]{};
+    private List<String> logisticsInfo = new ArrayList<>();
 
     public WayBillDetailVo() {
     }

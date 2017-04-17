@@ -12,6 +12,7 @@ import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.AccountEntity;
+import com.hyperchain.dal.entity.BankInfoEntity;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
@@ -187,7 +188,24 @@ public class ReceivableServiceImpl implements ReceivableService{
 
     }
 
-    //贴现回复
+    @Override
+    public BaseResult<Object> discountApplyBankList() {//第二个参数是给合约的参数
+        Map<Integer, String> bankNameMap = new HashMap<>();
+//        bankNameMap.put(new Long(3456), "zheshangyinhang");
+
+        List<BankInfoEntity> bankInfoList = new ArrayList<>();
+        bankInfoList.add(new BankInfoEntity(316, "浙商银行"));
+        bankInfoList.add(new BankInfoEntity(102,"中国工商银行"));
+        bankInfoList.add(new BankInfoEntity(103, "中国农业银行"));
+        bankInfoList.add(new BankInfoEntity(104, "中国银行"));
+
+        // 调用合约查询账户，获取返回结果
+        BaseResult result = new BaseResult();
+        result.returnWithValue(Code.SUCCESS, bankInfoList);
+        return result;
+    }
+
+        //贴现回复
     @Override
     public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams, String newReceivableNo) {
         String methodName = "discountReply";

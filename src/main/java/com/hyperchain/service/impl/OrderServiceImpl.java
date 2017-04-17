@@ -138,17 +138,16 @@ public class OrderServiceImpl implements OrderService{
 
 //        以下为应收账款概要信息
 
-
         String receNo = partParams1.get(10);
         String receivingSide = partParams1.get(11);
         String payingSide = partParams1.get(12);
-        String dueDate = partParams1.get(13);
+        long coupon = partParams1.get(13).equals("") ? 0 : Long.parseLong(partParams1.get(13));
 
         long receGenerateTime = partParams2.get(10).equals("") ? 0 : Long.parseLong(partParams2.get(10));
         long receAmount = partParams2.get(11).equals("") ? 0 : Long.parseLong(partParams2.get(11));
-        long coupon = partParams2.get(12).equals("") ? 0 : Long.parseLong(partParams2.get(12));
-        int receLatestStatus = partParams2.get(13).equals("") ? 0 : Integer.parseInt(partParams2.get(13));
-        long receUpdateTime = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
+        int receLatestStatus = partParams2.get(12).equals("") ? 0 : Integer.parseInt(partParams2.get(12));
+        long receUpdateTime = partParams2.get(13).equals("") ? 0 : Long.parseLong(partParams2.get(13));
+        long dueDate = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
 
         TransactionDetailVo txDetailVo = new TransactionDetailVo();
         List<OperationRecordVo> txRecordList = new ArrayList<>();
