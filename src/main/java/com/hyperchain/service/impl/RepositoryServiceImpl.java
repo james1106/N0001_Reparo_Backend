@@ -490,23 +490,12 @@ public class RepositoryServiceImpl implements RepositoryService{
             List<String> repoBusiDetail2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
             List<String> repoBusiDetail3 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
 
-            int length = repoBusiDetail3.size();
+            int length = repoBusiDetail3.size() / 2;
 
 
             for(int i = 0; i < length; i++){
                 boolean flag=false;
-            /*String repoBusinessNo = bytesResultList.get(i*3);
-            String productName = bytesResultList.get(i*3+1);
-            String repoEnterpriseAddress = bytesResultList.get(i*3+2).equals("x0000000000000000000000000000000000000000") ? "" : bytesResultList.get(i*3+2).substring(1);
-            int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
-            int repoBusiStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
-            String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
-            //RepoCertVo repoCertVo = new RepoCertVo(repoBusinessNo, productName, productQuantitiy, repoBusiStatus, repoEnterpriseName);
-            RepoCertVo repoCertVo = new RepoCertVo();
-            repoCertVo.setRepoBusinessNo(repoBusinessNo);
-            repoCertVo.setProductName(productName);
-            repoCertVo.setProductQuantity(productQuantitiy);
-            repoCertVo.setRepoEnterpriseName(repoEnterpriseName);*/
+
                 int repoBusiStatus = repoBusiDetail2.get(i*4).equals("")? 0 : Integer.parseInt(repoBusiDetail2.get(i*4));
                 if (repoBusiStatus == 0){
                     continue;
@@ -539,10 +528,13 @@ public class RepositoryServiceImpl implements RepositoryService{
                     repoBusiVo.setProductQuantity(repoBusiDetail2.get(i*4+2).equals("")? 0 : Long.parseLong(repoBusiDetail2.get(i*4+2)));
                     repoBusiVo.setOpgTimeOfCurStatus(repoBusiDetail2.get(i*4+3).equals("")? 0 : Long.parseLong((repoBusiDetail2.get(i*4+3))));
 
-                    String repoEnterpriseAddress = repoBusiDetail3.get(i).equals("x0000000000000000000000000000000000000000") ? "" : repoBusiDetail3.get(i).substring(1);
+                    String repoEnterpriseAddress = repoBusiDetail3.get(i).equals("x0000000000000000000000000000000000000000") ? "" : repoBusiDetail3.get(i * 2).substring(1);
                     String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
                     repoBusiVo.setRepoEnterpriceName(repoEnterpriseName);
 
+                    String holderAddress = repoBusiDetail3.get(i).equals("x0000000000000000000000000000000000000000") ? "" : repoBusiDetail3.get(i * 2 + 1).substring(1);
+                    String holderEnterpriseName = holderAddress.equals("") ? "" : userEntityRepository.findByAddress(holderAddress).getCompanyName();
+                    repoBusiVo.setHolderEnterpriseName(holderEnterpriseName);
                     repoBusinessVos.add(repoBusiVo);
                 }
 

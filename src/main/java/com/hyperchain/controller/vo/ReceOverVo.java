@@ -10,9 +10,17 @@ public class ReceOverVo {
     private String payingSide;
     private long receAmount;
     private long coupon;
-    private String dueDate;
+    private long dueDate;
     private int receLatestStatus;
     private long receUpdateTime;
+
+    public long getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(long dueDate) {
+        this.dueDate = dueDate;
+    }
 
     public String getReceNo() {
         return receNo;
@@ -60,14 +68,6 @@ public class ReceOverVo {
 
     public void setCoupon(long coupon) {
         this.coupon = coupon;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
     }
 
     public int getReceLatestStatus() {
