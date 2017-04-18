@@ -421,7 +421,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 //签发回复
-    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address accountAddress, address wayBillContractAddress) returns (uint){
+    function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address orderAddress, address wayBillContractAddress) returns (uint){
         /*        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
          return (3);
          }
@@ -451,10 +451,14 @@ enum DiscountedStatus {NO, YES} //贴现标志位
             //return (888);
         }else{
             receivable.status = 26;
-            address pyeeAddress = callAccountContractGetAddressByAcctId(receivable.pyee, accountAddress);
-            address pyerAddress = callAccountContractGetAddressByAcctId(receivable.pyer, accountAddress);
+            uint code;
+            address[] memory resultAddress;
+            bytes32[] memory resultBytes32;
+            uint[] memory resultUint;
+            (code, resultAddress, resultBytes32, resultUint) = callOrderContractByOrderNoForWayBill(receivable.orderNo, orderAddress);
+
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
-            wayBillCon.initWayBillStatus(receivable.orderNo, time, pyeeAddress, pyerAddress);
+            wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
         }
         receivable.signInDt = time;
 
@@ -472,6 +476,13 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         AccountContract accountCon = AccountContract(accountAddress);
         return accountCon.getAddressByAcctId(acctId);
     }
+
+    function callOrderContractByOrderNoForWayBill(bytes32 orderNo, address orderAddress) returns (uint code, address[] resultAddress, bytes32[] resultBytes32, uint[] resultUint){
+        OrderContract orderCon = OrderContract(orderAddress);
+        //(code, resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
+        return orderCon.queryOrderInfoForRece(orderNo);
+    }
+
 
 //贴现申请
     function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount) returns(uint) {
@@ -2465,6 +2476,36 @@ return orderDetailMap[orderNo].productName;
 /***********************根据订单编号查询货品数量*********************************/
 function queryProductQuantityByOrderNo(bytes32 orderNo)returns(uint){
 return orderDetailMap[orderNo].productQuantity;
+}
+
+/***********************根据订单编号查询交易信息给应收账款合约*********************************/
+function queryOrderInfoForRece(bytes32 orderNo)returns (
+uint,
+address[] resultAddress,
+bytes32[] resultBytes32,
+uint[] resultUint){
+//如果订单不存在，返回"订单不存在"
+if(!orderExists(orderNo)){
+return (2001, resultAddress, resultBytes32, resultUint);
+}
+
+resultAddress = new address[](4);
+resultBytes32 = new bytes32[](4);
+resultUint = new uint[](2);
+
+Order order = orderDetailMap[orderNo];
+resultAddress[0] = order.payerAddress;
+resultAddress[1] = order.payeeAddress;
+resultAddress[2] = order.payerRepoAddress;
+resultAddress[3] = order.payeeRepoAddress;
+resultBytes32[0] = order.orderNo;
+resultBytes32[1] = order.payerRepoCertNo;
+resultBytes32[2] = order.payeeRepoBusinessNo;
+resultBytes32[3] = order.productName;
+resultUint[0] = order.productQuantity;
+resultUint[1] = order.productTotalPrice;
+
+return(0, resultAddress, resultBytes32, resultUint);
 }
 
 /***********************根据订单编号更新订单的某状态******************************/
