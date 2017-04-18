@@ -310,17 +310,8 @@ public class WayBillServiceImpl implements WayBillService {
 //        System.out.println("logisticsInfo: " + logisticsInfo);
 
         if(Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()){ //只有发货待确认(卖家填完发货申请单)之后才有的数据
-            wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
-            wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
-            wayBillDetailVo.setProductName(strs.get(2));
-            wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
-            wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));
             UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
             wayBillDetailVo.setLogisticsEnterpriseName(logisticsUserEntity.getCompanyName());
-            UserEntity senderRepoUserEntity = userEntityRepository.findByAddress(addrs.get(3).substring(1, addrs.get(3).length()));
-            wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
-            UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
-            wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
         }
         if (Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode() &&
                 Integer.parseInt(longs.get(7)) != WayBillStatus.REQUESTING.getCode() &&
@@ -328,12 +319,21 @@ public class WayBillServiceImpl implements WayBillService {
             wayBillDetailVo.setWayBillNo(strs.get(1));
             wayBillDetailVo.setLogisticsInfo(logisticsInfo);
         }
-        //所有状态都有的数据
+        //所有状态都有的数据(即从待发货状态就已经有的数据)
         wayBillDetailVo.setOrderNo(strs.get(0));
+        wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
+        wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
+        wayBillDetailVo.setProductName(strs.get(2));
+        wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
+        wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));
         UserEntity senderUserEntity = userEntityRepository.findByAddress(addrs.get(1).substring(1, addrs.get(1).length()));
         wayBillDetailVo.setSenderEnterpriseName(senderUserEntity.getCompanyName());
         UserEntity receiverUserEntity = userEntityRepository.findByAddress(addrs.get(2).substring(1, addrs.get(2).length()));
         wayBillDetailVo.setReceiverEnterpriseName(receiverUserEntity.getCompanyName());
+        UserEntity senderRepoUserEntity = userEntityRepository.findByAddress(addrs.get(3).substring(1, addrs.get(3).length()));
+        wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
+        UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
+        wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
         //历史状态
         int wayBillStatus = Integer.parseInt(longs.get(7));
         wayBillDetailVo.setWaybillStatusCode(wayBillStatus);
