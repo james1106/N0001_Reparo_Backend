@@ -1278,7 +1278,22 @@ contract RepositoryContract{
 //仓储业务编号 => 仓单编号
     mapping(bytes32=> bytes32) repoBusiToCertMap;
 
-
+    //更新仓储结构体中的物流信息
+    function updateLogisInfo(bytes32 repoCertNo,//仓单编号
+        address logisticsEnterpriseAddress,//物流公司address
+        bytes32 wayBillNo //运单号
+) returns (uint){
+        RepoCert repoCert = repoCertDetailMap[repoCertNo];
+        bytes32 repoBusinessNo = repoCert.repoBusinessNo;
+        //
+        bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
+        uint length = repoBusinessTransNoList.length;
+        bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
+        RepoBusiness repoBusinsess = businessDetailMap[newestBusinessTransNo];
+        repoBusinsess.logisticsEnterpriseAddress = logisticsEnterpriseAddress;
+        repoBusinsess.wayBillNo = wayBillNo;
+        return (0);
+    }
 
 //查询我的仓单列表
     function getRepoCertInfoList(address userAddress)returns (uint, bytes32[] bytesResult,uint[] uintResult, address[] resultAddress){
@@ -1594,7 +1609,7 @@ contract RepositoryContract{
         address orderContractAddress,//订单合约地址，用来更改仓储状态
         bytes32 repoCertNo,       //  仓单编号
         uint operateOperateTime   //  操作时间(时间戳)
-) returns(uint){
+) returns(uint,bytes32){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
         //获取仓储业务编号
@@ -1639,7 +1654,7 @@ contract RepositoryContract{
         orderContract = OrderContract(orderContractAddress);
         orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME);
 
-        return (0);
+        return (0,lastBusinessTransNo);
     }
 
     struct slice {
@@ -1850,7 +1865,7 @@ contract RepositoryContract{
 //查询仓储业务详情详情
     function getRepoBusinessDetail(bytes32 businessTransNo) returns(uint,
         uint,/// 仓储状态
-        address,//持有人
+        address,//存货人(申请人)
         bytes32[] ,//2个
         uint[]   //4个
     ) {
@@ -1871,7 +1886,7 @@ contract RepositoryContract{
 
         return (0,
                 busDtl.repoBusiStatus,
-                busDtl.holderAddress,
+                busDtl.storerAddress,
                 outBytesList,
                 outUintList
         );
