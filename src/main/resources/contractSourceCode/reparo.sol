@@ -2598,11 +2598,10 @@ uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
 uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
 //生成待发货运单（初始化状态为待发货、待发货时间）。内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
-function initWayBillStatus(
-address[] addrs, //senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress
-bytes32[] strs, //orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName
-uint[] integers //waitTime, productQuantity, productValue
-) returns (uint code){
+/*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
+/*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
+/*waitTime, productQuantity, productValue*/
+function initWayBillStatus( address[] addrs, bytes32[] strs, uint[] integers ) returns (uint code){
 //拼接statusTransId
 string memory s1 = bytes32ToString(strs[0]);
 string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));
@@ -2613,23 +2612,7 @@ address logisticsAddress;
 bytes32[] memory logisticsInfo;
 
 //生成初始化运单
-statusTransIdToWayBillDetail[statusTransId] = WayBill(
-strs[0],
-statusTransId,
-"",
-logisticsAddress,
-addrs[0],
-addrs[1],
-strs[3],
-integers[1],
-integers[2],
-integers[0],
-addrs[2],
-strs[2],
-addrs[3],
-strs[2],
-logisticsInfo,
-WAYBILL_WAITING);
+statusTransIdToWayBillDetail[statusTransId] = WayBill(strs[0], statusTransId, "", logisticsAddress, addrs[0], addrs[1], strs[3], integers[1], integers[2], integers[0], addrs[2], strs[2], addrs[3], strs[2], logisticsInfo, WAYBILL_WAITING);
 //
 orderNoToStatusTransIdList[strs[0]].push(statusTransId);
 //
@@ -2640,13 +2623,10 @@ return CODE_SUCCESS;
 }
 
 //生成待确认运单
-function generateUnConfirmedWayBill(
-uint[] integers,  //requestTime, productValue, productQuantity,
-address[] addrs, //logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress
-bytes32[] strs, //orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId
-address accountContractAddr,
-address receivableContractAddress
-) returns (uint code){
+/*requestTime, productValue, productQuantity, */
+/*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
+/*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
+function generateUnConfirmedWayBill(uint[] integers,  address[] addrs, bytes32[] strs, address accountContractAddr, address receivableContractAddress) returns (uint code){
 accountContract = AccountContract (accountContractAddr);
 receivableContract = ReceivableContract (receivableContractAddress);
 // uint requestTime = integers[0];
@@ -2662,7 +2642,7 @@ receivableContract = ReceivableContract (receivableContractAddress);
 // bytes32 senderRepoCertNo = strs[2];
 // bytes32 receiverRepoBusinessNo = strs[3];
 // bytes32 statusTransId = strs[4];
-bytes32 wayBillNo;
+// bytes32 waybillNo = strs[5];
 bytes32[] memory logisticsInfo;
 
 //TODO ：运单上的每一个address都要判断用户是否存在？（发货者、收货者、物流、发货仓储、收货仓储）
@@ -2679,7 +2659,7 @@ return CODE_WAY_BILL_ALREADY_EXIST;
 }
 
 //生成未确认运单
-statusTransIdToWayBillDetail[strs[4]] = WayBill(strs[0], strs[4], wayBillNo, addrs[0], addrs[1], addrs[2], strs[1], integers[2], integers[1], integers[0], addrs[4], strs[2], addrs[3], strs[3], logisticsInfo, WAYBILL_REQUESTING);
+statusTransIdToWayBillDetail[strs[4]] = WayBill(strs[0], strs[4], strs[5], addrs[0], addrs[1], addrs[2], strs[1], integers[2], integers[1], integers[0], addrs[4], strs[2], addrs[3], strs[3], logisticsInfo, WAYBILL_REQUESTING);
 //
 orderNoToStatusTransIdList[strs[0]].push(strs[4]);
 //
@@ -2689,7 +2669,7 @@ return CODE_SUCCESS; //成功
 }
 
 //生成已确认运单
-function generateWayBill(bytes32 orderNo, bytes32 statusTransId, bytes32 wayBillNo, uint sendTime, address accountContractAddr) returns (uint code){
+function generateWayBill(bytes32 orderNo, bytes32 statusTransId, uint sendTime, address accountContractAddr) returns (uint code){
 accountContract = AccountContract (accountContractAddr);
 
 bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
@@ -2705,7 +2685,7 @@ return CODE_PERMISSION_DENIED;
 }
 
 //生成已确认运单
-statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, sendTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_SENDING);
+statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, sendTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_SENDING);
 //
 orderNoToStatusTransIdList[orderNo].push(statusTransId);
 //
@@ -2862,7 +2842,7 @@ statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, ol
 orderNoToStatusTransIdList[orderNo].push(statusTransId);
 //
 //TODO 调用订单合约更新订单状态为已完成
-orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
+//orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
 return (CODE_SUCCESS);
 }
 

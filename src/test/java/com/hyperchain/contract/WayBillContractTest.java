@@ -2875,8 +2875,8 @@ public class WayBillContractTest extends SpringBaseTest {
         strs00[3] = "productName"; //productName
         long[] ints00 = new long[3];
         ints00[0] = new Date().getTime(); //waitTime
-        ints00[0] = 1000; //productQuantity
-        ints00[0] = 100000; //productValue
+        ints00[1] = 1000; //productQuantity
+        ints00[2] = 100000; //productValue
 
         initContractMethodParams[0] = addrs00;
         initContractMethodParams[1] = strs00;
@@ -2943,12 +2943,13 @@ public class WayBillContractTest extends SpringBaseTest {
         requestAddrs[2] = receiverAddress; //receiverAddress
         requestAddrs[3] = receiverRepoAddress; //receiverRepoAddress
         requestAddrs[4] = senderRepoAddress; //senderRepoAddress
-        String[] requestStrs = new String[5];
+        String[] requestStrs = new String[6];
         requestStrs[0] = "123订单" + random; //orderNo
         requestStrs[1] = "productName"; //productName
         requestStrs[2] = "senderRepoCertNo"; //senderRepoCertNo
         requestStrs[3] = "receiverRepoBusinessNo"; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
+        requestStrs[5] = "123运单" + random; //wayBillNo
         requestContractMethodParams[0] = requestLongs;
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
@@ -2965,12 +2966,11 @@ public class WayBillContractTest extends SpringBaseTest {
         //物流确认发货，生成完整运单
         ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String confirmContractMethodName = "generateWayBill";
-        Object[] confirmContractMethodParams = new Object[5];
+        Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = "123订单" + random; //orderNo
         confirmContractMethodParams[1] = "123订单" + random + WayBillStatus.SENDING.getCode(); //statusTransId: orderNo + WayBillStatus
-        confirmContractMethodParams[2] = "123运单" + random; //wayBillNo
-        confirmContractMethodParams[3] = new Date().getTime(); //sendTime
-        confirmContractMethodParams[4] = accountContractAddr; //accountContractAddr
+        confirmContractMethodParams[2] = new Date().getTime(); //sendTime
+        confirmContractMethodParams[3] = accountContractAddr; //accountContractAddr
         String[] confirmResultMapKey = new String[]{};
         System.out.println("调用合约generateWayBill入参：" + confirmContractMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
