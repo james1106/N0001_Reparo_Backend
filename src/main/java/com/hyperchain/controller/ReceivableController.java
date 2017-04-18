@@ -66,6 +66,7 @@ public class ReceivableController {
         List<String> list= new ArrayList<>();
         list.add(contractNo);
         list.add(invoiceNo);
+        list.add(serialNo);
 
 //        ContractKey contractKey = new ContractKey(pyeeAddress);
 
@@ -75,6 +76,7 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//order合约地址
 
         Object[] params = new Object[12];
         params[0] = receivableNo;
@@ -87,9 +89,8 @@ public class ReceivableController {
         params[7] = dueDt;
         params[8] = rate;
         params[9] = list;
-        params[10] = serialNo;
-        params[11] = receivableGenerateTime;
-
+        params[10] = receivableGenerateTime;
+        params[11] = orderContractAddress;
         // 调用合约查询账户，获取返回结果
         return receivableService.signOutApply(contractKey, params, receivableNo);
     }
@@ -116,7 +117,7 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
         String wayBillContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
 
 
@@ -126,7 +127,7 @@ public class ReceivableController {
         params[2] = response;
         params[3] = serialNo;
         params[4] = signOutReplyTime;
-        params[5] = accountContractAddress;
+        params[5] = orderContractAddress;
         params[6] = wayBillContractAddress;
 
         // 调用合约查询账户，获取返回结果
@@ -156,13 +157,16 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        Object[] params = new Object[6];
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
+
+        Object[] params = new Object[7];
         params[0] = receivableNo;
         params[1] = applicantAcctId;
         params[2] = replyerAcctId;
         params[3] = serialNo;
         params[4] = discountApplyTime;
         params[5] = discountApplyAmount;
+        params[6] = orderContractAddress;
 
         // 调用合约查询账户，获取返回结果
         return receivableService.discountApply(contractKey, params, receivableNo);
@@ -173,29 +177,8 @@ public class ReceivableController {
     @ResponseBody
     @RequestMapping(value = "discountApplyBankList",method = RequestMethod.POST)//路径
     public BaseResult<Object> discountApplyBankList(
-            //@ApiParam(value = "申请人私钥", required = true) @RequestParam String applicantAddress,
-//            @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
-//            @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
-//            @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
-//            @ApiParam(value = "申请贴现金额", required = true) @RequestParam long discountApplyAmount,//申请贴现金额
             HttpServletRequest request
     ) throws Exception {
-
-//        String address = TokenUtil.getAddressFromCookie(request);//用户address
-//        UserEntity userEntity = userEntityRepository.findByAddress(address);
-//        String privateKey = userEntity.getPrivateKey();
-//        String accountName = userEntity.getAccountName();
-//        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
-
-//        Map<Integer, String> bankNameMap = new HashMap<>();
-////        bankNameMap.put(new Long(3456), "zheshangyinhang");
-//        bankNameMap.put(3456, "zheshangyinhang");
-//
-//
-//        // 调用合约查询账户，获取返回结果
-//        BaseResult result = new BaseResult();
-//        result.returnWithValue(Code.SUCCESS, bankNameMap);
-
 
         return receivableService.discountApplyBankList();
     }
@@ -224,7 +207,9 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        Object[] params = new Object[7];
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
+
+        Object[] params = new Object[8];
         params[0] = receivableNo;
         params[1] = replyerAcctId;
         params[2] = response;
@@ -232,7 +217,7 @@ public class ReceivableController {
         params[4] = discountReplyTime;
         params[5] = newReceivableNo;
         params[6] = discountInHandAmount;
-//        params[7] = discountApplySerialNo;
+        params[7] = orderContractAddress;
 
         // 调用合约查询账户，获取返回结果
         return receivableService.discountReply(contractKey, params, newReceivableNo);
@@ -259,13 +244,15 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        Object[] params = new Object[5];
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
+
+        Object[] params = new Object[6];
         params[0] = receivableNo;
         params[1] = cashedAmount;
         params[2] = cashTime;
         params[3] = serialNo;
         params[4] = response;
-
+        params[5] = orderContractAddress;
         // 调用合约查询账户，获取返回结果
         return receivableService.cash(contractKey, params, receivableNo);
     }

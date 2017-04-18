@@ -358,9 +358,14 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivableRecordMap[serialNo].receivableStatus = receivableStatus;
     }
 
+    function updateOrderStateByReceivable(address orderAddress, bytes32 orderNo, bytes32 stateType, uint newState) returns (uint){
+        OrderContract orderCon = OrderContract(orderAddress);
+        return orderCon.updateOrderState(orderNo, stateType, newState);
+    }
+
 //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
-    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, bytes32 serialNo, uint time) returns(uint code){
-        if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
+    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNoAndSerialNo, uint time, address orderAddress) returns(uint code){
+        if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
             return (3);
         }
         /*        if(judgeRepetitiveSerialNo(serialNo)){
@@ -387,21 +392,22 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         }
 
         allReceivableNos.push(receivableNo);
-        giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
+        giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNoAndSerialNo, time);
 
         //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
-        accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
         pyerToReceivableMap[pyer].push(receivableNo);
         pyeeToReceivableMap[pyee].push(receivableNo);
-        receivableTransferHistoryMap[receivableNo].push(serialNo);
+
+        updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
+
 
         return (0);
     }
 
-    function giveReceivableInfo(bytes32 receivableNo, bytes32 serialNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
+    function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
         Receivable receivable = receivableDetailMap[receivableNo];
         receivable.receivableNo = receivableNo;
         receivable.orderNo = orderNo;
@@ -417,7 +423,10 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivable.status = 21;
         receivable.contractNo = contractAndInvoiceNo[0];
         receivable.invoiceNo = contractAndInvoiceNo[1];
-        newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
+
+        newReceivableRecord(contractAndInvoiceNo[2], receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
+        accountReceivableRecords[signer].push(contractAndInvoiceNo[2]);
+        receivableTransferHistoryMap[receivableNo].push(contractAndInvoiceNo[2]);
     }
 
 //签发回复
@@ -468,6 +477,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
@@ -500,7 +510,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
 
 //贴现申请
-    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount) returns(uint) {
+    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -531,11 +541,12 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return(0);
     }
 
 //贴现回复
-    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount) returns(uint) {
+    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -566,6 +577,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
@@ -688,7 +700,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 //兑付
-    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType)returns(uint){
+    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType, address orderAddress)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (3);
         }
@@ -718,6 +730,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
