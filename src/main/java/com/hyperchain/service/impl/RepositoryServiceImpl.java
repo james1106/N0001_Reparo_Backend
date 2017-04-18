@@ -321,7 +321,7 @@ public class RepositoryServiceImpl implements RepositoryService{
 
             String repoEnterpriseAddress = detailInfoList3.get(1).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(1).substring(1);
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
-
+            //repoBusinessVo.setRepoCertStatus(null);
 
             repoBusinessVo.setLogisticsEntepsName(logiEnterpriseName);
             repoBusinessVo.setRepoEnterpriceName(repoEnterpriseName);
@@ -545,6 +545,35 @@ public class RepositoryServiceImpl implements RepositoryService{
             e.printStackTrace();
         }
         result.returnWithValue(code, repoBusinessVos);
+        return result;
+    }
+
+    @Override
+    public BaseResult<Object> createRepoCertForRepoeEnterprise(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "createRepoCertForRepoEnter";
+        LogUtil.info("调用合约 : RepositoryContract 方法: createRepoCertForRepoEnter 入参：" + contractParams.toString());
+        String[] resultMapKey = new String[]{""};
+        BaseResult result = new BaseResult();
+
+        try {
+            ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: createRepoCertForRepoEnter 返回结果：" + contractResult.toString());
+            Code code = contractResult.getCode();
+            if(code == Code.SUCCESS){
+                //result.returnWithValue(code);
+                result.returnWithoutValue(code);
+            }
+            else {
+                result.returnWithoutValue(code);
+            }
+
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
         return result;
     }
 

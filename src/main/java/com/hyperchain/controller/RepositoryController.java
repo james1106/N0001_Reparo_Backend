@@ -1,6 +1,7 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
+import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
@@ -365,5 +366,77 @@ public class RepositoryController {
         // 调用合约查询账户，获取返回结果
         return repositoryService.getRepoBusiInfoList(contractKey, params,role);
     }
+
+    @LogInterceptor
+    @ApiOperation(value = "仓储机构生成仓单", notes = "仓储机构生成非交易相关的仓单，仓储")
+    @ResponseBody
+    @RequestMapping(value = "createRepoCertForRepoeEnterprise",method = RequestMethod.POST)
+    public BaseResult<Object> createRepoCertForRepoeEnterprise(
+            @ApiParam(value = "存货人", required = true) @RequestParam String storerName,
+            @ApiParam(value = "仓储机构", required = true) @RequestParam String repoEnterpriseName,
+            @ApiParam(value = "仓储所在位置", required = true) @RequestParam String productLocation,
+            @ApiParam(value = "产品名称", required = true) @RequestParam String productName,
+            @ApiParam(value = "产品数量", required = true) @RequestParam long productQuantitiy,
+            @ApiParam(value = "计量单位 如：箱", required = true) @RequestParam String measureUnit,
+            @ApiParam(value = "产品单价", required = true) @RequestParam long productUnitPrice,
+            @ApiParam(value = "产品总价", required = true) @RequestParam long productTotalPrice,
+            HttpServletRequest request) throws Exception {
+        BaseResult result = new BaseResult();
+        try{
+            String address = TokenUtil.getAddressFromCookie(request);//用户address
+            UserEntity userEntity = userEntityRepository.findByAddress(address);
+            if(CommonUtil.isEmpty(userEntity)){
+
+                result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+                return  result;
+            }
+            String privateKey = userEntity.getPrivateKey();
+            String accountName = userEntity.getAccountName();
+            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+            String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);//  仓储业务编号
+            String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);; //仓单编码
+            String businessTransNo = repoBusinessNo + REPO_BUSI_INCOMED;      //  仓储业务业务流转编号
+            UserEntity storerEntity = userEntityRepository.findByCompanyName(storerName);
+            String storerAddress = storerEntity.getAddress();        //  存货人=持有人holderAddress
+            UserEntity repoEnterpriseEntity = userEntityRepository.findByCompanyName(repoEnterpriseName);
+            String repoEnterpriseAddress = repoEnterpriseEntity.getAddress();//  保管人(仓储公司)
+            //String measureUnit = measureUnit;// 仓储物计量单位
+
+
+            long    operateOperateTime = System.currentTimeMillis();;  //  操作时间(时间戳)
+
+            Object[] params = new Object[9];
+            params[0] = repoBusinessNo;
+            params[1] = repoCertNo;
+            params[2] = businessTransNo;
+            params[3] = storerAddress;
+            params[4] = repoEnterpriseAddress;
+            params[5] = measureUnit;
+            params[6] = productName;
+            params[7] = productLocation;
+
+            long[] productIntInfo = new long[4];
+
+            productIntInfo[0] = productQuantitiy;
+            productIntInfo[1] = productUnitPrice * 100;//金额以分为单位
+            productIntInfo[2] = productTotalPrice * 100;
+            productIntInfo[3] = operateOperateTime;
+            params[8] = productIntInfo;
+            /*params[8] = productQuantitiy;
+            params[9] = productUnitPrice * 100;//金额以分为单位
+            params[10] = productTotalPrice * 100;
+            params[11] = operateOperateTime;*/
+            //params[1] = role;
+            // 调用合约查询账户，获取返回结果
+            return repositoryService.createRepoCertForRepoeEnterprise(contractKey, params);
+        }
+        catch (Exception e){
+            LogUtil.error("调用方法createRepoCertForRepoeEnterprise异常");
+            e.printStackTrace();
+        }
+        return  result;
+    }
+
 
 }
