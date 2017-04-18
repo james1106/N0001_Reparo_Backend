@@ -158,6 +158,34 @@ public class RepositoryServiceImpl implements RepositoryService{
     }
 
     @Override
+    public BaseResult<Object> getRepobusiNoByrepoCert(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "getRepoBusinessByRepoCert";
+        String[] resultMapKey = new String[]{};
+        BaseResult result = new BaseResult();
+
+        try {
+            ContractResult contractResult;
+            contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: getRepoBusinessByRepoCert 返回结果：" + contractResult.toString());
+            Code code = contractResult.getCode();
+            String repoBusiNo = (String)contractResult.getValue().get(0);
+            //result.returnWithoutValue(code);
+            result.returnWithValue(code,repoBusiNo);
+
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    @Override
     public BaseResult<Object> outcomeConfirm(ContractKey contractKey, Object[] contractParams) {
         String methodName = "outcomeConfirm";
         String[] resultMapKey = new String[]{};
@@ -315,8 +343,12 @@ public class RepositoryServiceImpl implements RepositoryService{
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
             //repoBusinessVo.setRepoCertStatus(null);
 
+            String sotreEnterpriseAddress = detailInfoList3.get(2).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(2).substring(1);
+            String sotreEnterpriseName = sotreEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(sotreEnterpriseAddress).getCompanyName();
+
             repoBusinessVo.setLogisticsEntepsName(logiEnterpriseName);
             repoBusinessVo.setRepoEnterpriceName(repoEnterpriseName);
+            repoBusinessVo.setStoreEnterpriseName(sotreEnterpriseName);
 
             //result.returnWithValue(code, repoBusuVoList);
             result.returnWithValue(code, repoBusinessVo);

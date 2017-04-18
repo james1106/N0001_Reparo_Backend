@@ -358,9 +358,14 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivableRecordMap[serialNo].receivableStatus = receivableStatus;
     }
 
+    function updateOrderStateByReceivable(address orderAddress, bytes32 orderNo, bytes32 stateType, uint newState) returns (uint){
+        OrderContract orderCon = OrderContract(orderAddress);
+        return orderCon.updateOrderState(orderNo, stateType, newState);
+    }
+
 //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
-    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, bytes32 serialNo, uint time) returns(uint code){
-        if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" || serialNo == ""){
+    function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNoAndSerialNo, uint time, address orderAddress) returns(uint code){
+        if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
             return (3);
         }
         /*        if(judgeRepetitiveSerialNo(serialNo)){
@@ -387,21 +392,22 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         }
 
         allReceivableNos.push(receivableNo);
-        giveReceivableInfo(receivableNo, serialNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNo, time);
+        giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNoAndSerialNo, time);
 
         //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
-        accountReceivableRecords[signer].push(serialNo);
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
         pyerToReceivableMap[pyer].push(receivableNo);
         pyeeToReceivableMap[pyee].push(receivableNo);
-        receivableTransferHistoryMap[receivableNo].push(serialNo);
+
+        updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
+
 
         return (0);
     }
 
-    function giveReceivableInfo(bytes32 receivableNo, bytes32 serialNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
+    function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
         Receivable receivable = receivableDetailMap[receivableNo];
         receivable.receivableNo = receivableNo;
         receivable.orderNo = orderNo;
@@ -417,7 +423,10 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         receivable.status = 21;
         receivable.contractNo = contractAndInvoiceNo[0];
         receivable.invoiceNo = contractAndInvoiceNo[1];
-        newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
+
+        newReceivableRecord(contractAndInvoiceNo[2], receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt, receivable.status);
+        accountReceivableRecords[signer].push(contractAndInvoiceNo[2]);
+        receivableTransferHistoryMap[receivableNo].push(contractAndInvoiceNo[2]);
     }
 
 //签发回复
@@ -468,6 +477,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
@@ -500,7 +510,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
 
 //贴现申请
-    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount) returns(uint) {
+    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -531,11 +541,12 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return(0);
     }
 
 //贴现回复
-    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount) returns(uint) {
+    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -566,6 +577,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
@@ -688,7 +700,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
     }
 
 //兑付
-    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType)returns(uint){
+    function cash(bytes32 receivableNo, uint cashedAmount, uint time, bytes32 serialNo, ResponseType responseType, address orderAddress)returns(uint){
         if(receivableNo == "" || serialNo == ""){
             return (3);
         }
@@ -718,6 +730,7 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
+        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
 
@@ -1630,10 +1643,20 @@ contract RepositoryContract{
         }
     }
 
+    //通过仓单编号找到仓储业务编号
+    function getRepoBusinessByRepoCert(bytes32 repoCertNo//  仓单编号
+) returns (uint,bytes32) {
+        RepoCert repoCert = repoCertDetailMap[repoCertNo];
+        bytes32 repoBusinessNo = repoCert.repoBusinessNo;
+        return (0,repoBusinessNo);
+    }
+
 //出库回复-待出库,卖家确认订单时仓储状态改为待出库
     function outcomeResponse(
         address orderContractAddress,//订单合约地址，用来更改仓储状态
         bytes32 repoCertNo,       //  仓单编号
+        bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号
+        bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号
         uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint,bytes32){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
@@ -1641,19 +1664,19 @@ contract RepositoryContract{
         //获取仓储业务编号
         RepoCert repoCert =  repoCertDetailMap[repoCertNo];
         bytes32  repoBusinessNo = repoCert.repoBusinessNo;
-        //获取上一个流转号
+        /*
+         //获取上一个流转号
+         string memory s1 = bytes32ToString(repoBusinessNo);
+         string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
 
-        string memory s1 = bytes32ToString(repoBusinessNo);
-        string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
+         string memory conStr = concatString(s1, s2);
+         bytes32 lastBusinessTransNo = stringToBytes32(conStr);
 
-        string memory conStr = concatString(s1, s2);
-        bytes32 lastBusinessTransNo = stringToBytes32(conStr);
-
-        //获取新的流转号
-        string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
-        conStr = concatString(s1, s3);
-        bytes32 currBusinessTransNo = stringToBytes32(conStr);
-
+         //获取新的流转号
+         string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
+         conStr = concatString(s1, s3);
+         bytes32 currBusinessTransNo = stringToBytes32(conStr);
+         */
         //bytes32 lastBusinessTransNo;
         //bytes32 currBusinessTransNo;
         //更新仓储状态为待出库
@@ -1868,7 +1891,7 @@ contract RepositoryContract{
 //===================获取仓储详情=================
         bytes32[]   memory detailInfoList1 = new bytes32[](5);//5个值
         uint[]      memory detailInfoList2 = new uint[](4);//4个值
-        address[]   memory detailInfoList3 = new address[](2);//个值
+        address[]   memory detailInfoList3 = new address[](3);//个值
 
         detailInfoList1[0] = repoBusinsess.repoBusinessNo;
         detailInfoList1[1] = repoBusinsess.wayBillNo;
@@ -1884,6 +1907,7 @@ contract RepositoryContract{
 
         detailInfoList3[0] = repoBusinsess.logisticsEnterpriseAddress;
         detailInfoList3[1] = repoBusinsess.repoEnterpriseAddress;
+        detailInfoList3[2] = repoBusinsess.storerAddress;
 
         return (0,historyList,detailInfoList1,detailInfoList2,detailInfoList3);
     }

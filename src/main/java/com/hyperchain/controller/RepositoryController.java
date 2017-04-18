@@ -27,11 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_INCOMED;
-import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOME;
-import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOME_RESPONSE;
-import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_OUTCOME;
-import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_OUTCOMED;
+import static com.hyperchain.common.constant.BaseConstant.*;
 
 /**
  * Created by chenxiaoyang on 2017/4/11.
@@ -217,12 +213,19 @@ public class RepositoryController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
+        Object[] params_1 = new Object[1];
+        params_1[0] = repoCertNo;
+        result = repositoryService.getRepobusiNoByrepoCert(contractKey, params_1);
+
+
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
-        String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
-        Object[] params = new Object[3];
+        String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
+        Object[] params = new Object[5];
         params[0] = orderContractAddress;
         params[1] = repoCertNo;
-        params[2] = operateTime;
+        params[2] = (String)result.getData() + REPO_BUSI_INCOMED;
+        params[3] = (String)result.getData() + REPO_BUSI_WATING_OUTCOME;//
+        params[4] = operateTime;
         /*
         params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
