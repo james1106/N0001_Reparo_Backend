@@ -451,11 +451,10 @@ enum DiscountedStatus {NO, YES} //贴现标志位
             //return (888);
         }else{
             receivable.status = 26;
-            uint code;
             address[] memory resultAddress;
             bytes32[] memory resultBytes32;
             uint[] memory resultUint;
-            (code, resultAddress, resultBytes32, resultUint) = callOrderContractByOrderNoForWayBill(receivable.orderNo, orderAddress);
+            (resultAddress, resultBytes32, resultUint) = callOrderContractByOrderNoForWayBill(receivable.orderNo, orderAddress);
 
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
@@ -477,10 +476,26 @@ enum DiscountedStatus {NO, YES} //贴现标志位
         return accountCon.getAddressByAcctId(acctId);
     }
 
-    function callOrderContractByOrderNoForWayBill(bytes32 orderNo, address orderAddress) returns (uint code, address[] resultAddress, bytes32[] resultBytes32, uint[] resultUint){
+    function callOrderContractByOrderNoForWayBill(bytes32 orderNo, address orderAddress) returns (address[] param1, bytes32[] param2, uint[] param3){
         OrderContract orderCon = OrderContract(orderAddress);
-        //(code, resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
-        return orderCon.queryOrderInfoForRece(orderNo);
+        address[4] memory resultAddress;
+        bytes32[4] memory resultBytes32;
+        uint[2] memory resultUint;
+        (resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
+        param1 = new address[](4);
+        param2 = new bytes32[](4);
+        param3 = new uint[](2);
+        param1[0] = resultAddress[0];
+        param1[1] = resultAddress[1];
+        param1[2] = resultAddress[2];
+        param1[3] = resultAddress[3];
+        param2[0] = resultBytes32[0];
+        param2[1] = resultBytes32[1];
+        param2[2] = resultBytes32[2];
+        param2[3] = resultBytes32[3];
+        param3[0] = resultUint[0];
+        param3[1] = resultUint[1];
+        return (param1, param2, param3);
     }
 
 
@@ -2495,18 +2510,18 @@ return orderDetailMap[orderNo].productQuantity;
 
 /***********************根据订单编号查询交易信息给应收账款合约*********************************/
 function queryOrderInfoForRece(bytes32 orderNo)returns (
-uint,
-address[] resultAddress,
-bytes32[] resultBytes32,
-uint[] resultUint){
+address[4],
+bytes32[4],
+uint[2]){
 //如果订单不存在，返回"订单不存在"
 if(!orderExists(orderNo)){
-return (2001, resultAddress, resultBytes32, resultUint);
+return (resultAddress, resultBytes32, resultUint);
 }
 
-resultAddress = new address[](4);
-resultBytes32 = new bytes32[](4);
-resultUint = new uint[](2);
+
+address[4] memory resultAddress;
+bytes32[4] memory resultBytes32;
+uint[2] memory resultUint;
 
 Order order = orderDetailMap[orderNo];
 resultAddress[0] = order.payerAddress;
@@ -2520,7 +2535,7 @@ resultBytes32[3] = order.productName;
 resultUint[0] = order.productQuantity;
 resultUint[1] = order.productTotalPrice;
 
-return(0, resultAddress, resultBytes32, resultUint);
+return(resultAddress, resultBytes32, resultUint);
 }
 
 /***********************根据订单编号更新订单的某状态******************************/
