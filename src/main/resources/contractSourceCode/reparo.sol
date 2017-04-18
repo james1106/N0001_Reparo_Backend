@@ -2467,6 +2467,36 @@ function queryProductQuantityByOrderNo(bytes32 orderNo)returns(uint){
 return orderDetailMap[orderNo].productQuantity;
 }
 
+/***********************根据订单编号查询交易信息给应收账款合约*********************************/
+function queryOrderInfoForRece(bytes32 orderNo)returns (
+uint,
+address[] resultAddress,
+bytes32[] resultBytes32,
+uint[] resultUint){
+//如果订单不存在，返回"订单不存在"
+if(!orderExists(orderNo)){
+return (2001, resultAddress, resultBytes32, resultUint);
+}
+
+resultAddress = new address[](4);
+resultBytes32 = new bytes32[](4);
+resultUint = new uint[](2);
+
+Order order = orderDetailMap[orderNo];
+resultAddress[0] = order.payerAddress;
+resultAddress[1] = order.payeeAddress;
+resultAddress[2] = order.payerRepoAddress;
+resultAddress[3] = order.payeeRepoAddress;
+resultBytes32[0] = order.orderNo;
+resultBytes32[1] = order.payerRepoCertNo;
+resultBytes32[2] = order.payeeRepoBusinessNo;
+resultBytes32[3] = order.productName;
+resultUint[0] = order.productQuantity;
+resultUint[1] = order.productTotalPrice;
+
+return(0, resultAddress, resultBytes32, resultUint);
+}
+
 /***********************根据订单编号更新订单的某状态******************************/
 function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState)returns(uint){
 Order order = orderDetailMap[orderNo];
