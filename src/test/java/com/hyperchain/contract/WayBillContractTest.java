@@ -2954,7 +2954,7 @@ public class WayBillContractTest extends SpringBaseTest {
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
         requestContractMethodParams[3] = accountContractAddr;
-        requestContractMethodParams[4] = receivableContractAddr;
+        requestContractMethodParams[4] = repoContractAddr;
         String[] requestResultMapKey = new String[]{};
         System.out.println("调用合约generateUnConfirmedWayBill入参：" + requestContractMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果

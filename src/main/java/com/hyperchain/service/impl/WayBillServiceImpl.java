@@ -103,12 +103,13 @@ public class WayBillServiceImpl implements WayBillService {
         requestAddrs[2] = receiverAddress; //receiverAddress
         requestAddrs[3] = receiverRepoAddress; //receiverRepoAddress
         requestAddrs[4] = senderRepoAddress; //senderRepoAddress
-        String[] requestStrs = new String[5];
+        String[] requestStrs = new String[6];
         requestStrs[0] = orderNo; //orderNo
         requestStrs[1] = productName; //productName
         requestStrs[2] = senderRepoCertNo; //senderRepoCertNo
         requestStrs[3] = receiverRepoBusinessNo; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
+        requestStrs[5] = generateWayBillNo(); //waybillNo
         requestContractMethodParams[0] = requestLongs;
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
@@ -143,14 +144,12 @@ public class WayBillServiceImpl implements WayBillService {
 
         ContractKey confirmContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
         String confirmContractMethodName = "generateWayBill";
-        Object[] confirmContractMethodParams = new Object[5];
+        Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = orderNo; //orderNo
         confirmContractMethodParams[1] = orderNo + WayBillStatus.SENDING.getCode(); //statusTransId: orderNo + WayBillStatus
-        confirmContractMethodParams[2] = generateWayBillNo(); //wayBillNo
-        confirmContractMethodParams[3] = new Date().getTime(); //sendTime
-        confirmContractMethodParams[4] = accountContractAddr; //accountContractAddr
+        confirmContractMethodParams[2] = new Date().getTime(); //sendTime
+        confirmContractMethodParams[3] = accountContractAddr; //accountContractAddr
         String[] confirmResultMapKey = new String[]{};
-        LogUtil.info("调用合约generateWayBill入参：" + confirmContractMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         LogUtil.info("调用合约generateWayBill返回结果：" + confirmContractResult.toString());
@@ -182,7 +181,6 @@ public class WayBillServiceImpl implements WayBillService {
         updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
         updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
         String[] updateToReceivedResultMapKey = new String[]{};
-        LogUtil.info("调用合约pdateWayBillStatusToReceived入参：" + updateToReceivedMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
         LogUtil.info("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
