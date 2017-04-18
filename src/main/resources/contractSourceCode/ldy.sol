@@ -164,7 +164,7 @@ contract WayBillContract {
 /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
 /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
 /*waitTime, productQuantity, productValue*/
-    function initWayBillStatus(address[] addrs, bytes32[] strs, uint[] integers ) returns (uint code){
+    function initWayBillStatus( address[] addrs, bytes32[] strs, uint[] integers ) returns (uint code){
     //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);
         string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));

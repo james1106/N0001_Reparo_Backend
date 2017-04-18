@@ -32,4 +32,5 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
             LogUtil.error("合约编译部署异常：" + e.getMessage());
         }
     }
+
 }
