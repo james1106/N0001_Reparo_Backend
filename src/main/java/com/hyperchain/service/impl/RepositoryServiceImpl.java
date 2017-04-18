@@ -142,15 +142,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             LogUtil.info("调用合约 : RepositoryContract 方法: outcomeResponse 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约outcomeResponse返回结果：" + contractResult.toString());
-            if(code == Code.SUCCESS){
-                //List<String> dataList = (List<String>) contractResult.getValue();
-                //result.returnWithoutValue(code);
-                String the_data = (String) contractResult.getValue().get(0);
-                result.returnWithValue(code,the_data);
-            }
-            else {
-                result.returnWithoutValue(code);
-            }
+            result.returnWithoutValue(code);
 
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
