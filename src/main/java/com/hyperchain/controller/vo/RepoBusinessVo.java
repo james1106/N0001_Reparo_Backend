@@ -25,7 +25,15 @@ public class RepoBusinessVo {
     private String orderNo;//订单号
     private int repoCertStatus;//仓单状态
     private String holderEnterpriseName;//持有人
+    private String storeEnterpriseName;//存货人
 
+    public String getStoreEnterpriseName() {
+        return storeEnterpriseName;
+    }
+
+    public void setStoreEnterpriseName(String storeEnterpriseName) {
+        this.storeEnterpriseName = storeEnterpriseName;
+    }
 
     public String getHolderEnterpriseName() {
         return holderEnterpriseName;

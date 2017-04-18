@@ -343,8 +343,12 @@ public class RepositoryServiceImpl implements RepositoryService{
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
             //repoBusinessVo.setRepoCertStatus(null);
 
+            String sotreEnterpriseAddress = detailInfoList3.get(2).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(2).substring(1);
+            String sotreEnterpriseName = sotreEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(sotreEnterpriseAddress).getCompanyName();
+
             repoBusinessVo.setLogisticsEntepsName(logiEnterpriseName);
             repoBusinessVo.setRepoEnterpriceName(repoEnterpriseName);
+            repoBusinessVo.setStoreEnterpriseName(sotreEnterpriseName);
 
             //result.returnWithValue(code, repoBusuVoList);
             result.returnWithValue(code, repoBusinessVo);

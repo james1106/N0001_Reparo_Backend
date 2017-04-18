@@ -1878,7 +1878,7 @@ contract RepositoryContract{
 //===================获取仓储详情=================
         bytes32[]   memory detailInfoList1 = new bytes32[](5);//5个值
         uint[]      memory detailInfoList2 = new uint[](4);//4个值
-        address[]   memory detailInfoList3 = new address[](2);//个值
+        address[]   memory detailInfoList3 = new address[](3);//个值
 
         detailInfoList1[0] = repoBusinsess.repoBusinessNo;
         detailInfoList1[1] = repoBusinsess.wayBillNo;
@@ -1894,6 +1894,7 @@ contract RepositoryContract{
 
         detailInfoList3[0] = repoBusinsess.logisticsEnterpriseAddress;
         detailInfoList3[1] = repoBusinsess.repoEnterpriseAddress;
+        detailInfoList3[2] = repoBusinsess.storerAddress;
 
         return (0,historyList,detailInfoList1,detailInfoList2,detailInfoList3);
     }
