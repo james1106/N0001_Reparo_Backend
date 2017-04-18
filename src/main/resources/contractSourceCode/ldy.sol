@@ -161,10 +161,11 @@ contract WayBillContract {
     uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
 //生成待发货运单（初始化状态为待发货、待发货时间）。内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
-/*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
-/*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
-/*waitTime, productQuantity, productValue*/
-    function initWayBillStatus( address[] addrs, bytes32[] strs, uint[] integers ) returns (uint code){
+    function initWayBillStatus(
+    address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
+    bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
+    uint[] integers /*waitTime, productQuantity, productValue*/
+    ) returns (uint code){
     //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);
         string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));
@@ -186,10 +187,13 @@ contract WayBillContract {
     }
 
 //生成待确认运单
-/*requestTime, productValue, productQuantity, */
-/*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
-/*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
-    function generateUnConfirmedWayBill(uint[] integers,  address[] addrs, bytes32[] strs, address accountContractAddr, address receivableContractAddress) returns (uint code){
+    function generateUnConfirmedWayBill(
+    uint[] integers,  /*requestTime, productValue, productQuantity, */
+    address[] addrs,  /*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
+    bytes32[] strs,  /*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
+    address accountContractAddr,
+    address receivableContractAddress)
+    returns (uint code){
         accountContract = AccountContract (accountContractAddr);
         receivableContract = ReceivableContract (receivableContractAddress);
     // uint requestTime = integers[0];

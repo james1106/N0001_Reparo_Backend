@@ -67,17 +67,17 @@ contract AccountContract {
 
 //帐户信息
     struct Account {
-        address accountAddress;//用户地址
-        bytes32 accountName;//用户名
-        bytes32 enterpriseName;//企业名称
-        uint roleCode;//角色
-        uint accountStatus;//账户状态
-        bytes32 certType; //证件类型
-        bytes32 certNo; //证件号码
-        bytes32[] acctId; //账号 多个
-        bytes32 svcrClass; //开户行别
-        bytes32 acctSvcr; //开户行行号
-        bytes32 acctSvcrName; //开户行名称
+    address accountAddress;//用户地址
+    bytes32 accountName;//用户名
+    bytes32 enterpriseName;//企业名称
+    uint roleCode;//角色
+    uint accountStatus;//账户状态
+    bytes32 certType; //证件类型
+    bytes32 certNo; //证件号码
+    bytes32[] acctId; //账号 多个
+    bytes32 svcrClass; //开户行别
+    bytes32 acctSvcr; //开户行行号
+    bytes32 acctSvcrName; //开户行名称
     }
 
 
@@ -2652,10 +2652,11 @@ uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
 uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
 
 //生成待发货运单（初始化状态为待发货、待发货时间）。内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
-/*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
-/*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
-/*waitTime, productQuantity, productValue*/
-function initWayBillStatus( address[] addrs, bytes32[] strs, uint[] integers ) returns (uint code){
+function initWayBillStatus(
+address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
+bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
+uint[] integers /*waitTime, productQuantity, productValue*/
+) returns (uint code){
 //拼接statusTransId
 string memory s1 = bytes32ToString(strs[0]);
 string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));
@@ -2677,12 +2678,15 @@ return CODE_SUCCESS;
 }
 
 //生成待确认运单
-/*requestTime, productValue, productQuantity, */
-/*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
-/*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
-function generateUnConfirmedWayBill(uint[] integers,  address[] addrs, bytes32[] strs, address accountContractAddr, address receivableContractAddress) returns (uint code){
+function generateUnConfirmedWayBill(
+uint[] integers,  /*requestTime, productValue, productQuantity, */
+address[] addrs,  /*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
+bytes32[] strs,  /*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
+address accountContractAddr,
+address repositoryContractAddr)
+returns (uint code){
 accountContract = AccountContract (accountContractAddr);
-receivableContract = ReceivableContract (receivableContractAddress);
+repositoryContract = RepositoryContract (repositoryContractAddr);
 // uint requestTime = integers[0];
 // uint productValue = integers[1];
 // uint productQuantity = integers[2];
@@ -2698,8 +2702,6 @@ receivableContract = ReceivableContract (receivableContractAddress);
 // bytes32 statusTransId = strs[4];
 // bytes32 waybillNo = strs[5];
 bytes32[] memory logisticsInfo;
-
-//TODO ：运单上的每一个address都要判断用户是否存在？（发货者、收货者、物流、发货仓储、收货仓储）
 
 //权限控制
 if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
@@ -2718,6 +2720,12 @@ statusTransIdToWayBillDetail[strs[4]] = WayBill(strs[0], strs[4], strs[5], addrs
 orderNoToStatusTransIdList[strs[0]].push(strs[4]);
 //
 addressToOrderNoList[addrs[0]].push(strs[0]);
+
+//TODO 更新仓储结构体中的物流信息
+ repositoryContract.updateLogisInfo(strs[2],//仓单编号
+                 addrs[0],//物流公司address
+                 strs[5] //运单号
+                 );
 
 return CODE_SUCCESS; //成功
 }
@@ -2896,7 +2904,7 @@ statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, ol
 orderNoToStatusTransIdList[orderNo].push(statusTransId);
 //
 //TODO 调用订单合约更新订单状态为已完成
-//orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
+orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
 return (CODE_SUCCESS);
 }
 
