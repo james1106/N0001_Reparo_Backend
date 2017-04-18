@@ -217,12 +217,26 @@ public class OrderController {
         // 调用合约确认订单，获取返回结果
         BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
 
+        Object[] params_1 = new Object[1];
+        params_1[0] = payeeRepoCertNo;
+        BaseResult repobusiResult = repositoryService.getRepobusiNoByrepoCert(contractKey, params_1);
 
+
+        //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
+        Object[] repoParams = new Object[5];
+        repoParams[0] = orderContractAddress;
+        repoParams[1] = payeeRepoCertNo;
+        repoParams[2] = (String)repobusiResult.getData() + REPO_BUSI_INCOMED;
+        repoParams[3] = (String)repobusiResult.getData() + REPO_BUSI_WATING_OUTCOME;//
+        repoParams[4] = txConfirmTime;
+
+        /*String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         Object[] repoParams = new Object[3];
         repoParams[0] = orderContractAddress;
         repoParams[1] = payeeRepoCertNo;
-        repoParams[2] = txConfirmTime;
+        repoParams[2] = txConfirmTime;*/
+
         // 调用合约查询账户，获取返回结果
         BaseResult outcomeResult = repositoryService.outcomeResponse(contractKey, repoParams);
 

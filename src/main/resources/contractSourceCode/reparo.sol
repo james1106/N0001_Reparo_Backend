@@ -1643,10 +1643,20 @@ contract RepositoryContract{
         }
     }
 
+    //通过仓单编号找到仓储业务编号
+    function getRepoBusinessByRepoCert(bytes32 repoCertNo//  仓单编号
+) returns (uint,bytes32) {
+        RepoCert repoCert = repoCertDetailMap[repoCertNo];
+        bytes32 repoBusinessNo = repoCert.repoBusinessNo;
+        return (0,repoBusinessNo);
+    }
+
 //出库回复-待出库,卖家确认订单时仓储状态改为待出库
     function outcomeResponse(
         address orderContractAddress,//订单合约地址，用来更改仓储状态
         bytes32 repoCertNo,       //  仓单编号
+        bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号
+        bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号
         uint operateOperateTime   //  操作时间(时间戳)
 ) returns(uint,bytes32){
         //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
@@ -1654,19 +1664,19 @@ contract RepositoryContract{
         //获取仓储业务编号
         RepoCert repoCert =  repoCertDetailMap[repoCertNo];
         bytes32  repoBusinessNo = repoCert.repoBusinessNo;
-        //获取上一个流转号
+        /*
+         //获取上一个流转号
+         string memory s1 = bytes32ToString(repoBusinessNo);
+         string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
 
-        string memory s1 = bytes32ToString(repoBusinessNo);
-        string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
+         string memory conStr = concatString(s1, s2);
+         bytes32 lastBusinessTransNo = stringToBytes32(conStr);
 
-        string memory conStr = concatString(s1, s2);
-        bytes32 lastBusinessTransNo = stringToBytes32(conStr);
-
-        //获取新的流转号
-        string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
-        conStr = concatString(s1, s3);
-        bytes32 currBusinessTransNo = stringToBytes32(conStr);
-
+         //获取新的流转号
+         string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
+         conStr = concatString(s1, s3);
+         bytes32 currBusinessTransNo = stringToBytes32(conStr);
+         */
         //bytes32 lastBusinessTransNo;
         //bytes32 currBusinessTransNo;
         //更新仓储状态为待出库
