@@ -479,8 +479,8 @@ enum DiscountedStatus {NO, YES} //贴现标志位
 
     function callOrderContractByOrderNoForWayBill(bytes32 orderNo, address orderAddress) returns (uint code, address[] resultAddress, bytes32[] resultBytes32, uint[] resultUint){
         OrderContract orderCon = OrderContract(orderAddress);
-        //(code, resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
-        return orderCon.queryOrderInfoForRece(orderNo);
+        (code, resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
+        return (code, resultAddress, resultBytes32, resultUint);
     }
 
 
