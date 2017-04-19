@@ -93,7 +93,7 @@ public class OrderContractTest extends SpringBaseTest{
 
 
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, "order_reparo");
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, "OrderContract");
             Code code = contractResult.getCode();
             result.returnWithValue(code, orderId);
         } catch (ContractInvokeFailException e) {
