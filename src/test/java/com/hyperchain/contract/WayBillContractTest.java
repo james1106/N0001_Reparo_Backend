@@ -2859,35 +2859,35 @@ public class WayBillContractTest extends SpringBaseTest {
 
         String random = TestUtil.getRandomString();
 
-        //初始化运单状态（当应收账款状态为承兑已签收）
-//        ContractKey initContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
-//        String initContractMethodName = "initWayBillStatus";
-//        Object[] initContractMethodParams = new Object[3];
-//        String[] addrs00 = new String[4];
-//        addrs00[0] = senderAddress;
-//        addrs00[1] = receiverAddress;
-//        addrs00[2] = senderRepoAddress;
-//        addrs00[3] = receiverRepoAddress;
-//        String[] strs00 = new String[4];
-//        strs00[0] = "123订单" + random; //orderNo
-//        strs00[1] = "senderRepoCertNo"; //senderRepoCertNo
-//        strs00[2] = "receiverRepoBusinessNo"; //receiverRepoBusinessNo
-//        strs00[3] = "productName"; //productName
-//        long[] ints00 = new long[3];
-//        ints00[0] = new Date().getTime(); //waitTime
-//        ints00[1] = 1000; //productQuantity
-//        ints00[2] = 100000; //productValue
-//
-//        initContractMethodParams[0] = addrs00;
-//        initContractMethodParams[1] = strs00;
-//        initContractMethodParams[2] = ints00;
-//        String[] initResultMapKey = new String[]{};
-//        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-//        ContractResult initContractResult = ContractUtil.invokeContract(initContractKey, initContractMethodName, initContractMethodParams, initResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-//        System.out.println("调用合约initWayBillStatus返回code：" + initContractResult.getCode());
-//        System.out.println("调用合约initWayBillStatus返回结果：" + initContractResult.toString());
-//        Assert.assertEquals(Code.SUCCESS, initContractResult.getCode());
-        testReceivable("123订单" + random);
+        //初始化运单状态（当应收账款状态为承兑已签收）-- 仅对ldy.sol测试
+        ContractKey initContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
+        String initContractMethodName = "initWayBillStatus";
+        Object[] initContractMethodParams = new Object[3];
+        String[] addrs00 = new String[4];
+        addrs00[0] = senderAddress;
+        addrs00[1] = receiverAddress;
+        addrs00[2] = senderRepoAddress;
+        addrs00[3] = receiverRepoAddress;
+        String[] strs00 = new String[4];
+        strs00[0] = "123订单" + random; //orderNo
+        strs00[1] = "senderRepoCertNo"; //senderRepoCertNo
+        strs00[2] = "receiverRepoBusinessNo"; //receiverRepoBusinessNo
+        strs00[3] = "productName"; //productName
+        long[] ints00 = new long[3];
+        ints00[0] = new Date().getTime(); //waitTime
+        ints00[1] = 1000; //productQuantity
+        ints00[2] = 100000; //productValue
+
+        initContractMethodParams[0] = addrs00;
+        initContractMethodParams[1] = strs00;
+        initContractMethodParams[2] = ints00;
+        String[] initResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult initContractResult = ContractUtil.invokeContract(initContractKey, initContractMethodName, initContractMethodParams, initResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        System.out.println("调用合约initWayBillStatus返回code：" + initContractResult.getCode());
+        System.out.println("调用合约initWayBillStatus返回结果：" + initContractResult.toString());
+        Assert.assertEquals(Code.SUCCESS, initContractResult.getCode());
+//        testReceivable("123订单" + random);
 
         //获取待发货运单信息
         ContractKey waybillContractKey0 = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
@@ -2962,6 +2962,47 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("调用合约generateUnConfirmedWayBill返回code：" + requestContractResult.getCode());
         System.out.println("调用合约generateUnConfirmedWayBill返回结果：" + requestContractResult.toString());
         Assert.assertEquals(Code.SUCCESS, requestContractResult.getCode());
+
+
+        //获取发货待确认运单信息
+        ContractKey waybillContractKey33 = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountJson);
+        String waybillContractMethodName33 = "getWayBill";
+        Object[] waybillContractMethodParams33 = new Object[2];
+        waybillContractMethodParams33[0] = "123订单" + random; //orderNo
+        System.out.println("===========请求订单号：" + waybillContractMethodParams33[0]);
+//        waybillContractMethodParams[0] = "123订单" + random; //orderNo
+        waybillContractMethodParams33[1] = accountContractAddr; //accountContractAddr
+        String[] waybillResultMapKey33 = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
+        System.out.println("发货待确认调用合约getWayBill入参：" + waybillContractMethodParams33);
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult waybillContractResult33 = ContractUtil.invokeContract(waybillContractKey33, waybillContractMethodName33, waybillContractMethodParams33, waybillResultMapKey33, BaseConstant.CONTRACT_NAME_WAYBILL);
+        System.out.println("发货待确认调用合约getWayBill返回code：" + waybillContractResult0.getCode());
+        Assert.assertEquals(Code.SUCCESS, waybillContractResult33.getCode());
+        Map<String, Object> waybillResultValueMap33 = waybillContractResult33.getValueMap();
+        System.out.println("发货待确认调用合约getWayBill返回结果：" + waybillContractResult33.toString());
+        List<Long> longs33 = (List<Long>) waybillResultValueMap33.get("longs");
+        List<String> strs33 = (List<String>) waybillResultValueMap33.get("strs");
+        List<String> addrs33 = (List<String>) waybillResultValueMap33.get("addrs");
+        List<String> logisticsInfo33 = (List<String>) waybillResultValueMap33.get("logisticsInfo");
+        System.out.println("productQuantity: " + longs33.get(0));
+        System.out.println("productValue: " + longs33.get(1));
+        System.out.println("requestTime: " + longs33.get(2));
+        System.out.println("receiveTime: " + longs33.get(3));
+        System.out.println("sendTime: " + longs33.get(4));
+        System.out.println("rejectTime: " + longs33.get(5));
+        System.out.println("waitTime: " + longs33.get(6));
+        System.out.println("wayBillStatus: " + longs33.get(7));
+        System.out.println("orderNo: " + strs33.get(0));
+        System.out.println("wayBillNo: " + strs33.get(1));
+        System.out.println("productName: " + strs33.get(2));
+        System.out.println("senderRepoCertNo: " + strs33.get(3));
+        System.out.println("receiverRepoBusinessNo: " + strs33.get(4));
+        System.out.println("logisticsAddress: " + addrs33.get(0));
+        System.out.println("senderAddress: " + addrs33.get(1));
+        System.out.println("receiverAddress: " + addrs33.get(2));
+        System.out.println("senderRepoAddress: " + addrs33.get(3));
+        System.out.println("receiverRepoAddress: " + addrs33.get(4));
+        System.out.println("logisticsInfo: " + logisticsInfo33);
 
         //物流确认发货，生成完整运单
         ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);

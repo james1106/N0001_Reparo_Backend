@@ -275,11 +275,16 @@ public class WayBillServiceImpl implements WayBillService {
     }
 
     private String generateWayBillNo() {
-        String waybillNo = "100" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
+        String waybillNo = "110" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
         return waybillNo;
     }
 
     private WayBillDetailVo parseContractResultToWayBillDetailVo(ContractResult waybillContractResult) {
+
+        if (waybillContractResult.getCode() != Code.SUCCESS) {
+            return null;
+        }
+
         Map<String, Object> waybillResultValueMap = waybillContractResult.getValueMap();
         List<String> longs = (List<String>) waybillResultValueMap.get("longs");
         List<String> strs = (List<String>) waybillResultValueMap.get("strs");
@@ -310,11 +315,11 @@ public class WayBillServiceImpl implements WayBillService {
         if(Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()){ //只有发货待确认(卖家填完发货申请单)之后才有的数据
             UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
             wayBillDetailVo.setLogisticsEnterpriseName(logisticsUserEntity.getCompanyName());
+            wayBillDetailVo.setWayBillNo(strs.get(1));
         }
         if (Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode() &&
                 Integer.parseInt(longs.get(7)) != WayBillStatus.REQUESTING.getCode() &&
                 Integer.parseInt(longs.get(7)) != WayBillStatus.REJECTED.getCode()) { //只有已发货（物流确认生成运单）之后才有的数据
-            wayBillDetailVo.setWayBillNo(strs.get(1));
             wayBillDetailVo.setLogisticsInfo(logisticsInfo);
         }
         //所有状态都有的数据(即从待发货状态就已经有的数据)

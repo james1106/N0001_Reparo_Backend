@@ -457,21 +457,23 @@ contract ReceivableContract{
         receivable.lastStatus = receivable.status;
         if(response == ResponseType.NO){
             receivable.status = 3;
-        //return (888);
+        //            return (888);
         }else{
             receivable.status = 26;
             address[] memory resultAddress;
             bytes32[] memory resultBytes32;
             uint[] memory resultUint;
+
             (resultAddress, resultBytes32, resultUint) = callOrderContractByOrderNoForWayBill(receivable.orderNo, orderAddress);
             resultUint[2] = resultUint[1];
             resultUint[1] = resultUint[0];
             resultUint[0] = time;
-
+        //            return (666);
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
-            returns (777);
+        //            return (777);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
         }
+    //        return (999);
         receivable.signInDt = time;
 
     //pyerToReceivableMap[receivable.pyer].push(receivableNo);
@@ -498,7 +500,7 @@ contract ReceivableContract{
         (resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
         param1 = new address[](4);
         param2 = new bytes32[](4);
-        param3 = new uint[](2);
+        param3 = new uint[](3);
         param1[0] = resultAddress[0];
         param1[1] = resultAddress[1];
         param1[2] = resultAddress[2];
@@ -509,6 +511,7 @@ contract ReceivableContract{
         param2[3] = resultBytes32[3];
         param3[0] = resultUint[0];
         param3[1] = resultUint[1];
+        param3[2] = 0;
         return (param1, param2, param3);
     }
 
@@ -1331,10 +1334,17 @@ contract RepositoryContract{
     //
         bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
         uint length = repoBusinessTransNoList.length;
+        //begin  ======= add by ldy
+        if(length == 0){
+            return (0);
+        }
+        //end  =======
         bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
-        RepoBusiness repoBusinsess = businessDetailMap[newestBusinessTransNo];
-        repoBusinsess.logisticsEnterpriseAddress = logisticsEnterpriseAddress;
-        repoBusinsess.wayBillNo = wayBillNo;
+//        RepoBusiness repoBusinsess = businessDetailMap[newestBusinessTransNo];
+//        repoBusinsess.logisticsEnterpriseAddress = logisticsEnterpriseAddress;
+//        repoBusinsess.wayBillNo = wayBillNo;
+        businessDetailMap[newestBusinessTransNo].logisticsEnterpriseAddress = logisticsEnterpriseAddress;
+        businessDetailMap[newestBusinessTransNo].wayBillNo = wayBillNo;
         return (0);
     }
 
@@ -2726,10 +2736,10 @@ orderNoToStatusTransIdList[strs[0]].push(strs[4]);
 addressToOrderNoList[addrs[0]].push(strs[0]);
 
 //TODO 更新仓储结构体中的物流信息
-repositoryContract.updateLogisInfo(strs[2],//仓单编号
-addrs[0],//物流公司address
-strs[5] //运单号
-);
+//repositoryContract.updateLogisInfo(strs[2],//仓单编号
+//addrs[0],//物流公司address
+//strs[5] //运单号
+//);
 
 return CODE_SUCCESS; //成功
 }
