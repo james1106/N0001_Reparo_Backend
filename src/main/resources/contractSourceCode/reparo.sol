@@ -1327,16 +1327,12 @@ contract RepositoryContract{
     address logisticsEnterpriseAddress,//物流公司address
     bytes32 wayBillNo //运单号
     ) returns (uint){
+
         RepoCert repoCert = repoCertDetailMap[repoCertNo];
         bytes32 repoBusinessNo = repoCert.repoBusinessNo;
     //
         bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
         uint length = repoBusinessTransNoList.length;
-    //begin  ======= add by ldy
-        if(length == 0){
-            return (0);
-        }
-    //end  =======
         bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
     //        RepoBusiness repoBusinsess = businessDetailMap[newestBusinessTransNo];
     //        repoBusinsess.logisticsEnterpriseAddress = logisticsEnterpriseAddress;
@@ -2734,10 +2730,10 @@ orderNoToStatusTransIdList[strs[0]].push(strs[4]);
 addressToOrderNoList[addrs[0]].push(strs[0]);
 
 //TODO 更新仓储结构体中的物流信息
-//repositoryContract.updateLogisInfo(strs[2],//仓单编号
-//addrs[0],//物流公司address
-//strs[5] //运单号
-//);
+repositoryContract.updateLogisInfo(strs[2],//仓单编号
+addrs[0],//物流公司address
+strs[5] //运单号
+);
 
 return CODE_SUCCESS; //成功
 }

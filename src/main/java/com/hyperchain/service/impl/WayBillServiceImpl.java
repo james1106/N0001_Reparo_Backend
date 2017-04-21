@@ -88,7 +88,7 @@ public class WayBillServiceImpl implements WayBillService {
 
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
-        String receivableContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
         ContractKey requestContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
         String requestContractMethodName = "generateUnConfirmedWayBill";
@@ -114,7 +114,7 @@ public class WayBillServiceImpl implements WayBillService {
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
         requestContractMethodParams[3] = accountContractAddr;
-        requestContractMethodParams[4] = receivableContractAddr;
+        requestContractMethodParams[4] = repoContractAddr;
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
