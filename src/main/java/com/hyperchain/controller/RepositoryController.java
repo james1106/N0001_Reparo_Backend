@@ -257,11 +257,12 @@ public class RepositoryController {
 
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
-        Object[] params = new Object[4];
+        Object[] params = new Object[5];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
         params[2] = repoBusinessNo + REPO_BUSI_WATING_OUTCOME;
         params[3] = repoBusinessNo + REPO_BUSI_OUTCOMED;
+        params[4] = System.currentTimeMillis();
         /*
         params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
