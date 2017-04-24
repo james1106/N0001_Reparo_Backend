@@ -47,7 +47,7 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "收货人企业名称", required = true) @RequestParam("receiverEnterpriseName") String receiverEnterpriseName,
             @ApiParam(value = "货品名称", required = true) @RequestParam("productName") String productName,
             @ApiParam(value = "货品数量", required = true) @RequestParam("productQuantity") long productQuantity,
-            @ApiParam(value = "货品价值", required = true) @RequestParam("productValue") long productValue,
+            @ApiParam(value = "货品价值", required = true) @RequestParam("productValue") double productValue,
             @ApiParam(value = "货品所在仓储公司名称", required = true) @RequestParam("senderRepoEnterpriseName") String senderRepoEnterpriseName,
             @ApiParam(value = "发货货品仓单编号", required = true) @RequestParam("senderRepoCertNo") String senderRepoCertNo,
             @ApiParam(value = "收货仓储公司名称", required = true) @RequestParam("receiverRepoEnterpriseName") String receiverRepoEnterpriseName,

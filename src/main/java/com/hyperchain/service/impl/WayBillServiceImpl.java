@@ -9,6 +9,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -63,7 +64,7 @@ public class WayBillServiceImpl implements WayBillService {
      * @throws PasswordIllegalParam
      */
     @Override
-    public BaseResult<Object> generateUnConfirmedWaybill(String orderNo, String logisticsEnterpriseName, String senderEnterpriseName, String receiverEnterpriseName, String productName, long productQuantity, long productValue, String senderRepoEnterpriseName, String senderRepoCertNo, String receiverRepoEnterpriseName, String receiverRepoBusinessNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> generateUnConfirmedWaybill(String orderNo, String logisticsEnterpriseName, String senderEnterpriseName, String receiverEnterpriseName, String productName, long productQuantity, double productValue, String senderRepoEnterpriseName, String senderRepoCertNo, String receiverRepoEnterpriseName, String receiverRepoBusinessNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
@@ -95,7 +96,7 @@ public class WayBillServiceImpl implements WayBillService {
         Object[] requestContractMethodParams = new Object[5];
         Long[] requestLongs = new Long[3];
         requestLongs[0] = new Date().getTime(); //requestTime
-        requestLongs[1] = productValue; //productValue
+        requestLongs[1] = ReparoUtil.convertYuanToCent(productValue); //productValue
         requestLongs[2] = productQuantity; //productQuantity
         String[] requestAddrs = new String[5];
         requestAddrs[0] = logisticsAddress; //logisticsAddress
@@ -325,7 +326,7 @@ public class WayBillServiceImpl implements WayBillService {
         //所有状态都有的数据(即从待发货状态就已经有的数据)
         wayBillDetailVo.setOrderNo(strs.get(0));
         wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
-        wayBillDetailVo.setProductValue(Long.parseLong(longs.get(1)));
+        wayBillDetailVo.setProductValue(ReparoUtil.convertCentToYuan(Long.parseLong(longs.get(1))));
         wayBillDetailVo.setProductName(strs.get(2));
         wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
         wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));

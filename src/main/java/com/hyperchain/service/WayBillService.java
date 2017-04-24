@@ -24,7 +24,7 @@ public interface WayBillService {
                                                   String receiverEnterpriseName,
                                                   String productName,
                                                   long productQuantity,
-                                                  long productValue,
+                                                  double productValue,
                                                   String senderRepoEnterpriseName,
                                                   String senderRepoCertNo,
                                                   String receiverRepoEnterpriseName,
