@@ -21,7 +21,7 @@ public class WayBillDetailVo {
     private String receiverRepoBusinessNo = "";
     private String productName = "";
     private Long productQuantity = new Long("0");
-    private Long productValue = new Long("0");
+    private String productValue = "0.00";
     private int waybillStatusCode = WayBillStatus.UNDEFINED.getCode();
     private OperationRecordVo[] operationRecordVo = new OperationRecordVo[]{};
     private List<String> logisticsInfo = new ArrayList<>();
@@ -117,11 +117,11 @@ public class WayBillDetailVo {
         this.productQuantity = productQuantity;
     }
 
-    public Long getProductValue() {
+    public String getProductValue() {
         return productValue;
     }
 
-    public void setProductValue(Long productValue) {
+    public void setProductValue(String productValue) {
         this.productValue = productValue;
     }
 
