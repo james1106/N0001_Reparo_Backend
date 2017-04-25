@@ -197,15 +197,9 @@ public class RepositoryServiceImpl implements RepositoryService{
             LogUtil.info("调用合约 : RepositoryContract 方法: outcomeConfirm 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
             LogUtil.info("调用合约outcomeConfirm返回结果：" + contractResult.toString());
-            if(code == Code.SUCCESS){
-                //List<String> dataList = (List<String>) contractResult.getValue();
-                //result.returnWithoutValue(code);
-                String the_data = (String) contractResult.getValue().get(0);
-                result.returnWithValue(code,the_data);
-            }
-            else {
-                result.returnWithoutValue(code);
-            }
+
+             result.returnWithoutValue(code);
+
 
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -409,14 +403,18 @@ public class RepositoryServiceImpl implements RepositoryService{
         repoCertVo.setStorerAddress(detailInfoList2.get(1));
         repoCertVo.setHolderAddress(detailInfoList2.get(2));
 
-        //.equals("")? 0
-        /*repoCertVo.setProductQuantity((String) contractResult.getValue().get(2));
-        repoCertVo.setProductTotalPrice((String) contractResult.getValue().get(3));
-        repoCertVo.setRepoCreateDate((String) contractResult.getValue().get(4));*/
-//        int productQuantity = (contractResult.getValue().get(2)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(2));
-//        int productTotalPrice = (contractResult.getValue().get(3)).equals("")? 0 : Integer.parseInt((String)contractResult.getValue().get(3));
-//        long repoCreateDate = (contractResult.getValue().get(3)).equals("")? 0 : Long.parseLong((String)contractResult.getValue().get(3));
-        //String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+        String repoEnterpriseAddress = detailInfoList2.get(0).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList2.get(0).substring(1);
+        String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+
+        String sotreEnterpriseAddress = detailInfoList2.get(1).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList2.get(1).substring(1);
+        String sotreEnterpriseName = sotreEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(sotreEnterpriseAddress).getCompanyName();
+
+        String holderEnterpriseAddress = detailInfoList2.get(2).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList2.get(2).substring(1);
+        String holderEnterpriseName = holderEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(holderEnterpriseAddress).getCompanyName();
+
+        repoCertVo.setHolderName(holderEnterpriseName);
+        repoCertVo.setRepoEnterpriseName(repoEnterpriseName);
+        repoCertVo.setStorerName(sotreEnterpriseName);
 
         repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
         repoCertVo.setProductTotalPrice(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1)));
