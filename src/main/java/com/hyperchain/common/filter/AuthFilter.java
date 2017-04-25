@@ -23,8 +23,8 @@ import java.io.IOException;
 /**
  * Created by ldy on 2017/4/9.
  */
-@Component
-@WebFilter(filterName = "AuthFilter", urlPatterns = "/*")
+//@Component
+//@WebFilter(filterName = "AuthFilter", urlPatterns = "/*")
 public class AuthFilter implements javax.servlet.Filter {
 
     @Autowired
