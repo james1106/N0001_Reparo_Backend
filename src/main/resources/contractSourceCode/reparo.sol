@@ -1469,6 +1469,14 @@ contract RepositoryContract{
         dest.repoBusiStatus             = sorce.repoBusiStatus      ;
         dest.businessTransNo        = sorce.businessTransNo     ;
         dest.orderNo                = sorce.orderNo             ;
+
+        dest.wayBillNo                = sorce.wayBillNo             ;
+        dest.repoCertNo                = sorce.repoCertNo             ;
+        dest.logisticsEnterpriseAddress                = sorce.logisticsEnterpriseAddress             ;
+        dest.incomeCert                = sorce.incomeCert             ;
+        dest.measureUnit                = sorce.measureUnit             ;
+        dest.norms                = sorce.norms             ;
+        dest.productLocation                = sorce.productLocation             ;
         dest.storerAddress          = sorce.storerAddress       ;
         dest.holderAddress          = sorce.holderAddress       ;
         dest.repoEnterpriseAddress  = sorce.repoEnterpriseAddress;
@@ -1527,6 +1535,7 @@ contract RepositoryContract{
         repoBusinsess.repoBusiStatus = REPO_BUSI_INCOMED;//RepoBusiStatus.INCOMED;
         repoBusinsess.businessTransNo = currBusinessTransNo;
         repoBusinsess.operateOperateTime = operateTime;
+        repoBusinsess.repoCertNo = repoCertNo;
         businessDetailMap[currBusinessTransNo] = repoBusinsess;
 
     //将新的操作记录加入业务流转编号列表
