@@ -15,11 +15,10 @@ import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hyperchain.common.util.ReparoUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static com.hyperchain.common.constant.BaseConstant.CONTRACT_NAME_REPOSITORY;
 import static com.hyperchain.contract.ContractUtil.*;
 import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_INCOMED;
@@ -27,6 +26,7 @@ import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOM
 import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_INCOME_RESPONSE;
 import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_WATING_OUTCOME;
 import static com.hyperchain.common.constant.BaseConstant.REPO_BUSI_OUTCOMED;
+
 /**
  * Created by chenxiaoyang on 2017/4/11.
  */
@@ -141,7 +141,7 @@ public class RepositoryServiceImpl implements RepositoryService{
             contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
             LogUtil.info("调用合约 : RepositoryContract 方法: outcomeResponse 返回结果：" + contractResult.toString());
             Code code = contractResult.getCode();
-            LogUtil.info("调用合约outcomeResponse返回结果：" + contractResult.toString());
+            //LogUtil.info("调用合约outcomeResponse返回结果：" + contractResult.toString());
             result.returnWithoutValue(code);
 
         } catch (ContractInvokeFailException e) {
@@ -320,7 +320,7 @@ public class RepositoryServiceImpl implements RepositoryService{
 
             repoBusinessVo.setCurRepoBusiStatus(curRepoBusiStatus);
             repoBusinessVo.setProductQuantity(productQuantity);
-            repoBusinessVo.setProductTotalPrice(productTotalPrice);
+            repoBusinessVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(productTotalPrice));
 
         /*repoBusinessVo.setCurRepoBusiStatus(Integer.parseInt(detailInfoList2.get(0)));
         repoBusinessVo.setProductQuantity(Long.parseLong(detailInfoList2.get(1)));
@@ -417,12 +417,13 @@ public class RepositoryServiceImpl implements RepositoryService{
         repoCertVo.setStorerName(sotreEnterpriseName);
 
         repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
-        repoCertVo.setProductTotalPrice(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1)));
+        repoCertVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1))));
         repoCertVo.setRepoCreateDate(uintList.get(2).equals("") ? 0 : Long.parseLong(uintList.get(2)));
+        repoCertVo.setRepoCertStatus(uintList.get(3).equals("") ? 0 : Integer.parseInt(uintList.get(3)));
         List<OperationRecordVo> recordVos = new ArrayList<>();
 
-        int length = (uintList.size()-3) / 2;
-        for(int i = 3; i < length+3; i++){
+        int length = (uintList.size()-4) / 2;
+        for(int i = 4; i < length+4; i++){
             OperationRecordVo recordVo = new OperationRecordVo();
             recordVo.setState(uintList.get(i).equals("")? 0 : Integer.parseInt(uintList.get(i)));
             recordVo.setOperateTime(uintList.get(i + length).equals("")? 0 : Long.parseLong(uintList.get(i + length)));
@@ -462,7 +463,7 @@ public class RepositoryServiceImpl implements RepositoryService{
         List<String> addressResultList = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
 
         int length = addressResultList.size();
-        List<RepoCertVo> repoCertVos = new ArrayList<>();
+        List<RepoCertList> repoCertVos = new ArrayList<>();
         for(int i = 0; i < length; i++){
             String repoacertNo = bytesResultList.get(i*2);
             String productName = bytesResultList.get(i*2+1);
@@ -470,7 +471,15 @@ public class RepositoryServiceImpl implements RepositoryService{
             int productQuantitiy = uintResultList.get(i*2).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2));
             int repoCertStatus = uintResultList.get(i*2+1).equals("")? 0 : Integer.parseInt(uintResultList.get(i*2+1));
             String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
-            RepoCertVo repoCertVo = new RepoCertVo();
+
+            /*RepoCertVo repoCertVo = new RepoCertVo();
+            repoCertVo.setRepoCertNo(repoacertNo);
+            repoCertVo.setProductName(productName);
+            repoCertVo.setProductQuantity(productQuantitiy);
+            repoCertVo.setRepoEnterpriseName(repoEnterpriseName);
+            repoCertVo.setRepoCertStatus(repoCertStatus);
+            repoCertVos.add(repoCertVo);*/
+            RepoCertList repoCertVo = new RepoCertList();
             repoCertVo.setRepoCertNo(repoacertNo);
             repoCertVo.setProductName(productName);
             repoCertVo.setProductQuantity(productQuantitiy);
@@ -478,6 +487,14 @@ public class RepositoryServiceImpl implements RepositoryService{
             repoCertVo.setRepoCertStatus(repoCertStatus);
             repoCertVos.add(repoCertVo);
         }
+        //Collections.sort();
+        Collections.sort(repoCertVos,new Comparator<RepoCertList>(){
+            @Override
+            public int compare(RepoCertList b1, RepoCertList b2) {//按仓单号降序排列
+                return b2.getRepoCertNo().compareTo(b1.getRepoCertNo());
+            }
+
+        });
         result.returnWithValue(code, repoCertVos);
         return result;
     }
@@ -561,6 +578,14 @@ public class RepositoryServiceImpl implements RepositoryService{
                 }
 
             }
+            Collections.sort(repoBusinessVos,new Comparator<RepoBusinessVo>(){
+                @Override
+                public int compare(RepoBusinessVo b1, RepoBusinessVo b2) {//按仓储业务编号降序排列
+                    return b2.getRepoBusiNo().compareTo(b1.getRepoBusiNo());
+                }
+
+            });
+
         }
         catch (Exception e){
             LogUtil.error("RepositoryServiceImpl.getRepoBusiInfoList方法异常");

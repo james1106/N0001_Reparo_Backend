@@ -1344,24 +1344,27 @@ contract RepositoryContract{
 
 //查询我的仓单列表
     function getRepoCertInfoList(address userAddress)returns (uint, bytes32[] bytesResult,uint[] uintResult, address[] resultAddress){
-    //通过用户地址查询该用户的仓储业务编号列表
-        bytes32[] repoCertList =  usrRepoBusinessMap[userAddress];
-        uint length = repoCertList.length;
+        //通过用户地址查询该用户的仓储业务编号列表
+        bytes32[] repoBusiList =  usrRepoBusinessMap[userAddress];//repoBusiList
+        uint length = repoBusiList.length;
         if(length == 0){
             return (0, bytesResult, uintResult, resultAddress);
         }
         bytesResult = new bytes32[](length * 2);
         uintResult = new uint[](length * 2);
         resultAddress = new address[](length);
-        for(uint i = 0; i < repoCertList.length; i ++){
+        bytes32 repoCertNo ;
+        for(uint i = 0; i < repoBusiList.length; i ++){
         //对于每个仓储流水号，找到业务流转编号列表
-            bytes32[] busiTransNoList = businessTransNoMap[repoCertList[i]];
+            bytes32[] busiTransNoList = businessTransNoMap[repoBusiList[i]];
         //对于每个业务流转编号，找到对应的仓储结构体
             RepoBusiness repoBusiess = businessDetailMap[busiTransNoList[busiTransNoList.length - 1]];
             bytesResult[i*2] = repoBusiess.repoCertNo;
             bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
-            uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+            repoCertNo = repoBusiToCertMap[repoBusiList[i]];
+            uintResult[i*2+1] = repoCertDetailMap[repoCertNo].repoCertStatus;
+            //uintResult[i*2+1] = repoCertDetailMap[repoBusiList[i]].repoCertStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
         }
         return(0, bytesResult, uintResult, resultAddress);
@@ -1529,7 +1532,7 @@ contract RepositoryContract{
 
     //businessDetailMap[businessTransNo].
 
-
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
         repoBusinsess.repoBusiStatus = REPO_BUSI_INCOMED;//RepoBusiStatus.INCOMED;
@@ -1585,7 +1588,7 @@ contract RepositoryContract{
         usrRepoCertListMap[storerAddress].push(repoCertNo);//持有人仓单列表
         usrRepoCertListMap[repoEnterpriseAddress].push(repoCertNo);//仓储公司仓单列表
 
-
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
 
         repoCertDetailMap[repoCertNo] = RepoCert("",
         repoCertNo,
@@ -1968,7 +1971,7 @@ RepoCert repoCertDtl =  repoCertDetailMap[repoCertNo];
 bytes32[] memory  outBytesList = new bytes32[](7);
 address[] memory  outAddressList = new address[](3);
 uint recordLength = repoCertRecordMap[repoCertNo].repoCertState.length;
-uint totalLength = 3 + recordLength*2;
+uint totalLength = 4 + recordLength*2;
 uint[] memory outUintList = new uint[](totalLength);
 
 outBytesList[0] = repoCertDtl.incomeCert;
@@ -1987,13 +1990,14 @@ outAddressList[2] = repoCertDtl.holderAddress;
 outUintList[0] = repoCertDtl.productQuantitiy;
 outUintList[1] = repoCertDtl.productTotalPrice;
 outUintList[2] = repoCertDtl.repoCreateDate;
+outUintList[3] = repoCertDtl.repoCertStatus;
 
-for(uint i = 3; i < totalLength; i ++){
-if(i < recordLength + 3){
-outUintList[i] = repoCertRecordMap[repoCertNo].repoCertState[i - 3];
+for(uint i = 4; i < totalLength; i ++){
+if(i < recordLength + 4){
+outUintList[i] = repoCertRecordMap[repoCertNo].repoCertState[i - 4];
 }
-if(i >= recordLength + 3){
-outUintList[i] = repoCertRecordMap[repoCertNo].operationTime[i - recordLength - 3];
+if(i >= recordLength + 4){
+outUintList[i] = repoCertRecordMap[repoCertNo].operationTime[i - recordLength - 4];
 }
 }
 
