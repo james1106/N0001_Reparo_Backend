@@ -228,7 +228,7 @@ public class WayBillServiceImpl implements WayBillService {
         //查询订单号列表成功
         //根据订单号获取运单详情
         List<WayBillDetailVo> wayBillDetailVoList = new ArrayList<>();
-        for (int i = 0; i < orderNoList.size(); i++) {
+        for (int i = orderNoList.size() - 1; i >= 0 ; i--) {
             LogUtil.info("运单订单号" + i + " : " + orderNoList.get(i));
 
             ContractKey waybillContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
