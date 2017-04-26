@@ -11,7 +11,16 @@ public class ReceivableRecordDetailVo {
     private String responseType;
     private long time;
     private String operateType;
-    private long dealAmount;
+
+    public String getDealAmount() {
+        return dealAmount;
+    }
+
+    public void setDealAmount(String dealAmount) {
+        this.dealAmount = dealAmount;
+    }
+
+    private String dealAmount;
     private int receivableStatus;
 
     public String getSerialNo() {
@@ -70,13 +79,7 @@ public class ReceivableRecordDetailVo {
         this.operateType = operateType;
     }
 
-    public long getDealAmount() {
-        return dealAmount;
-    }
 
-    public void setDealAmount(long dealAmount) {
-        this.dealAmount = dealAmount;
-    }
 
     public int getReceivableStatus() {
         return receivableStatus;

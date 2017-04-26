@@ -7,6 +7,7 @@ import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
@@ -332,6 +333,10 @@ public class ReceivableServiceImpl implements ReceivableService{
         int status = (partParams1.get(6).equals("")) ? 0 : Integer.parseInt(partParams1.get(6));
         int lastStatus = (partParams1.get(7).equals("")) ? 0 : Integer.parseInt(partParams1.get(7));
 
+        String isseAmtYuan = ReparoUtil.convertCentToYuan(isseAmt);
+        String cashedAmountYuan = ReparoUtil.convertCentToYuan(cashedAmount);
+        String discountInHandAmountYuan = ReparoUtil.convertCentToYuan(discountInHandAmount);
+
         AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
         AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);
         String pyerAddress = pyerAccountEntity.getAddress();
@@ -340,9 +345,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         String pyeeAcctSvcrName = pyeeAccountEntity.getAcctSvcrName();//收款人开户行
         UserEntity pyerUserEntity = userEntityRepository.findByAddress(pyerAddress);
         UserEntity pyeeUserEntity = userEntityRepository.findByAddress(pyeeAddress);
-        String pyerLinkMan = pyerUserEntity.getPhone();//付款人联系方式
+        String pyerLinkPhone = pyerUserEntity.getPhone();//付款人联系方式
         String pyerEnterpriseName = pyerUserEntity.getCompanyName();//付款人企业名
-        String pyeeLinkman = pyeeUserEntity.getPhone();//收款人联系方式
+        String pyeeLinkPhone = pyeeUserEntity.getPhone();//收款人联系方式
         String pyeeEnterpriseName = pyeeUserEntity.getCompanyName();//收款人企业名
 
         ReceivableDetailVo receivableDetailVo = new ReceivableDetailVo();
@@ -364,16 +369,16 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);
         receivableDetailVo.setPyeeEnterpriseName(pyeeEnterpriseName);
         receivableDetailVo.setPyeeAcctSvcrName(pyeeAcctSvcrName);
-        receivableDetailVo.setIsseAmt(isseAmt);
-        receivableDetailVo.setCashedAmount(cashedAmount);
+        receivableDetailVo.setIsseAmt(isseAmtYuan);
+        receivableDetailVo.setCashedAmount(cashedAmountYuan);
         receivableDetailVo.setIsseDt(isseDt);
         receivableDetailVo.setSignInDt(signInDt);
         receivableDetailVo.setDueDt(dueDt);
-        receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
+        receivableDetailVo.setDiscountInHandAmount(discountInHandAmountYuan);
         receivableDetailVo.setDiscounted(discounted);
         receivableDetailVo.setNote(note);
-        receivableDetailVo.setPyeeLinkMan(pyeeLinkman);
-        receivableDetailVo.setPyerLinkMan(pyerLinkMan);
+        receivableDetailVo.setPyeeLinkPhone(pyeeLinkPhone);
+        receivableDetailVo.setPyerLinkPhone(pyerLinkPhone);
 
 
         result.returnWithValue(code, receivableDetailVo);
@@ -461,6 +466,10 @@ public class ReceivableServiceImpl implements ReceivableService{
         int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
         int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
 
+        String isseAmtYuan = ReparoUtil.convertCentToYuan(isseAmt);
+        String cashedAmountYuan = ReparoUtil.convertCentToYuan(cashedAmount);
+        String discountInHandAmountYuan = ReparoUtil.convertCentToYuan(discountInHandAmount);
+
         AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
         AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);
         String pyerAddress = pyerAccountEntity.getAddress();
@@ -469,9 +478,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         String pyeeAcctSvcrName = pyeeAccountEntity.getAcctSvcrName();//收款人开户行
         UserEntity pyerUserEntity = userEntityRepository.findByAddress(pyerAddress);
         UserEntity pyeeUserEntity = userEntityRepository.findByAddress(pyeeAddress);
-        String pyerLinkMan = pyerUserEntity.getPhone();//付款人联系方式
+        String pyerLinkPhone = pyerUserEntity.getPhone();//付款人联系方式
         String pyerEnterpriseName = pyerUserEntity.getCompanyName();//付款人企业名
-        String pyeeLinkman = pyeeUserEntity.getPhone();//收款人联系方式
+        String pyeeLinkPhone = pyeeUserEntity.getPhone();//收款人联系方式
         String pyeeEnterpriseName = pyeeUserEntity.getCompanyName();//收款人企业名
 
         ReceivableDetailVo receivableDetailVo = new ReceivableDetailVo();
@@ -493,16 +502,16 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);
         receivableDetailVo.setPyeeEnterpriseName(pyeeEnterpriseName);
         receivableDetailVo.setPyeeAcctSvcrName(pyeeAcctSvcrName);
-        receivableDetailVo.setIsseAmt(isseAmt);
-        receivableDetailVo.setCashedAmount(cashedAmount);
+        receivableDetailVo.setIsseAmt(isseAmtYuan);
+        receivableDetailVo.setCashedAmount(cashedAmountYuan);
         receivableDetailVo.setIsseDt(isseDt);
         receivableDetailVo.setSignInDt(signInDt);
         receivableDetailVo.setDueDt(dueDt);
-        receivableDetailVo.setDiscountInHandAmount(discountInHandAmount);
+        receivableDetailVo.setDiscountInHandAmount(discountInHandAmountYuan);
         receivableDetailVo.setDiscounted(discounted);
         receivableDetailVo.setNote(note);
-        receivableDetailVo.setPyeeLinkMan(pyeeLinkman);
-        receivableDetailVo.setPyerLinkMan(pyerLinkMan);
+        receivableDetailVo.setPyeeLinkPhone(pyeeLinkPhone);
+        receivableDetailVo.setPyerLinkPhone(pyerLinkPhone);
 
         receivableDetailVoList.add(receivableDetailVo);
 
@@ -570,6 +579,8 @@ public class ReceivableServiceImpl implements ReceivableService{
         long dealAmt = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Long.parseLong(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
         int receivableStatus = (String.valueOf(contractResult.getValueMap().get(resultMapKey[7])).equals("")) ? 0 : Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[7])));
 
+        String dealAmtYuan = ReparoUtil.convertCentToYuan(dealAmt);
+
         ReceivableRecordDetailVo receivableRecordDetailVo = new ReceivableRecordDetailVo();
 
         receivableRecordDetailVo.setSerialNo(serialNo);
@@ -579,7 +590,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableRecordDetailVo.setResponseType(responseType);
         receivableRecordDetailVo.setTime(time);
         receivableRecordDetailVo.setOperateType(operateType);
-        receivableRecordDetailVo.setDealAmount(dealAmt);
+        receivableRecordDetailVo.setDealAmount(dealAmtYuan);
         receivableRecordDetailVo.setReceivableStatus(receivableStatus);
 
         result.returnWithValue(code, receivableRecordDetailVo);
@@ -654,7 +665,23 @@ public class ReceivableServiceImpl implements ReceivableService{
 //        List<OrderOverVo> orderOverVoList = new ArrayList<>();
         List<ReceivableSimpleListVo> receivableSimpleList = new ArrayList<>();
         int length = list1.size() / 3;
-        for(int i = 0; i < length; i++){
+/*        for(int i = 0; i < length; i++){
+            ReceivableSimpleListVo receivableSimpleListVo = new ReceivableSimpleListVo();
+            receivableSimpleListVo.setReceivableNo(list1.get(i*3));
+            receivableSimpleListVo.setProductName(list1.get(i*3+1));
+            receivableSimpleListVo.setEnterpriseName(list1.get(i*3+2));
+
+//            String quantity =(list2.get(i*4) == null || list2.get(i*4).equals("") )? "0": list2.get(i*4);
+            long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
+
+            receivableSimpleListVo.setProductQuantity(quantity);
+            receivableSimpleListVo.setIsseAmt(Long.parseLong(list2.get(i*4+1)));
+            receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
+            receivableSimpleListVo.setStatus(Integer.parseInt(list2.get(i*4+3)));
+            receivableSimpleList.add(receivableSimpleListVo);
+        }
+*/
+        for(int i = length - 1; i >= 0; i--){
             ReceivableSimpleListVo receivableSimpleListVo = new ReceivableSimpleListVo();
             receivableSimpleListVo.setReceivableNo(list1.get(i*3));
             receivableSimpleListVo.setProductName(list1.get(i*3+1));

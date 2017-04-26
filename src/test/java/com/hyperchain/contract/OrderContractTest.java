@@ -1,20 +1,27 @@
 package com.hyperchain.contract;
 
+import cn.hyperchain.common.log.LogUtil;
 import cn.hyperchain.sdk.rpc.Transaction.Transaction;
 import cn.hyperchain.sdk.rpc.returns.CompileReturn;
 import com.alibaba.fastjson.JSON;
 import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
+import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
-import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.common.util.CommonUtil;
+import com.hyperchain.controller.vo.*;
+import com.hyperchain.dal.entity.UserEntity;
+import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.exception.ESDKException;
 import com.hyperchain.test.base.SpringBaseTest;
+import jxl.common.BaseUnit;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -37,65 +44,110 @@ public class OrderContractTest extends SpringBaseTest{
     String payeePublicKey = "59a919333413f214131e1cb29a65b17ba42ffd86";
     String payeePrivateKey = "{\"address\":\"59a919333413f214131e1cb29a65b17ba42ffd86\",\"encrypted\":\"779bbf3e3779156f9b95928c1ac6ef9d1c3b2ffc72fc6f618e53cbee0fe1cc89\",\"version\":\"2.0\",\"algo\":\"0x03\"}";
 
-        @Test
-    public void newAccount() throws Exception{
+    @Autowired
+    private UserEntityRepository userEntityRepository;
 
-        List<String> keyInfos1 = ESDKUtil.newAccount();
-        String publicKey1 = keyInfos1.get(0);
-        String privateKey1 = keyInfos1.get(1);
-        System.out.println("payerPublicKey:"+publicKey1);
-        System.out.println("payerPrivateKey:"+privateKey1);
-
-
-        List<String> keyInfos2 = ESDKUtil.newAccount();
-        String publicKey2 = keyInfos2.get(0);
-        String privateKey2 = keyInfos2.get(1);
-        System.out.println("payeePublicKey:"+publicKey2);
-        System.out.println("payeePrivateKey:"+privateKey2);
-    }
 
     @Test
+    public void ThisIsTheMethodModelTry() throws Exception {
+
+        //1.获取contractKey：ContractKey contractKey = new ContractKey(调用者的私钥, BaseConstant.SALT_FOR_PRIVATE_KEY+调用者的账户名);
+        //2.创建好需要的 (String)contractMethodName  (Object)contractMethodParams[]  (String)contractReturnsMapKey[]参数列表；
+        //3.调用ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, BaseConstant.合约方法名)
+        //  方法，得到contractResult结果
+        //4.判断所得到的结果与自己想要的结果是否符合 or 输出得到的结果供检查
+
+        //--1.1获取用户名
+        //----1.1.1首先根据用户地址获取用户实体
+        UserEntity payerUserEntity = userEntityRepository.findByAddress("59a919333413f214131e1cb29a65b17ba42ffd86"); //参数为 买家地址
+        //----1.1.2调用用户实体的getAccountName()方法获取用户账户名
+        String payerAccountName = payerUserEntity.getAccountName();
+
+        //1.2获取contractKey
+        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+
+        //2.1
+        String contractMethodName = "updateOrderState";
+        //2.2
+        Object[] contractMethodParams = new Object[3];
+        String orderNo = "100"+"20170405205903117"+"200";   //订单编号 21位
+        String stateType = "";
+        String newState = "";
+        contractMethodParams[0] = orderNo;
+        contractMethodParams[1] = stateType;
+        contractMethodParams[2] = newState;
+        //2.3若合约中的返回值有n个，则在String数组中填写n个名字，作为要查看的返回信息的key，对应合约中的各个返回值
+        String[] contractReturnsMapKey = new String[]{};
+
+        //3.调用
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractReturnsMapKey, BaseConstant.CONTRACT_NAME_ORDER);
+
+        //4.此处是选择打印出来返回信息
+        System.out.println("调用OrderContract合约中的ThisIsTheMethodModelTry方法的返回code：" + contractResult.getCode());      //code为0表示成功
+        System.out.println("调用OrderContract合约中的ThisIsTheMethodModelTry方法的返回content：" + contractResult.toString());  //把整个返回内容展现出来
+    }
+
+    //买家address： 0e1b81184266eaa1bbb19dabcefe78faeae11895
+    //卖家address： f014bae4a69e0e4790214f52b6615a3a5e3d8c28
+    //买家仓储address: 5cb0febe91a1c1a714cbf91a80bf51661f3b5ed6
+    //卖家仓储address: eedddb31964b8896d795e1a0dbf1e854c3aab57f
+
+    //单元测试--新增一个订单(默认为测试主体为买家)
+    @Test
     public void addOrder() throws Exception {
+
+        UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
+        String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
+        String payerAccountName = payerUserEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+
+        //2.1
+        String contractMethodName = "createOrder";
+        //2.2
+        Object[] contractMethodParams = new Object[9];
+
         long unitPrice = 100;
         long prodNum = 100;
         long timeStamp = System.currentTimeMillis();
-
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");//设置日期格式
-        String orderId = "20170405205903117";
+        String orderNo = "100"+"20170405205903117"+"200";   //订单编号 21位
+        String txSerialNo = orderNo + "00";                 //交易序列号
         String productName = "Apple";
-        String payerRepo = "A仓储公司";
+        String repoBusinessNo = "123";
         String payerBank = "中国银行";
         String payerBankClss = "54321";
         String payerAccount = "55556777777";
         List<String> list= new ArrayList<>();
-        list.add(orderId);
+        list.add(orderNo);
         list.add(productName);
+        list.add(repoBusinessNo);
         list.add(payerBank);
         list.add(payerBankClss);
         list.add(payerAccount);
-        list.add(payerRepo);
+        list.add(txSerialNo);
+        String accountAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);    //账户合约地址
 
-        String funcName = "createOrder";
-        Object[] params = new Object[7];
-        params[0] = "59a919333413f214131e1cb29a65b17ba42ffd86";
-        params[1] = unitPrice; //单价
-        params[2] = prodNum; //
-        params[3] = unitPrice * prodNum; //
-        params[4] = list;
-        params[5] = 0;
-        params[6] = timeStamp;
-
-        String methodName = "createOrder";
-        String[] resultMapKey = new String[]{};
-        BaseResult result = new BaseResult();
-
-        ContractKey contractKey = new ContractKey(payerPrivateKey);
+        contractMethodParams[0] = accountAddr;                                  //账户合约地址
+        contractMethodParams[1] = "f014bae4a69e0e4790214f52b6615a3a5e3d8c28";   //卖方address
+        contractMethodParams[2] = "5cb0febe91a1c1a714cbf91a80bf51661f3b5ed6";   //买方仓储公司address
+        contractMethodParams[3] = unitPrice;              //单价
+        contractMethodParams[4] = prodNum;                //数量
+        contractMethodParams[5] = unitPrice * prodNum;    //总价
+        contractMethodParams[6] = list;                   //参数列表(内容见创建列表处)
+        contractMethodParams[7] = 0;                      //付款方式(0代表应付账款方式，1代表现金)
+        contractMethodParams[8] = timeStamp;              //生成订单时间
 
 
+        //2.3若合约中的返回值有n个，则在String数组中填写n个名字，作为要查看的返回信息的key，对应合约中的各个返回值
+        String[] contractReturnsMapKeys = new String[]{};
+
+
+        //3.调用
+        BaseResult result = new BaseResult();       //
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, "OrderContract");
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractReturnsMapKeys, BaseConstant.CONTRACT_NAME_ORDER);
             Code code = contractResult.getCode();
-            result.returnWithValue(code, orderId);
+            result.returnWithValue(code, orderNo);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -103,64 +155,51 @@ public class OrderContractTest extends SpringBaseTest{
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
         }
-//        return result;
-//
-//
-//
-//        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
-//        transaction.sign(payerPrivateKey, null);
-//
-//        String result = ESDKConnection.invokeContractMethod(transaction);
-//        Assert.assertNotNull(result);
-//        System.out.println("==================invoke result:================== " + result);
-//        //返回值解码
-//        List<Object> retDec;
+
         System.out.println("==================after decode result:==================" + JSON.toJSON(result));
     }
 
+    //单元测试--根据订单编号获取订单详情(默认为测试主体为买家)
     @Test
-    public void queryOrderDetailTest() throws Exception {
-        String orderId = "20170405205903111";// new Date()为获取当前系统时间，也可使用当前时间戳
-//
-//        String funcName = "queryOrderDetail";
-//        Object[] params = new Object[1];
-//        params[0] = orderId;
-//
-//        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
-//        transaction.sign(payerPrivateKey, null);
-//
-//        String result = ESDKConnection.invokeContractMethod(transaction);
-//        Assert.assertNotNull(result);
-//        //System.out.println("==================invoke result:================== " + result);
-//
-//        //返回值解码
-//        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-//        System.out.println("==================after decode result:==================" + retDecode);
-//
+    public void queryOrderDetail() throws Exception {
 
-        // 合约的公私钥
-        ContractKey contractKey = new ContractKey(payerPrivateKey);
-        String[] contractMethodReturns = new String[]{"address1", "address2", "string", "uint[]", "int", "int"};
+        UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
+        String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
+        String payerAccountName = payerUserEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+
+        //2.1
         String contractMethodName = "queryOrderDetail";
-        // 合约方法参数（公钥，角色代码，物流交换码）
+        //2.2
+        Object[] contractMethodParams = new Object[4];
 
-        Object[] contractMethodParams = new Object[1];
-        contractMethodParams[0] = orderId;
+        String receAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_RECEIVABLE);    //应收帐款合约地址
+        String wbillAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);      //运单合约地址
+        String accountAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);    //账户合约地址
+        String orderNo = "100"+"20170405205903117"+"200";   //订单编号
 
-        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, "order_reparo");
+        contractMethodParams[0] = receAddr;
+        contractMethodParams[1] = wbillAddr;
+        contractMethodParams[2] = accountAddr;
+        contractMethodParams[3] = orderNo;
+        //2.3
+        String[] contractReturnsMapKey = new String[]{"resultAddress", "resultBytes32", "resultUint", "resultMethod", "txState"};
+
+        //3.调用
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractReturnsMapKey, BaseConstant.CONTRACT_NAME_ORDER);
+
+        //4.检查
         BaseResult<Object> result = new BaseResult<>();
-//         将合约结果转化为接口返回数据
+        //将合约结果转化为接口返回数据
         int resultCode = contractResult.getCode().getCode();
         Code code1 = Code.fromInt(resultCode);
-        System.out.println(resultCode);
+
         if(resultCode == 2001){
             result.returnWithoutValue(code1);
-
-//            result.setCode(21);
-//            result.setMessage("该订单编号不存在");
+            //result.setCode(21);
+            //result.setMessage("该订单编号不存在");
             System.out.println(JSON.toJSON(result));
         }
-
         else if(resultCode == 2002){
             result.setCode(22);
             result.setMessage("用户不可查询该订单详情");
@@ -169,137 +208,299 @@ public class OrderContractTest extends SpringBaseTest{
         }
         else {
 
-            String  payerAccount =  (String)contractResult.getValueMap().get(contractMethodReturns[0]);
-            String  payeeAccount =  (String)contractResult.getValueMap().get(contractMethodReturns[1]);
-            List<String> partParams1 = (List<String>) contractResult.getValueMap().get(contractMethodReturns[2]);
-            List<String> partParams2 = (List<String>) contractResult.getValueMap().get(contractMethodReturns[3]);
-            String payingMethod = (String) contractResult.getValueMap().get(contractMethodReturns[4]);
-            String orderState = (String)contractResult.getValueMap().get(contractMethodReturns[5]);
+            List<String> addressList = (List<String>)contractResult.getValueMap().get(contractReturnsMapKey[0]);
+            List<String> partParams1 = (List<String>)contractResult.getValueMap().get(contractReturnsMapKey[1]);
+            List<String> partParams2 = (List<String>)contractResult.getValueMap().get(contractReturnsMapKey[2]);
+            String payingMethodString = (String)contractResult.getValueMap().get(contractReturnsMapKey[3]);
+            String txStateString = (String)contractResult.getValueMap().get(contractReturnsMapKey[4]);
 
-            String productPrice = partParams2.get(0);
-            String productNum = partParams2.get(1);
-            String totalPrice = partParams2.get(2);
-            String timeStamp = partParams2.get(3);
+            int payingMethodInt = payingMethodString.equals("") ? 0 : Integer.parseInt(payingMethodString);
+            int txStateInt = txStateString.equals("")? 0 : Integer.parseInt(txStateString);
 
-            String orderId2 = partParams1.get(0);
+            String payerAddress = addressList.get(0).substring(1);
+            String payeeAddress = addressList.get(1).substring(1);
+            String payerRepoAddress = addressList.get(2).equals("")? "" : addressList.get(2).substring(1);
+            String payeeRepoAddress = addressList.get(3).equals("x0000000000000000000000000000000000000000")? "" : addressList.get(3).substring(1);
+
+            String payerCompanyName = userEntityRepository.findByAddress(payerAddress).getCompanyName();
+            String payeeCompanyName = userEntityRepository.findByAddress(payeeAddress).getCompanyName();
+            String payerRepoName = payerRepoAddress.equals("") ? "" : userEntityRepository.findByAddress(payerRepoAddress).getCompanyName();
+            String payeeRepoName = payeeRepoAddress.equals("") ? "" : userEntityRepository.findByAddress(payeeRepoAddress).getCompanyName();
+
+            //获取交易信息
+            String orderId = partParams1.get(0);
             String productName = partParams1.get(1);
             String payerBank = partParams1.get(2);
             String payerBankClss = partParams1.get(3);
-            String payerBankAccount = partParams1.get(4);
+            String payerAccount = partParams1.get(4);
 
-            Map<String, Object> resultMap = new HashedMap();
+            //以下为仓储详情
+            String payerRepoBusinessNo = partParams1.get(5);//买家仓储流水号
+            String payeeRepoBusinessNo = partParams1.get(6);//卖家仓储流水号
+            String payerRepoCertNo = partParams1.get(7);    //买家仓单编号
+            String payeeRepoCertNo = partParams1.get(8);    //卖家仓单编号
 
-            resultMap.put("payerAccount", payerAccount);
-            resultMap.put("payeeAccount", payeeAccount);
-            resultMap.put("orderId", orderId2);
-            resultMap.put("productName", productName);
-            resultMap.put("payerBank", payerBank);
-            resultMap.put("payerBankClss", payerBankClss);
-            resultMap.put("payerBankAccount", payerBankAccount);
-            resultMap.put("productPrice", Long.parseLong(productPrice)/100);
-            resultMap.put("productNum", productNum);
-            resultMap.put("totalPrice", Long.parseLong(totalPrice)/100);
-            resultMap.put("timeStamp", timeStamp);
-            resultMap.put("payingMethod", payingMethod);
-            resultMap.put("orderState", orderState);
+            long productUnitPrice = Long.parseLong(partParams2.get(0))/100;
+            long productQuantity = Long.parseLong(partParams2.get(1));
+            long productTotalPrice = Long.parseLong(partParams2.get(2))/100;
+            long orderGenerateTime = Long.parseLong(partParams2.get(3));
+            long orderComfirmTime = partParams2.get(4).equals("") ? 0:Long.parseLong(partParams2.get(4));
+            int payerRepoBusiState = partParams2.get(5).equals("") ? 0: Integer.parseInt(partParams2.get(5));
+            int payeeRepoBusiState = partParams2.get(6).equals("") ? 0: Integer.parseInt(partParams2.get(6));
 
-            result.setData(resultMap);
-            result.setCode(contractResult.getCode().getCode());
+            //物流信息详情
+            String wayBillNo = partParams1.get(9);//物流单号
+            String logisticCompany = addressList.get(4);//物流公司
+
+            long wayBillGenerateTime = partParams2.get(7).equals("") ? 0 : Long.parseLong(partParams2.get(7));
+            int wayBillLatestStatus = partParams2.get(8).equals("") ? 0 : Integer.parseInt(partParams2.get(8));
+            long wayBillUpdateTime = partParams2.get(9).equals("") ? 0 : Long.parseLong(partParams2.get(9));
+
+//        以下为应收账款概要信息
+
+            String receNo = partParams1.get(10);
+            String receivingSide = partParams1.get(11);
+            String payingSide = partParams1.get(12);
+            long coupon = partParams1.get(13).equals("") ? 0 : Long.parseLong(partParams1.get(13));
+
+            long receGenerateTime = partParams2.get(10).equals("") ? 0 : Long.parseLong(partParams2.get(10));
+            long receAmount = partParams2.get(11).equals("") ? 0 : Long.parseLong(partParams2.get(11));
+            int receLatestStatus = partParams2.get(12).equals("") ? 0 : Integer.parseInt(partParams2.get(12));
+            long receUpdateTime = partParams2.get(13).equals("") ? 0 : Long.parseLong(partParams2.get(13));
+            long dueDate = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
+
+            TransactionDetailVo txDetailVo = new TransactionDetailVo();
+            List<OperationRecordVo> txRecordList = new ArrayList<>();
+
+
+            txRecordList.add(new OperationRecordVo(1, orderGenerateTime));
+            if(txStateInt == 2){
+                txRecordList.add(new OperationRecordVo(txStateInt, orderComfirmTime));
+            }
+
+            txDetailVo.setPayerCompanyName(payerCompanyName);
+            txDetailVo.setPayeeCompanyName(payeeCompanyName);
+            txDetailVo.setPayingMethod(payingMethodInt);
+            txDetailVo.setProductUnitPrice(productUnitPrice);
+            txDetailVo.setProductQuantity(productQuantity);
+            txDetailVo.setProductTotalPrice(productTotalPrice);
+            txDetailVo.setOrderId(orderId);
+            txDetailVo.setOperationRecordVoList(txRecordList);
+            txDetailVo.setProductName(productName);
+            txDetailVo.setPayerBank(payerBank);
+            txDetailVo.setPayerBankClss(payerBankClss);
+            txDetailVo.setPayerAccount(payerAccount);
+            txDetailVo.setPayeeRepo(payeeRepoName);
+            txDetailVo.setPayerRepo(payerRepoName);
+            txDetailVo.setPayeeRepoBusinessNo(payeeRepoBusinessNo);
+            txDetailVo.setPayerRepoBusinessNo(payerRepoBusinessNo);
+            txDetailVo.setPayeeRepoCertNo(payeeRepoCertNo);
+            txDetailVo.setPayerRepoCertNo(payerRepoCertNo);
+
+            ReceOverVo receOverVo = new ReceOverVo();
+            receOverVo.setReceNo(receNo);
+            receOverVo.setReceivingSide(receivingSide);
+            receOverVo.setPayingSide(payingSide);
+            receOverVo.setDueDate(dueDate);
+            receOverVo.setReceGenerateTime(receGenerateTime);
+            receOverVo.setReceAmount(receAmount);
+            receOverVo.setCoupon(coupon);
+            receOverVo.setReceLatestStatus(receLatestStatus);
+            receOverVo.setReceUpdateTime(receUpdateTime);
+
+            WayBillOverInfo wayBillOverInfo = new WayBillOverInfo();
+            wayBillOverInfo.setLogisticCompany(logisticCompany);
+            wayBillOverInfo.setWayBillGenerateTime(wayBillGenerateTime);
+            wayBillOverInfo.setWayBillLatestStatus(wayBillLatestStatus);
+            wayBillOverInfo.setWayBillNo(wayBillNo);
+            wayBillOverInfo.setWayBillUpdateTime(wayBillUpdateTime);
+
+            RepoOverVo repoOverVo = new RepoOverVo();
+            repoOverVo.setPayerRepoCertNo(payerRepoCertNo);
+            repoOverVo.setPayeeRepoCertNo(payeeRepoCertNo);
+            repoOverVo.setPayerRepoBusinessNo(payerRepoBusinessNo);
+            repoOverVo.setPayeeRepoBusinessNo(payeeRepoBusinessNo);
+            repoOverVo.setInApplyTime(orderGenerateTime);
+            repoOverVo.setOutApplyTime(orderComfirmTime);
+            repoOverVo.setPayeeRepoBusiState(payeeRepoBusiState);
+            repoOverVo.setPayerRepoBusiState(payerRepoBusiState);
+
+
+            Map<String, Object> orderDetailMap = new HashMap();
+            orderDetailMap.put("txDetail", txDetailVo);
+            orderDetailMap.put("receOver", receOverVo);
+            orderDetailMap.put("wayBillOver", wayBillOverInfo);
+            orderDetailMap.put("repoOver", repoOverVo);
+
+            result.returnWithValue(contractResult.getCode(), orderDetailMap);
+
             System.out.println(JSON.toJSON(result));
         }
 
     }
 
+    //单元测试--查询所有的订单概要信息(默认为测试主体为买家)
     @Test
-    public void queryAllOrderListForPayerTest() throws Exception {
-        String funcName = "queryAllOrderListForPayer";
-        Object[] params = new Object[0];
+    public void queryAllOrderOverViewInfoListTest1() throws Exception {
+        UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
+        String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
+        String payerAccountName = payerUserEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
 
-        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params, "order_reparo");
-        transaction.sign(payerPrivateKey, null);
+        //2.1
+        String contractMethodName = "queryAllOrderOverViewInfoList";
+        //2.2
+        Object[] contractMethodParams = new Object[2];
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);    //账户合约地址
+        String companyRole = "0";   //0代表买家，1代表卖家
+        contractMethodParams[0] = acctContractAddress;
+        contractMethodParams[1] = companyRole;
+        //2.3
+        String[] contractReturnsMapKeys = new String[]{"partList1", "partList2", "partList3", "methodList", "stateList"};
 
-        String result = ESDKConnection.invokeContractMethod(transaction);
-        Assert.assertNotNull(result);
-        //System.out.println("==================invoke result:================== " + result);
+        //3.
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractReturnsMapKeys, BaseConstant.CONTRACT_NAME_ORDER);
 
-        //返回值解码
-        List<Object> retDecode = ESDKUtil.retDecode(funcName, result, "order_reparo");
-        System.out.println("==================after decode result:==================" + retDecode);
+        BaseResult<Object> result = new BaseResult<>();
+
+        int resultCode = contractResult.getCode().getCode();
+        Code code1 = Code.fromInt(resultCode);
+        //打印查询结果的成功与否
+        System.out.println(resultCode);
+
+        List<String> partList1 = (List<String>)contractResult.getValueMap().get(contractReturnsMapKeys[0]);
+        List<String> partList2 = (List<String>)contractResult.getValueMap().get(contractReturnsMapKeys[1]);
+        List<String> partList3 = (List<String>)contractResult.getValueMap().get(contractReturnsMapKeys[2]);
+        List<String> methodList = (List<String>)contractResult.getValueMap().get(contractReturnsMapKeys[3]);
+        List<String> stateList = (List<String>)contractResult.getValueMap().get(contractReturnsMapKeys[4]);
+
+        int length = methodList.size();
+        List<OrderOverVo> orderOverVoList = new ArrayList<>();
+
+        for(int i = 0; i < length; i++){
+            OrderOverVo orderOverVo = new OrderOverVo();
+
+            orderOverVo.setOrderNo(partList1.get(i*4));
+            orderOverVo.setProductName(partList1.get(i*4+1));
+            orderOverVo.setPayerBank(partList1.get(i*4+2));
+            orderOverVo.setPayerBankAccount(partList1.get(i*4+3));
+
+            String payerAddress = partList2.get(i*4).substring(1);
+            String payeeAddress = partList2.get(i*4+1).substring(1);
+            String payerRepoAddress = partList2.get(i*4+2).equals("x0000000000000000000000000000000000000000") ? "" : partList2.get(i*4+2).substring(1);
+            String payeeRepoAddress = partList2.get(i*4+3).equals("x0000000000000000000000000000000000000000") ? "" : partList2.get(i*4+3).substring(1);
+            String payerCompanyName = userEntityRepository.findByAddress(payerAddress).getCompanyName();
+            String payeeCompanyName = userEntityRepository.findByAddress(payeeAddress).getCompanyName();
+            String payerRepoName = payerRepoAddress.equals("") ? "" : userEntityRepository.findByAddress(payerRepoAddress).getCompanyName();
+            String payeeRepoName = payeeRepoAddress.equals("") ? "" : userEntityRepository.findByAddress(payeeRepoAddress).getCompanyName();
+            int iiii = 0;//别管这句话，任何用都没有
+
+            orderOverVo.setPayerCompanyName(payerCompanyName);
+            orderOverVo.setPayeeCompanyName(payeeCompanyName);
+            orderOverVo.setPayerRepoName(payerRepoName);
+            orderOverVo.setPayeeRepoName(payeeRepoName);
+
+            orderOverVo.setProductQuantity(Long.parseLong(partList3.get(i*5)));
+            orderOverVo.setProductUnitPrice(Long.parseLong(partList3.get(i*5+1))/100);
+
+            long orderConfirmTime = partList3.get(i*5+4).equals("")? 0 : Long.parseLong(partList3.get(i*5+4));
+            orderOverVo.setProductTotalPrice(Long.parseLong(partList3.get(i*5+2))/100);
+            orderOverVo.setOrderGenerateTime(Long.parseLong(partList3.get(i*5+3)));
+            orderOverVo.setOrderConfirmTime(orderConfirmTime);
+
+            int txState = stateList.get(i*4).equals("")? 0 : Integer.parseInt(stateList.get(i*4));
+            int repoState = stateList.get(i*4+1).equals("")? 0 : Integer.parseInt(stateList.get(i*4+1));
+            int wayState = stateList.get(i*4+2).equals("")? 0 : Integer.parseInt(stateList.get(i*4+2));
+            int receState = stateList.get(i*4+3).equals("")? 0 : Integer.parseInt(stateList.get(i*4+3));
+
+            orderOverVo.setReceStatus(receState);
+            orderOverVo.setRepoStatus(repoState);
+            orderOverVo.setTransactionStatus(txState);
+            orderOverVo.setWayBillStatus(wayState);
+            int payingMethod = methodList.get(i).equals("")? 0 : Integer.parseInt(methodList.get(i));
+            orderOverVo.setPayingMethod(payingMethod);
+            orderOverVoList.add(orderOverVo);
+        }
+
+
+        result.returnWithValue(contractResult.getCode(),orderOverVoList);
+        System.out.println(JSON.toJSON(result));
 
     }
 
-
+    //单元测试--测试确认订单方法(默认为测试主体为卖家)
     @Test
-    public void queryAllOrderListForPayeeTest() throws Exception {
-        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
+    public void confirmOrderTest() throws Exception {
+        UserEntity payeeUserEntity = userEntityRepository.findByAddress("f014bae4a69e0e4790214f52b6615a3a5e3d8c28"); //参数为 卖家地址
+        String payeePrivateKeyThis = payeeUserEntity.getPrivateKey();
+        String payeeAccountName = payeeUserEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(payeePrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payeeAccountName);
 
-        String funcName = "queryAllOrderListForPayee";
-        Object[] params = new Object[0];
-        //params[0] = orderId;
+        //2.1
+        String contractMethodName = "confirmOrder";
+        //2.2
+        Object[] contractMethodParams = new Object[6];
 
-        Transaction transaction = ESDKUtil.getTxHash(payeePublicKey, funcName, params, "order_reparo");
-        transaction.sign(payeePrivateKey, null);
+        UserEntity payeeRepoEntity = userEntityRepository.findByCompanyName("卖家仓储007");//参数为 仓储公司名字查询
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);    //账户合约地址
+        String orderNo = "100"+"20170405205903117"+"200";   //订单编号 21位
+        String payeeRepoAddress = payeeRepoEntity.getAddress();
+        String payeeRepoCertNo = ""; //(由swagger生成，暂无)
+        String txSerialNo = orderNo + "01";
+        long orderConfirmTime = System.currentTimeMillis();
 
-        String result = ESDKConnection.invokeContractMethod(transaction);
-        Assert.assertNotNull(result);
-        //System.out.println("==================invoke result:================== " + result);
+        contractMethodParams[0] = acctContractAddress;
+        contractMethodParams[1] = orderNo;
+        contractMethodParams[2] = payeeRepoAddress;
+        contractMethodParams[3] = payeeRepoCertNo;
+        contractMethodParams[4] = txSerialNo;
+        contractMethodParams[5] = orderConfirmTime;
 
-        //返回值解码
-        List<Object> retDecode = ESDKUtil.retDecode(funcName, result, "order_reparo");
-        System.out.println("==================after decode result:==================" + retDecode);
+        //2.3
+        String[] contractReturnsMapKeys = new String[]{};
 
+        //3.+4.
+        BaseResult result = new BaseResult();
+        try {
+            ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractReturnsMapKeys, BaseConstant.CONTRACT_NAME_ORDER);
+            Code code = contractResult.getCode();
+            result.returnWithoutValue(code);
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        System.out.println("==================after confirmOrder result:==================" + JSON.toJSON(result));
     }
 
 
-
-//
-//    @Test //由买方进行确认时会返回22-订单仅允许卖方进行确认
-//    public void orderConfirm() throws Exception {
-//        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
-//
-//        String funcName = "orderConfirm";
-//        Object[] params = new Object[1];
-//        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
-//
-//
-//        Transaction transaction = ESDKUtil.getTxHash(payerPublicKey, funcName, params);
-//        transaction.sign(payerPrivateKey, null);
-//
-//        String result = ESDKConnection.invokeContractMethod(transaction);
-//        Assert.assertNotNull(result);
-//        //System.out.println("==================invoke result:================== " + result);
-//
-//        //返回值解码
-//        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-//        System.out.println("==================after decode result:==================" + retDecode);
-//        Assert.assertEquals("22", retDecode.get(0));
-//      }
-//
-//    @Test //由卖方进行确认时会返回0-成功
-//    public void orderConfirm_2() throws Exception {
-//        String orderId = "20170405205903840";// new Date()为获取当前系统时间，也可使用当前时间戳
-//
-//        String funcName = "orderConfirm";
-//        Object[] params = new Object[1];
-//        params[0] = orderId; //+"92a87ad2c26d80705cf1f0d7c0c1f6ecb140459e";
-//
-//
-//        Transaction transaction = ESDKUtil.getTxHash(payeePublicKey, funcName, params);
-//        transaction.sign(payeePrivateKey, null);
-//
-//        String result = ESDKConnection.invokeContractMethod(transaction);
-//        Assert.assertNotNull(result);
-//        //System.out.println("==================invoke result:================== " + result);
-//
-//        //返回值解码
-//        List<Object> retDecode = ESDKUtil.retDecode(funcName, result);
-//        System.out.println("==================after decode result:==================" + retDecode);
-//        Assert.assertEquals("0", retDecode.get(0));
-//    }
     @Test
     public void randomTest(){
-            for (int i = 0; i < 10; i++){
-                System.out.println(new Random().nextInt(900)+100);
-            }
+        for (int i = 0; i < 10; i++){
+            System.out.println(new Random().nextInt(900)+100);
+        }
     }
+
+
+//    @Test
+//    public void newAccount() throws Exception{
+//
+//        List<String> keyInfos1 = ESDKUtil.newAccount();
+//        String publicKey1 = keyInfos1.get(0);
+//        String privateKey1 = keyInfos1.get(1);
+//        System.out.println("payerPublicKey:"+publicKey1);
+//        System.out.println("payerPrivateKey:"+privateKey1);
+//
+//
+//        List<String> keyInfos2 = ESDKUtil.newAccount();
+//        String publicKey2 = keyInfos2.get(0);
+//        String privateKey2 = keyInfos2.get(1);
+//        System.out.println("payeePublicKey:"+publicKey2);
+//        System.out.println("payeePrivateKey:"+privateKey2);
+//    }
+
+
 }

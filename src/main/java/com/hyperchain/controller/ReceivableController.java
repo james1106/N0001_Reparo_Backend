@@ -4,6 +4,7 @@ import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
@@ -52,7 +53,7 @@ public class ReceivableController {
             @ApiParam(value = "订单编号", required = true) @RequestParam String orderNo,
             @ApiParam(value = "付款人账号", required = true) @RequestParam String pyer,//承兑人 = 付款人
             @ApiParam(value = "收款人账号", required = true) @RequestParam String pyee,//签发人 = 收款人
-            @ApiParam(value = "票面金额", required = true) @RequestParam long isseAmt,
+            @ApiParam(value = "票面金额", required = true) @RequestParam double isseAmt,
             @ApiParam(value = "到期日", required = true) @RequestParam long dueDt,
             @ApiParam(value = "带息利率", required = true) @RequestParam String rate,
             @ApiParam(value = "合同编号", required = true) @RequestParam String contractNo,
@@ -78,6 +79,7 @@ public class ReceivableController {
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//order合约地址
 
+        long isseAmtFen = ReparoUtil.convertYuanToCent(isseAmt);
         Object[] params = new Object[12];
         params[0] = receivableNo;
         params[1] = orderNo;
@@ -85,7 +87,7 @@ public class ReceivableController {
         params[3] = pyer;
         params[4] = pyee;
         params[5] = pyer;
-        params[6] = isseAmt;
+        params[6] = isseAmtFen;
         params[7] = dueDt;
         params[8] = rate;
         params[9] = list;
@@ -143,7 +145,7 @@ public class ReceivableController {
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
-            @ApiParam(value = "申请贴现金额", required = true) @RequestParam long discountApplyAmount,//申请贴现金额
+            @ApiParam(value = "申请贴现金额", required = true) @RequestParam double discountApplyAmount,//申请贴现金额
             HttpServletRequest request
     ) throws Exception {
 
@@ -158,14 +160,14 @@ public class ReceivableController {
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
-
+        long discountApplyAmountFen = ReparoUtil.convertYuanToCent(discountApplyAmount);
         Object[] params = new Object[7];
         params[0] = receivableNo;
         params[1] = applicantAcctId;
         params[2] = replyerAcctId;
         params[3] = serialNo;
         params[4] = discountApplyTime;
-        params[5] = discountApplyAmount;
+        params[5] = discountApplyAmountFen;
         params[6] = orderContractAddress;
 
         // 调用合约查询账户，获取返回结果
@@ -192,7 +194,7 @@ public class ReceivableController {
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,//应收款编号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
             @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
-            @ApiParam(value = "回复到手金额", required = true) @RequestParam long discountInHandAmount,//回复到手金额
+            @ApiParam(value = "回复到手金额", required = true) @RequestParam double discountInHandAmount,//回复到手金额
 //            @ApiParam(value = "贴现申请时的流水号", required = true) @RequestParam long discountApplySerialNo,//贴现申请时的流水号
             HttpServletRequest request//http请求实体
     ) throws Exception {
@@ -208,7 +210,7 @@ public class ReceivableController {
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
-
+        long discountInHandAmountFen = ReparoUtil.convertYuanToCent(discountInHandAmount);
         Object[] params = new Object[8];
         params[0] = receivableNo;
         params[1] = replyerAcctId;
@@ -216,7 +218,7 @@ public class ReceivableController {
         params[3] = serialNo;
         params[4] = discountReplyTime;
         params[5] = newReceivableNo;
-        params[6] = discountInHandAmount;
+        params[6] = discountInHandAmountFen;
         params[7] = orderContractAddress;
 
         // 调用合约查询账户，获取返回结果
@@ -230,7 +232,7 @@ public class ReceivableController {
     public BaseResult<Object> cash(
             //@ApiParam(value = "回复人私钥", required = true) @RequestParam String replyerAddress,
             @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
-            @ApiParam(value = "兑付金额", required = true) @RequestParam long cashedAmount,
+            @ApiParam(value = "兑付金额", required = true) @RequestParam double cashedAmount,
             @ApiParam(value = "回复意见", required = true) @RequestParam int response,
             HttpServletRequest request
     ) throws Exception {
@@ -245,10 +247,10 @@ public class ReceivableController {
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
-
+        long cashedAmountFen = ReparoUtil.convertYuanToCent(cashedAmount);
         Object[] params = new Object[6];
         params[0] = receivableNo;
-        params[1] = cashedAmount;
+        params[1] = cashedAmountFen;
         params[2] = cashTime;
         params[3] = serialNo;
         params[4] = response;
