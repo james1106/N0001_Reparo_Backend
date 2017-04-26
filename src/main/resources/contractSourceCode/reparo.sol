@@ -921,6 +921,7 @@ contract ReceivableContract{
         bytes32[] memory list1 = new bytes32[](receivableNosLength * 3);//receivableNo，productName,收款人企业名enterpriseName
         uint[] memory list2 = new uint[](receivableNosLength * 4);//productQuantity,isseAmt, dueDt,status
 
+
         for(uint i = 0; i < receivableNosLength; i++){
             list1[i*3] = receivableNos[i];
             list1[i*3+1] = callOrderContractGetProductName(orderAddress, receivableNos[i]);
@@ -935,6 +936,25 @@ contract ReceivableContract{
             list2[i*4+3] = receivableDetailMap[receivableNos[i]].status;
         }
 
+/*        if(receivableNosLength == 0){
+            return (0, list1, list2);
+        }
+        uint j = 0;
+        for(uint i = receivableNosLength - 1; i >= 0; i--){
+            list1[j*3] = receivableNos[i];
+            list1[j*3+1] = callOrderContractGetProductName(orderAddress, receivableNos[i]);
+            if(roleCode == 0){
+                list1[j*3+2] = callAccountContractGetPyeeEnterpriseName(accountAddress, receivableNos[i]);
+            }else if(roleCode ==1){
+                list1[j*3+2] = callAccountContractGetPyerEnterpriseName(accountAddress, receivableNos[i]);
+            }
+            list2[j*4] = callOrderContractGetProductQuantity(orderAddress, receivableNos[i]);
+            list2[j*4+1] = receivableDetailMap[receivableNos[i]].isseAmt;
+            list2[j*4+2] = receivableDetailMap[receivableNos[i]].dueDt;
+            list2[j*4+3] = receivableDetailMap[receivableNos[i]].status;
+            j++;
+        }
+*/
         return (0, list1, list2);
 
     }
