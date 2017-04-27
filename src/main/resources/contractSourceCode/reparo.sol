@@ -2986,8 +2986,6 @@ contract WayBillContract {
             return CODE_PERMISSION_DENIED;
         }
 
-        //TODO 判断仓储状态是否为已入库，如果是，则更新订单状态为已完成
-
         statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_REJECTED);
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
