@@ -624,5 +624,34 @@ public class RepositoryServiceImpl implements RepositoryService{
         return result;
     }
 
+    @Override
+    public BaseResult<Object> updateRepoCertinfo(ContractKey contractKey, Object[] contractParams) {
+        String methodName = "updateLogisInfo";
+        LogUtil.info("调用合约 : RepositoryContract 方法: updateLogisInfo 入参：" + contractParams.toString());
+        String[] resultMapKey = new String[]{""};
+        BaseResult result = new BaseResult();
+
+        try {
+            ContractResult contractResult = invokeContract(contractKey, methodName, contractParams, resultMapKey, CONTRACT_NAME_REPOSITORY);
+            LogUtil.info("调用合约 : RepositoryContract 方法: updateLogisInfo 返回结果：" + contractResult.toString());
+            Code code = contractResult.getCode();
+            if(code == Code.SUCCESS){
+                //result.returnWithValue(code);
+                result.returnWithoutValue(code);
+            }
+            else {
+                result.returnWithoutValue(code);
+            }
+
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+        return result;
+    }
+
 
 }
