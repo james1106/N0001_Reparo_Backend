@@ -72,7 +72,7 @@ public class AccountEntity {
         this.certNo = certNo;
     }
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, unique = true, length = 200)
     public String getAcctId() {
         return acctId;
     }

@@ -52,16 +52,16 @@ public class AccountController extends BaseController{
     @ResponseBody
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public BaseResult<Object> register(
-            @ApiParam(value = "用户名", required = true) @RequestParam("accountName") String accountName,
+            @ApiParam(value = "用户名(不能重复)", required = true) @RequestParam("accountName") String accountName,
             @ApiParam(value = "密码", required = true) @RequestParam("password") String password,
-            @ApiParam(value = "企业名称", required = true) @RequestParam("enterpriseName") String enterpriseName,
-            @ApiParam(value = "手机号", required = true) @RequestParam("phone") String phone,
+            @ApiParam(value = "企业名称（不能重复）", required = true) @RequestParam("enterpriseName") String enterpriseName,
+            @ApiParam(value = "手机号（不能重复）", required = true) @RequestParam("phone") String phone,
             @ApiParam(value = "角色code", required = true) @RequestParam("roleCode") int roleCode,
             @ApiParam(value = "验证码", required = true) @RequestParam("securityCode") String securityCode,
             @ApiParam(value = "验证码id", required = true) @RequestParam("securityCodeId") long securityCodeId,
             @ApiParam(value = "证件类型", required = true) @RequestParam("certType") String certType,
             @ApiParam(value = "证件号码", required = true) @RequestParam("certNo") String certNo,
-            @ApiParam(value = "开户行账号（多个，使用:拼接)", required = true) @RequestParam("acctIds") String acctIds,
+            @ApiParam(value = "开户行账号（不能重复）", required = true) @RequestParam("acctIds") String acctIds,
             @ApiParam(value = "开户行别", required = true) @RequestParam("svcrClass") String svcrClass,
             @ApiParam(value = "开户行行号", required = true) @RequestParam("acctSvcr") String acctSvcr,
             @ApiParam(value = "开户行名称", required = true) @RequestParam("acctSvcrName") String acctSvcrName,

@@ -23,6 +23,7 @@ import com.hyperchain.dal.repository.SecurityCodeEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.AccountService;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -102,8 +103,8 @@ public class AccountServiceImpl implements AccountService {
                                        HttpServletRequest request,
                                        HttpServletResponse response)
             throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
-        //判断用户名 或 手机号 或 企业名称是否存在
-        if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName)) {
+        //判断用户名 或 手机号 或 企业名称 或 开户行账号 是否存在
+        if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName) || isAcctIdExist(acctIds)) {
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(Code.ACCOUNT_ALREADY_EXIST);
             LogUtil.info("账户已存在");
@@ -249,6 +250,15 @@ public class AccountServiceImpl implements AccountService {
         if (userEntity == null) {
             return false;
         } else {
+            return true;
+        }
+    }
+
+    private boolean isAcctIdExist(String acctId) {
+        AccountEntity accountEntity = accountEntityRepository.findByAcctId(acctId);
+        if (accountEntity == null) {
+            return false;
+        }else {
             return true;
         }
     }
