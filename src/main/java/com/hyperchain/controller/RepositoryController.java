@@ -442,5 +442,44 @@ public class RepositoryController {
         return  result;
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "更新仓储中的物流信息", notes = "更新仓储中的物流信息")
+    @ResponseBody
+    @RequestMapping(value = "updateRepoCertinfo",method = RequestMethod.POST)
+    public BaseResult<Object> updateRepoCertinfo(
+            @ApiParam(value = "物流公司", required = true) @RequestParam String storerName,
+            @ApiParam(value = "物流编号", required = true) @RequestParam String willBillNo,
+            @ApiParam(value = "仓单号", required = true) @RequestParam String repoCertNo,
+            HttpServletRequest request
+            ) throws Exception {
+        BaseResult result = new BaseResult();
+        try{
+            String address = TokenUtil.getAddressFromCookie(request);//用户address
+            UserEntity userEntity = userEntityRepository.findByAddress(address);
+            if(CommonUtil.isEmpty(userEntity)){
+
+                result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+                return  result;
+            }
+            String privateKey = userEntity.getPrivateKey();
+            String accountName = userEntity.getAccountName();
+            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+            UserEntity storerEntity = userEntityRepository.findByCompanyName(storerName);
+            String storeAddress = storerEntity.getAddress();
+
+            Object[] params = new Object[3];
+            params[0] = repoCertNo ;
+            params[1] = storeAddress ;
+            params[2] = willBillNo;
+
+            return repositoryService.updateRepoCertinfo(contractKey, params);
+        }
+        catch (Exception e){
+            LogUtil.error("调用方法updateRepoCertinfo异常");
+            e.printStackTrace();
+        }
+        return  result;
+    }
 
 }
