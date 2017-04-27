@@ -21,7 +21,7 @@ public class RepoCertVo {
     private String holderName;//持有人
     private List<OperationRecordVo> repoCertHisList;//仓单流水记录
     private long productQuantity;//产品数量
-    private long productTotalPrice;//产品总价
+    private String productTotalPrice;//产品总价
     private long repoCreateDate;//仓单生成时间
     private  int repoCertStatus;//仓单状态
     private List<OperationRecordVo> recordVos;
@@ -79,11 +79,11 @@ public class RepoCertVo {
         this.productQuantity = productQuantity;
     }
 
-    public long getProductTotalPrice() {
+    public String getProductTotalPrice() {
         return productTotalPrice;
     }
 
-    public void setProductTotalPrice(long productTotalPrice) {
+    public void setProductTotalPrice(String productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
     }
 

@@ -26,12 +26,29 @@ public class ReceivableDetailVo {
     private String pyeeEnterpriseName;
     private String pyeeAcctSvcrName;
 
-    private long isseAmt;
-    private long cashedAmount;
+    private String isseAmt;
+
+    public String getIsseAmt() {
+        return isseAmt;
+    }
+
+    public void setIsseAmt(String isseAmt) {
+        this.isseAmt = isseAmt;
+    }
+
+    public String getCashedAmount() {
+        return cashedAmount;
+    }
+
+    public void setCashedAmount(String cashedAmount) {
+        this.cashedAmount = cashedAmount;
+    }
+
+    private String cashedAmount;
     private long isseDt;
     private long signInDt;
     private long dueDt;
-    private long discountInHandAmount;
+    private String discountInHandAmount;
 
     private int discounted;
     private String note;
@@ -56,6 +73,27 @@ public class ReceivableDetailVo {
 
     private String pyeeLinkMan;
 
+    private String pyerLinkPhone;
+
+    public String getPyerLinkPhone() {
+        return pyerLinkPhone;
+    }
+
+    public void setPyerLinkPhone(String pyerLinkPhone) {
+        this.pyerLinkPhone = pyerLinkPhone;
+    }
+
+    public String getPyeeLinkPhone() {
+        return pyeeLinkPhone;
+    }
+
+    public void setPyeeLinkPhone(String pyeeLinkPhone) {
+        this.pyeeLinkPhone = pyeeLinkPhone;
+    }
+
+    private String pyeeLinkPhone;
+
+
     public String getPyerLinkMan() {
         return pyerLinkMan;
     }
@@ -72,11 +110,11 @@ public class ReceivableDetailVo {
         this.pyeeLinkMan = pyeeLinkMan;
     }
 
-    public long getDiscountInHandAmount() {
+    public String getDiscountInHandAmount() {
         return discountInHandAmount;
     }
 
-    public void setDiscountInHandAmount(long discountInHandAmount) {
+    public void setDiscountInHandAmount(String discountInHandAmount) {
         this.discountInHandAmount = discountInHandAmount;
     }
 
@@ -216,21 +254,6 @@ public class ReceivableDetailVo {
         this.pyeeAcctSvcrName = pyeeAcctSvcrName;
     }
 
-    public long getIsseAmt() {
-        return isseAmt;
-    }
-
-    public void setIsseAmt(long isseAmt) {
-        this.isseAmt = isseAmt;
-    }
-
-    public long getCashedAmount() {
-        return cashedAmount;
-    }
-
-    public void setCashedAmount(long cashedAmount) {
-        this.cashedAmount = cashedAmount;
-    }
 
     public long getIsseDt() {
         return isseDt;

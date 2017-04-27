@@ -18,7 +18,7 @@ public class RepoBusinessVo {
     private String productName;//货品名称
     private Long productQuantity;//货品数量
     private String measureUnit;//计量单位
-    private Long productTotalPrice;//货品总价
+    private String productTotalPrice;//货品总价
     private String logisticsEntepsName;//物流公司名称
     private String waybillNo;//运单号
     private List<OperationRecordVo> operationRecordVoList;//仓储操作历史列表
@@ -125,11 +125,11 @@ public class RepoBusinessVo {
         this.productQuantity = productQuantity;
     }
 
-    public Long getProductTotalPrice() {
+    public String getProductTotalPrice() {
         return productTotalPrice;
     }
 
-    public void setProductTotalPrice(Long productTotalPrice) {
+    public void setProductTotalPrice(String productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
     }
 

@@ -55,7 +55,8 @@ public enum Code {
     CASHEDAMOUNT_ERROR(1016,"已兑付金额为负值或0"),
     RECEIVABLE_NOT_EXITS(1005,"应收款不存在"),
     CASH_TIME_ERROR(1010,"兑付时应收款还未到期"),
-    RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录");
+    RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录"),
+    NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人");
 
     private int code;
     private String msg;
@@ -123,6 +124,8 @@ public enum Code {
                 return CASHEDAMOUNT_ERROR;
             case 1005:
                 return RECEIVABLE_NOT_EXITS;
+            case 1008:
+                return NOT_RECEIVABLE_FIRSTOWNER;
             case 1010:
                 return CASH_TIME_ERROR;
             case 1013:
