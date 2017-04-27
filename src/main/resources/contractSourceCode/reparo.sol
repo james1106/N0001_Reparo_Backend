@@ -368,6 +368,12 @@ contract ReceivableContract{
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
             return (3);
         }
+        if(callOrderContractGetTxStateOfOrderState(orderNo,orderAddress)){
+            return (1002);
+        }
+        if(callOrderContractGetPayerRepoBusiStateOfOrderState(orderNo,orderAddress)){
+            return (1003);
+        }
     /*        if(judgeRepetitiveSerialNo(serialNo)){
      return (1032);
      }
@@ -405,6 +411,24 @@ contract ReceivableContract{
 
 
         return (0);
+    }
+
+    //根据订单编号拿到订单状态
+    function callOrderContractGetTxStateOfOrderState(bytes32 orderNo, address orderAddress) returns (bool){
+        OrderContract orderCon = OrderContract(orderAddress);
+        if(orderCon.queryTxStateOfOrderState(orderNo) != 2){
+            return true;
+        }
+        return false;
+    }
+
+    //根据订单编号拿到买方仓储状态
+    function callOrderContractGetPayerRepoBusiStateOfOrderState(bytes32 orderNo, address orderAddress) returns (bool){
+        OrderContract orderCon = OrderContract(orderAddress);
+        if(orderCon.queryPayerRepoBusiStateOfOrderState(orderNo) != 2){
+            return true;
+        }
+        return false;
     }
 
     function giveReceivableInfo(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyer, bytes32 pyee, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNo, uint time) internal {
@@ -2176,6 +2200,18 @@ uint OUTCOMED = 6;                  //已出库
         uint payeeRepoBusiState;
         uint wayBillState;  //
         uint receState;     //
+    }
+
+    //根据订单编号返回订单状态
+    function queryTxStateOfOrderState(bytes32 orderNo) returns(uint txState){
+            Order order = orderDetailMap[orderNo];
+            return order.orderState.txState;
+    }
+
+    //根据订单编号返回买方仓储信息
+    function queryPayerRepoBusiStateOfOrderState(bytes32 orderNo) returns(uint txState){
+            Order order = orderDetailMap[orderNo];
+            return order.orderState.payerRepoBusiState;
     }
 
     //订单

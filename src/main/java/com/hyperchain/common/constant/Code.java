@@ -57,6 +57,8 @@ public enum Code {
     RECEIVABLE_NOT_EXITS(1005,"应收款不存在"),
     CASH_TIME_ERROR(1010,"兑付时应收款还未到期"),
     RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录"),
+    TXSTATE_ERROR(1002,"订单状态错误"),
+    PAYERREPOBUSISTATE(1003,"买方仓储状态错误"),
     NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人");
 
     private int code;
