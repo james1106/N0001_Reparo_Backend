@@ -101,6 +101,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法signOutApply异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -148,6 +149,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法signOutReply异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -193,6 +195,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法discountApply异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -251,6 +254,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法discountReply异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -292,6 +296,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法cash异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -326,6 +331,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法getReceivableAllInfo异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -357,6 +363,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法getRecordBySerialNo异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -388,6 +395,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法historySerialNo异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -429,6 +437,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法receivableSimpleDetailList异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
@@ -462,6 +471,7 @@ public class ReceivableController {
         catch (Exception e){
             LogUtil.error("调用方法receivableInfoWithSerial异常");
             e.printStackTrace();
+            result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
         }
         return  result;
     }
