@@ -169,7 +169,7 @@ public class ReceivableContractTest extends SpringBaseTest{
     @Test
     public void testReceivableCash() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
 
-        //贴现回复
+        //兑付
         List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
         String accountJson1 = keyInfo1.get(1); //含address 私钥
 
