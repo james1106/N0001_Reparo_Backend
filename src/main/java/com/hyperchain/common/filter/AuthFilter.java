@@ -101,7 +101,7 @@ public class AuthFilter implements javax.servlet.Filter {
         }
 
         //cookie中无token
-        LogUtil.info("cookie中无token");
+        LogUtil.info("cookie中无token, 重定向到登录页面");
         redirectToLogin(httpServletRequest, httpServletResponse);
         return;
 
