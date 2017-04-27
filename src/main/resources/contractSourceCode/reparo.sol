@@ -540,6 +540,9 @@ contract ReceivableContract{
         if(receivable.status == 1){
             return (1038);
         }
+        if(applicantAcctId != receivable.firstOwner){
+            return (1008);
+        }
         receivable.lastStatus = receivable.status;
         receivable.status = 41;
         receivable.secondOwner = replyerAcctId;

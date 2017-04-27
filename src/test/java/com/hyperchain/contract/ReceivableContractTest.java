@@ -28,8 +28,9 @@ import java.util.Map;
  */
 public class ReceivableContractTest extends SpringBaseTest{
 
+    //签发申请
     @Test
-    public void testReceivable() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
+    public void testReceivableSignOutApply() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
         List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
         String accountJson = keyInfo.get(1); //含address 私钥
 
@@ -46,11 +47,11 @@ public class ReceivableContractTest extends SpringBaseTest{
         String pyer = "pyer";
         long isseAmt = 100000;
         long dueDt = 20170413;
-        String rate = "9.8";
-        String[] conAndInv = new String[2];
-        conAndInv[0] = "con";
-        conAndInv[1] = "inv";
-        String serialNo = "seNo";
+        String rate = "9.8%";
+        String[] conAndInvAndSerialNo = new String[3];
+        conAndInvAndSerialNo[0] = "con";
+        conAndInvAndSerialNo[1] = "inv";
+        conAndInvAndSerialNo[2] = "serialNoSignOutApply";
         long time = 888888;
 
         requestContractMethodParams[0] = receNo;
@@ -62,15 +63,21 @@ public class ReceivableContractTest extends SpringBaseTest{
         requestContractMethodParams[6] = isseAmt;
         requestContractMethodParams[7] = dueDt;
         requestContractMethodParams[8] = rate;
-        requestContractMethodParams[9] = conAndInv;
-        requestContractMethodParams[10] = serialNo;
-        requestContractMethodParams[11] = time;
+        requestContractMethodParams[9] = conAndInvAndSerialNo;
+        requestContractMethodParams[10] = time;
+        requestContractMethodParams[11] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+
 
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(contractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
         System.out.println("调用合约签发申请返回code：" + requestContractResult.getCode());
         Assert.assertEquals(Code.SUCCESS, requestContractResult.getCode());
+    }
+
+    //签发回复
+    @Test
+    public void testReceivableSignOutReply() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
 
         //签发回复
         List<String> keyInfo2 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
@@ -80,13 +87,13 @@ public class ReceivableContractTest extends SpringBaseTest{
         ContractKey contractKey2 = new ContractKey(accountJson2, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
 
         String requestContractMethodName2 = "signOutReply";
-        Object[] requestContractMethodParams2= new Object[7];
+        Object[] requestContractMethodParams2 = new Object[7];
         String receivableNo2 = "rece";
-        String replyerAcctId2 = "replyerAcctId";
+        String replyerAcctId2 = "pyer";
         int response2 = 0;
-        String serialNo2 = "serialNo";
-        int time2 = 20170416;
-        String accountContractAddress2 = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+        String serialNo2 = "serialNoSignOutReply";
+        int time2 = 20170427;
+        String orderContractAddress2 = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
         String wayBillContractAddress2 = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
 
         requestContractMethodParams2[0] = receivableNo2;
@@ -94,7 +101,7 @@ public class ReceivableContractTest extends SpringBaseTest{
         requestContractMethodParams2[2] = response2;
         requestContractMethodParams2[3] = serialNo2;
         requestContractMethodParams2[4] = time2;
-        requestContractMethodParams2[5] = accountContractAddress2;
+        requestContractMethodParams2[5] = orderContractAddress2;
         requestContractMethodParams2[6] = wayBillContractAddress2;
 
 
@@ -103,26 +110,128 @@ public class ReceivableContractTest extends SpringBaseTest{
         ContractResult requestContractResult2 = ContractUtil.invokeContract(contractKey2, requestContractMethodName2, requestContractMethodParams2, requestResultMapKey2, BaseConstant.CONTRACT_NAME_RECEIVABLE);
         System.out.println("调用合约签发回复返回code：" + requestContractResult2.getCode());
         Assert.assertEquals(Code.SUCCESS, requestContractResult2.getCode());
+    }
 
+    //贴现申请
+    @Test
+    public void testReceivableDiscountApply() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
 
-//
-//        //应收款列表
-//        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
-//        String accountJson1 = keyInfo1.get(1); //含address 私钥
-//
-//        //账户信息存储到区块链
-//        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
-//        String confirmContractMethodName = "receivableSimpleDeatilList";
-//        Object[] confirmContractMethodParams = new Object[4];
-//        confirmContractMethodParams[0] = 0; //orderNo
-//        confirmContractMethodParams[1] = "pyer"; //statusTransId: orderNo + WayBillStatus
-//        confirmContractMethodParams[2] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
-//        confirmContractMethodParams[3] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
-//        String[] confirmResultMapKey = new String[]{};
-//        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
-//        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
-//        System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
-//        System.out.println("调用合约签发申请返回list：" + confirmContractResult);
-//        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+        //贴现申请
+        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson1 = keyInfo1.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "discountApply";
+        Object[] confirmContractMethodParams = new Object[7];
+        confirmContractMethodParams[0] = "rece"; //receNo
+        confirmContractMethodParams[1] = "pyee"; //applicantAcctId
+        confirmContractMethodParams[2] = "discountReplyer";
+        confirmContractMethodParams[3] = "serialNoDiscountApply";
+        confirmContractMethodParams[4] = 201604;
+        confirmContractMethodParams[5] = 10;
+        confirmContractMethodParams[6] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约discountApply返回code：" + confirmContractResult.getCode());
+        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+    }
+
+    //贴现回复
+    @Test
+    public void testReceivableDiscountReply() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
+
+        //贴现回复
+        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson1 = keyInfo1.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "discountReply";
+        Object[] confirmContractMethodParams = new Object[8];
+        confirmContractMethodParams[0] = "rece"; //receNo
+        confirmContractMethodParams[1] = "discountReplyer"; //applicantAcctId
+        confirmContractMethodParams[2] = 0;
+        confirmContractMethodParams[3] = "serialNoDiscountReply";
+        confirmContractMethodParams[4] = 2016046;
+        confirmContractMethodParams[5] = "NewReceDiscountReply";
+        confirmContractMethodParams[6] = 6;
+        confirmContractMethodParams[7] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约discountReply返回code：" + confirmContractResult.getCode());
+        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+    }
+
+    //兑付
+    @Test
+    public void testReceivableCash() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
+
+        //贴现回复
+        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson1 = keyInfo1.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "cash";
+        Object[] confirmContractMethodParams = new Object[6];
+        confirmContractMethodParams[0] = "rece"; //receNo
+        confirmContractMethodParams[1] = 88; //applicantAcctId
+        confirmContractMethodParams[2] = 2011;
+        confirmContractMethodParams[3] = "serialNoCash";
+        confirmContractMethodParams[4] = 0;
+        confirmContractMethodParams[5] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约cash返回code：" + confirmContractResult.getCode());
+        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+    }
+
+    //获取买卖方列表
+    @Test
+    public void testReceivableSimpleDetailList() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
+
+        //获取买卖方列表
+        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson1 = keyInfo1.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "receivableSimpleDetailList";
+        Object[] confirmContractMethodParams = new Object[4];
+        confirmContractMethodParams[0] = 0; //orderNo
+        confirmContractMethodParams[1] = "pyer"; //statusTransId: orderNo + WayBillStatus
+        confirmContractMethodParams[2] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
+        confirmContractMethodParams[3] = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约generateWayBill返回code：" + confirmContractResult.getCode());
+        System.out.println("调用合约签发申请返回list：" + confirmContractResult);
+        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
+    }
+
+    @Test
+    public void testGetReceivableAllInfoWithSerial() throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, ReadFileException, PropertiesLoadException, GeneralSecurityException, IOException {
+
+        //获取买卖方列表
+        List<String> keyInfo1 = ESDKUtil.newAccount(BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD); //加密私钥
+        String accountJson1 = keyInfo1.get(1); //含address 私钥
+
+        //账户信息存储到区块链
+        ContractKey contractKey1 = new ContractKey(accountJson1, BaseConstant.DEFAULT_PRIVATE_KEY_PASSWORD);
+        String confirmContractMethodName = "getReceivableAllInfoWithSerial";
+        Object[] confirmContractMethodParams = new Object[2];
+        confirmContractMethodParams[0] = "rece"; //receNo
+        confirmContractMethodParams[1] = "pyee"; //statusTransId: orderNo + WayBillStatus
+        String[] confirmResultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult confirmContractResult = ContractUtil.invokeContract(contractKey1, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_RECEIVABLE);
+        System.out.println("调用合约getReceivableAllInfoWithSerial返回code：" + confirmContractResult.getCode());
+        System.out.println("带有应收款流水信息的应收款更具体详情：" + confirmContractResult);
+        Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
     }
 }
