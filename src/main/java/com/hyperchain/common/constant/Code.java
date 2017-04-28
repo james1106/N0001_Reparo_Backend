@@ -19,6 +19,14 @@ public enum Code {
     SYSTEM_ERROR(19, "系统异常，请稍后重试"),
     JSON_TRANSFER_ERROR(20, "JSON转化异常"),
 
+    //仓储管理部分
+    REPOCERT_NOT_EXSIT(4001, "仓单不存在"),
+    REPOBUSINO_ALREADY_EXSIT(4002, "仓储业务编号已经存在"),
+    BUSITRANSNO_ALREADY_EXSIT(4003, "业务流转编号已经存在"),
+    REPOCERT_ALREADY_EXSIT(4004, "仓单编号已经存在"),
+    REPOBUSINO_NOT_EXSIT(4005, "仓储业务编号不存在"),
+    LASTBUSITRANSNO_NOT_EXSIT(4006, "上一个业务流转编号不存在"),
+
     //订单管理部分
     ORDER_NOT_EXIST(2001, "订单不存在"),
     QEURY_ORDER_PERMISSION_DENIED(2002, "无权限查询该账单"),

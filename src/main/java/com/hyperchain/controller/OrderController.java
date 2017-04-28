@@ -8,6 +8,7 @@ import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
@@ -76,22 +77,22 @@ public class OrderController {
             return result;
         }
         //查询开户行号，如果用户无该银行账号,则返回用户无该银行账号
-//        List<AccountEntity> accountList = accountEntityRepository.findByAddress(payerAddress);
-//        boolean isAccountRight = false;
-//        String payerBankClss = "";
-//        for(AccountEntity accountEntity : accountList){
-//            if(accountEntity.getAcctId() == payerAccount){
-//                isAccountRight = true;
-//                payerBankClss = accountEntity.getSvcrClass();
-//                break;
-//            }
-//        }
-//        if(!isAccountRight){
-//            code = Code.BANKACCOUNT_NOT_EXIST;
-//            result.returnWithoutValue(code);
-//            return result;
-//        }
+        List<AccountEntity> accountList = accountEntityRepository.findByAddress(payerAddress);
+        boolean isAccountRight = false;
         String payerBankClss = "";
+        for(AccountEntity accountEntity : accountList){
+            if(accountEntity.getAcctId().equals(payerAccount)){
+                isAccountRight = true;
+                payerBankClss = accountEntity.getSvcrClass();
+                break;
+            }
+        }
+        if(!isAccountRight){
+            code = Code.BANKACCOUNT_NOT_EXIST;
+            result.returnWithoutValue(code);
+            return result;
+        }
+
 
         //从数据库中查询卖方公司对应的地址，如果查询不到数据，返回卖方公司名称未注册
         UserEntity payeeUserEntity = userEntityRepository.findByCompanyName(payeeCompanyName);
