@@ -2785,11 +2785,13 @@ contract WayBillContract {
     //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用
     //生成待发货运单（初始化状态为待发货、待发货时间）。）
     function initWayBillStatus(
-        address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
+        address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress, orderAddress*/
         bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
         uint[] integers /*waitTime, productQuantity, productValue*/
     ) returns (uint code)
     {
+        OrderContract orderContract = OrderContract (addrs[4]);
+
         //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);
         string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));

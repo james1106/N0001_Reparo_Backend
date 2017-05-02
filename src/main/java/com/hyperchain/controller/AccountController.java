@@ -67,14 +67,6 @@ public class AccountController extends BaseController{
             @ApiParam(value = "开户行名称", required = true) @RequestParam("acctSvcrName") String acctSvcrName,
             HttpServletRequest request,
             HttpServletResponse response) throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
-//        String securityCodeMock = "1111";
-//        String securityCodeIdMock = "12";
-//        String certTypeMock = "身份证";
-//        String certNoMock = "123456";
-//        String acctIdsMock = "12345678";
-//        String svcrClassMock = "123";
-//        String acctSvcrMock = "123456";
-//        String acctSvcrNameMock = "中国银行";
         return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName, request, response);
     }
 
