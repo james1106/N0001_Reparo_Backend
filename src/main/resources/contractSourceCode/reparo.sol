@@ -722,10 +722,11 @@ contract ReceivableContract{
         if(receivable.receivableNo == 0x0) {
             return(1005);
         }
-    /*
-     if(receivable.status != "020006" && receivable.status != "070006"){
-     return(1006);
+
+     if(receivable.status != 26){
+        return(1006);
      }
+     /*
      //到期日才能兑付
      if(time < receivable.dueDt){
      return(1010);
