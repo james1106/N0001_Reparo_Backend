@@ -469,8 +469,10 @@ contract ReceivableContract{
             resultUint[1] = resultUint[0];
             resultUint[0] = time;
             //end  modify by ldy
+
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
+            return (0);
         }
         receivable.signInDt = time;
 
@@ -496,13 +498,14 @@ contract ReceivableContract{
         bytes32[4] memory resultBytes32;
         uint[2] memory resultUint;
         (resultAddress, resultBytes32, resultUint) = orderCon.queryOrderInfoForRece(orderNo);
-        param1 = new address[](4);
+        param1 = new address[](5);
         param2 = new bytes32[](4);
         param3 = new uint[](3);  //modify by ldy
         param1[0] = resultAddress[0];
         param1[1] = resultAddress[1];
         param1[2] = resultAddress[2];
         param1[3] = resultAddress[3];
+        param1[4] = orderAddress;
         param2[0] = resultBytes32[0];
         param2[1] = resultBytes32[1];
         param2[2] = resultBytes32[2];
