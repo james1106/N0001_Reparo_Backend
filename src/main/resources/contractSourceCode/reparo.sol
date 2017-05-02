@@ -2793,7 +2793,7 @@ contract WayBillContract {
         uint[] integers /*waitTime, productQuantity, productValue*/
     ) returns (uint code)
     {
-        OrderContract orderContract = OrderContract (addrs[4]);
+        orderContract = OrderContract (addrs[4]);
 
         //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);
