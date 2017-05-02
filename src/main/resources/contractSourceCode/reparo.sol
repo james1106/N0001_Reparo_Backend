@@ -1400,7 +1400,10 @@ contract RepositoryContract{
             bytesResult[i*2] = repoBusiess.repoCertNo;
             bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
-            uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+
+            //uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+            bytes32 repoCertNo = repoBusiToCertMap[repoCertList[i]];
+            uintResult[i*2+1] = repoCertDetailMap[repoCertNo].repoCertStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
         }
         return(0, bytesResult, uintResult, resultAddress);
@@ -1661,6 +1664,7 @@ contract RepositoryContract{
         if(accountContract.queryRoleCode(msg.sender) != 2){
             return (1);
         }
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
     //加入存货人的列表
         usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
     //加入仓储公司的列表
@@ -1915,7 +1919,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_CERT_INVALID);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
         return (0);
     }
 
