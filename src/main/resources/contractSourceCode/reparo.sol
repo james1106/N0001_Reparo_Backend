@@ -1770,7 +1770,7 @@ contract RepositoryContract{
     //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
         if(repoCertNoExsit(repoCertNo) == false){
-            return (1, "");
+            return (4001, "");
         }
     //获取仓储业务编号
         RepoCert repoCert =  repoCertDetailMap[repoCertNo];
@@ -2708,6 +2708,11 @@ uint OUTCOMED = 6;                  //已出库
         }
         if(stateType == "payerRepoBusiState"){
             order.orderState.payerRepoBusiState = newState;
+            if(newState == INCOMED){
+                if(order.orderState.wayBillState == RECEIVED){
+                    order.orderState.txState = COMPLETED;
+                }
+            }
             return 0;
         }
         if(stateType == "payeeRepoBusiState"){
@@ -2716,8 +2721,7 @@ uint OUTCOMED = 6;                  //已出库
         }
 
         if(stateType == "wayBillState"){
-
-        order.orderState.wayBillState = newState;
+            order.orderState.wayBillState = newState;
             if(newState == RECEIVED){
                 if(order.orderState.payerRepoBusiState == INCOMED){
                     order.orderState.txState = COMPLETED;
