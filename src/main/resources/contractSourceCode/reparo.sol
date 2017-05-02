@@ -2808,7 +2808,7 @@ contract WayBillContract {
         addressToOrderNoList[addrs[1]].push(strs[0]);
 
         //TODO 更新订单中的运单状态为待发货
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_WAITING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_WAITING);
 
         return CODE_SUCCESS;
     }
@@ -2865,7 +2865,7 @@ contract WayBillContract {
             strs[5] //运单号
         );
         //TODO 更新订单中的运单状态为发货待响应
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REQUESTING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_REQUESTING);
 
         return CODE_SUCCESS; //成功
     }
