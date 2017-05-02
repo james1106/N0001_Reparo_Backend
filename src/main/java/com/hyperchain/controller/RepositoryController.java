@@ -148,13 +148,14 @@ public class RepositoryController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
         String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
-        Object[] params = new Object[5];
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
+        Object[] params = new Object[6];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
         params[2] = repoBusinessNo + REPO_BUSI_WATING_INCOME_RESPONSE; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号+REPO_BUSI_WATING_INCOME_RESPONSE
         params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_WATING_INCOME
         params[4] = operateTime; //操作时间
-
+        params[5] = acctContractAddress;
         // 调用合约查询账户，获取返回结果
         return repositoryService.incomeApplyResponse(contractKey, params);
     }
@@ -181,14 +182,15 @@ public class RepositoryController {
 
         String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
-        Object[] params = new Object[6];
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
+        Object[] params = new Object[7];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
         params[2] = repoCertNo;
         params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
         params[5] = operateTime; //操作时间
-
+        params[6] = acctContractAddress;
         // 调用合约查询账户，获取返回结果
         return repositoryService.incomeConfirm(contractKey, params);
     }
@@ -257,12 +259,14 @@ public class RepositoryController {
 
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
-        Object[] params = new Object[5];
+        Object[] params = new Object[6];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
         params[2] = repoBusinessNo + REPO_BUSI_WATING_OUTCOME;
         params[3] = repoBusinessNo + REPO_BUSI_OUTCOMED;
         params[4] = System.currentTimeMillis();
+        String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
+        params[5] = acctContractAddress;
         /*
         params[3] = repoBusinessNo + REPO_BUSI_WATING_INCOME; //上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 0
         params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
@@ -410,7 +414,7 @@ public class RepositoryController {
 
             long    operateOperateTime = System.currentTimeMillis();;  //  操作时间(时间戳)
 
-            Object[] params = new Object[9];
+            Object[] params = new Object[10];
             params[0] = repoBusinessNo;
             params[1] = repoCertNo;
             params[2] = businessTransNo;
@@ -427,6 +431,8 @@ public class RepositoryController {
             productIntInfo[2] = productTotalPrice * 100;
             productIntInfo[3] = operateOperateTime;
             params[8] = productIntInfo;
+            String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
+            params[9] = acctContractAddress;
             /*params[8] = productQuantitiy;
             params[9] = productUnitPrice * 100;//金额以分为单位
             params[10] = productTotalPrice * 100;
