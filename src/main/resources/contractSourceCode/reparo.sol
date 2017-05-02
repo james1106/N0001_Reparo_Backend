@@ -1404,7 +1404,10 @@ contract RepositoryContract{
             bytesResult[i*2] = repoBusiess.repoCertNo;
             bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
-            uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+
+            //uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+            bytes32 repoCertNo = repoBusiToCertMap[repoCertList[i]];
+            uintResult[i*2+1] = repoCertDetailMap[repoCertNo].repoCertStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
         }
         return(0, bytesResult, uintResult, resultAddress);
@@ -1665,6 +1668,7 @@ contract RepositoryContract{
         if(accountContract.queryRoleCode(msg.sender) != 2){
             return (1);
         }
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
     //加入存货人的列表
         usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
     //加入仓储公司的列表
@@ -1919,7 +1923,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_CERT_INVALID);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
         return (0);
     }
 
@@ -2789,11 +2793,13 @@ contract WayBillContract {
     //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用
     //生成待发货运单（初始化状态为待发货、待发货时间）。）
     function initWayBillStatus(
-        address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress*/
+        address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress, orderAddress*/
         bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
         uint[] integers /*waitTime, productQuantity, productValue*/
     ) returns (uint code)
     {
+        orderContract = OrderContract (addrs[4]);
+
         //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);
         string memory s2 = bytes32ToString(bytes32(WAYBILL_WAITING));

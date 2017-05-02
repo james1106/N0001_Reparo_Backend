@@ -422,8 +422,8 @@ public class RepositoryServiceImpl implements RepositoryService{
         repoCertVo.setRepoCertStatus(uintList.get(3).equals("") ? 0 : Integer.parseInt(uintList.get(3)));
         List<OperationRecordVo> recordVos = new ArrayList<>();
 
-        int length = (uintList.size()-4) / 2;
-        for(int i = 4; i < length+4; i++){
+        int length = (uintList.size()-3) / 2;
+        for(int i = 3; i < length+3; i++){
             OperationRecordVo recordVo = new OperationRecordVo();
             recordVo.setState(uintList.get(i).equals("")? 0 : Integer.parseInt(uintList.get(i)));
             recordVo.setOperateTime(uintList.get(i + length).equals("")? 0 : Long.parseLong(uintList.get(i + length)));
