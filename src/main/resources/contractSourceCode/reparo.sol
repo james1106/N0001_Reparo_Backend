@@ -402,8 +402,6 @@ contract ReceivableContract{
         pyeeToReceivableMap[pyee].push(receivableNo);
 
         updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
-
-
         return (0);
     }
 
@@ -472,7 +470,6 @@ contract ReceivableContract{
 
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
-            return (0);
         }
         receivable.signInDt = time;
 
@@ -722,10 +719,11 @@ contract ReceivableContract{
         if(receivable.receivableNo == 0x0) {
             return(1005);
         }
-    /*
-     if(receivable.status != "020006" && receivable.status != "070006"){
-     return(1006);
+
+     if(receivable.status != 26){
+        return(1006);
      }
+     /*
      //到期日才能兑付
      if(time < receivable.dueDt){
      return(1010);
@@ -1403,7 +1401,10 @@ contract RepositoryContract{
             bytesResult[i*2] = repoBusiess.repoCertNo;
             bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
-            uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+
+            //uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+            bytes32 repoCertNo = repoBusiToCertMap[repoCertList[i]];
+            uintResult[i*2+1] = repoCertDetailMap[repoCertNo].repoCertStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
         }
         return(0, bytesResult, uintResult, resultAddress);
@@ -1664,6 +1665,7 @@ contract RepositoryContract{
         if(accountContract.queryRoleCode(msg.sender) != 2){
             return (1);
         }
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
     //加入存货人的列表
         usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
     //加入仓储公司的列表
@@ -1918,7 +1920,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_CERT_INVALID);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
         return (0);
     }
 
@@ -2793,7 +2795,7 @@ contract WayBillContract {
         uint[] integers /*waitTime, productQuantity, productValue*/
     ) returns (uint code)
     {
-        OrderContract orderContract = OrderContract (addrs[4]);
+        orderContract = OrderContract (addrs[4]);
 
         //拼接statusTransId
         string memory s1 = bytes32ToString(strs[0]);

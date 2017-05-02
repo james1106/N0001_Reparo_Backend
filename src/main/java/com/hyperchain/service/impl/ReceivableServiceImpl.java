@@ -691,7 +691,9 @@ public class ReceivableServiceImpl implements ReceivableService{
             long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
 
             receivableSimpleListVo.setProductQuantity(quantity);
-            receivableSimpleListVo.setIsseAmt(Long.parseLong(list2.get(i*4+1)));
+            String isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i*4+1)));
+            receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
+
             receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
             receivableSimpleListVo.setStatus(Integer.parseInt(list2.get(i*4+3)));
             receivableSimpleList.add(receivableSimpleListVo);
