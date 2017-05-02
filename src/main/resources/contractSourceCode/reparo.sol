@@ -2727,6 +2727,9 @@ contract WayBillContract {
         addressToOrderNoList[addrs[0]].push(strs[0]);
         addressToOrderNoList[addrs[1]].push(strs[0]);
 
+        //TODO 更新订单中的运单状态为待发货
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_WAITING);
+
         return CODE_SUCCESS;
     }
 
@@ -2781,6 +2784,8 @@ contract WayBillContract {
             addrs[0],//物流公司address
             strs[5] //运单号
         );
+        //TODO 更新订单中的运单状态为发货待响应
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REQUESTING);
 
         return CODE_SUCCESS; //成功
     }
@@ -2806,6 +2811,10 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
+
+        //TODO 更新订单中的运单状态为已发货
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING);
+
         return CODE_SUCCESS;
     }
 
@@ -2961,8 +2970,9 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
-        //TODO 调用订单合约更新订单状态为已完成
+        //TODO 更新订单中的运单状态为已完成
         orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
+
         return (CODE_SUCCESS);
     }
 
@@ -2990,6 +3000,10 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
+
+        //TODO 更新订单中的运单状态为已拒绝
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED);
+
         return (CODE_SUCCESS);
     }
 
