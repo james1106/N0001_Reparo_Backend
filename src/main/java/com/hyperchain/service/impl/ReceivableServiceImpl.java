@@ -457,7 +457,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         int length = (partParams1.size() - 8) / 2;
         int lastLength = partParams1.size() - 8;
 
-        long isseAmt = Long.parseLong(partParams1.get(lastLength));
+        //long isseAmt = Long.parseLong(partParams1.get(lastLength));
+        long isseAmt = (partParams1.get(lastLength).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength));
+
         long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 1));
         long isseDt = Long.parseLong(partParams1.get(lastLength + 2));
         long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 3));
