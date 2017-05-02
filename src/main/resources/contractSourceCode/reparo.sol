@@ -402,8 +402,6 @@ contract ReceivableContract{
         pyeeToReceivableMap[pyee].push(receivableNo);
 
         updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
-
-
         return (0);
     }
 
@@ -472,7 +470,6 @@ contract ReceivableContract{
 
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
-            return (0);
         }
         receivable.signInDt = time;
 
