@@ -140,9 +140,6 @@ contract AccountContract {
         return acctIdToAddress[acctId];
     }
 
-    function getEnterpriseNameByAddress(address accountAddress) returns (bytes32 EnterpriseNameByAddress){
-        return accountMap[accountAddress].enterpriseName;
-    }
 }
 
 contract ReceivableContract{
@@ -363,7 +360,7 @@ contract ReceivableContract{
 
     function updateOrderStateByReceivable(address orderAddress, bytes32 orderNo, bytes32 stateType, uint newState) returns (uint){
         OrderContract orderCon = OrderContract(orderAddress);
-        return orderCon.updateOrderState(orderNo, stateType, newState);
+        return orderCon.updateOrderState(orderNo, stateType, newState, "", 0);
     }
 
 //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
@@ -1496,7 +1493,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(businessTransNo);
     //更改仓储状态为1（入库待响应）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE);
+        orderContract.updateOrderState(orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE, "", 0);
 
     //仓储业务详情
         businessDetailMap[businessTransNo].repoBusinessNo = repoBusinessNo;
@@ -1577,7 +1574,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
     //更改仓储状态为2（待入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME, "", 0);
 
 
     //waittodo 待补充 修改订单中的买家仓储状态
@@ -1592,7 +1589,8 @@ contract RepositoryContract{
     bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
     bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
     uint operateTime,   //  操作时间(时间戳)
-    address accountContractAddress
+    address accountContractAddress,
+    bytes32 txSerialNo
     ) returns(uint,bytes32){
     //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
@@ -1630,7 +1628,7 @@ contract RepositoryContract{
 
     //更改订单仓储状态为3（已入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_INCOMED);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_INCOMED, txSerialNo, operateTime);
 
 
         return repoCertNoApply( repoBusinessNo, repoCertNo, operateTime) ;
@@ -1815,7 +1813,7 @@ contract RepositoryContract{
 
     //更新订单中的卖家状态为 REPO_BUSI_WATING_OUTCOME
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME, "", 0);
 
         return (0,lastBusinessTransNo);
     }
@@ -1871,8 +1869,6 @@ contract RepositoryContract{
         }
     }
 
-
-
     //出库确认-已出库
     function outcomeConfirm(
     address orderContractAddress,//
@@ -1923,7 +1919,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED, "", 0);
         return (0);
     }
 
@@ -2267,7 +2263,6 @@ uint OUTCOMED = 6;                  //已出库
         Order order = orderDetailMap[orderNo];
         return order.orderState.payerRepoBusiState;
     }
-
     //订单
     struct Order{
         bytes32 orderNo;//订单编号
@@ -2291,12 +2286,14 @@ uint OUTCOMED = 6;                  //已出库
         OrderState orderState;//订单状态
     }
     //for yf
-    function queryPayerRepoEnterpriseName(bytes32 orderNo) returns(bytes32){
+    function queryPayerRepoEnterpriseName(bytes32 orderNo, address accountAddress) returns(bytes32){
         Order order = orderDetailMap[orderNo];
+        accountContract = AccountContract(accountAddress);
         return accountContract.getEnterpriseNameByAddress(order.payerRepoAddress);
     }
-    function queryPayeeRepoEnterpriseName(bytes32 orderNo) returns(bytes32){
+    function queryPayeeRepoEnterpriseName(bytes32 orderNo, address accountAddress) returns(bytes32){
         Order order = orderDetailMap[orderNo];
+        accountContract = AccountContract(accountAddress);
         return accountContract.getEnterpriseNameByAddress(order.payeeRepoAddress);
     }
     function queryPayerRepoCertNo(bytes32 orderNo) returns(bytes32){
@@ -2388,7 +2385,7 @@ uint OUTCOMED = 6;                  //已出库
         orderDetailMap[orderNo].productTotalPrice = productTotalPrice;
         orderDetailMap[orderNo].payingMethod = payingMethod;
         orderDetailMap[orderNo].orderGenerateTime = orderGenerateTime;
-        updateOrderState(orderNo, "txState", 1);      //更新买方的所有订单和卖方所有的订单
+        updateOrderState(orderNo, "txState", 1, txSerialNo, orderGenerateTime);      //更新买方的所有订单和卖方所有的订单
         allPayerOrderMap[msg.sender].push(orderNo);
         allPayeeOrderMap[payeeAddress].push(orderNo);
         //提取交易流水号，添加操作记录
@@ -2476,18 +2473,19 @@ uint OUTCOMED = 6;                  //已出库
             return (2001, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
+        Order order = orderDetailMap[orderNo];
+
         //如果订单与合约调用者无关，"权限拒绝"
         if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
             return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-        Order order = orderDetailMap[orderNo];
         bytes32[] memory param1 = new bytes32[](5);
         uint[] memory param2 = new uint[](8);
         address[] memory param3 = new address[](1);
 
         (param1, param2, param3) = searchReceAndWayBillInfo(receAddress, wbillContractAddress, accountContractAddr, orderNo);
-        resultUint = new uint[](15);
+        resultUint = new uint[](16);
         resultBytes32 = new bytes32[](14);
         resultAddress = new address[](5);
 
@@ -2535,6 +2533,13 @@ uint OUTCOMED = 6;                  //已出库
         resultUint[12] = param2[2];
         resultUint[13] = param2[3];
         resultUint[14] = param2[4];
+        if(txSerialNoList[orderNo].length == 3){
+            resultUint[15] = txRecordDetailMap[txSerialNoList[orderNo][2]].time;
+        }
+        else{
+            resultUint[15] = 0;
+        }
+
 
         resultBytes32[10] = param1[0];
         resultBytes32[11] = param1[1];
@@ -2655,7 +2660,7 @@ uint OUTCOMED = 6;                  //已出库
         }
 
         //更新订单的状态为"已确认"，添加卖方指定的仓储公司和仓单编号
-        updateOrderState(orderNo, "txState", 2);//修改订单详情map中的订单状态
+        updateOrderState(orderNo, "txState", 2, txSerialNo, orderConfirmTime);//修改订单详情map中的订单状态
         orderDetailMap[orderNo].payeeRepoAddress = payeeRepoAddress;
         orderDetailMap[orderNo].payeeRepoCertNo = payeeRepoCertNo;
         orderDetailMap[orderNo].payeeRepoBusinessNo = payeeRepoBusinessNo;
@@ -2663,7 +2668,7 @@ uint OUTCOMED = 6;                  //已出库
         updateOrderState(orderNo, "payeeRepoBusiState", 5);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
-            updateOrderState(orderNo, "receState", 2);
+            updateOrderState(orderNo, "receState", 2, txSerialNo, orderConfirmTime);
         }
 
         //添加操作记录
@@ -2722,7 +2727,7 @@ uint OUTCOMED = 6;                  //已出库
     }
 
     /***********************根据订单编号更新订单的某状态******************************/
-    function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState)returns(uint){
+    function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState, bytes32 txSerialNo, uint orderCompleteTime)returns(uint){
         Order order = orderDetailMap[orderNo];
         if(stateType == "txState"){
             order.orderState.txState = newState;
@@ -2733,6 +2738,13 @@ uint OUTCOMED = 6;                  //已出库
             if(newState == INCOMED){
                 if(order.orderState.wayBillState == RECEIVED){
                     order.orderState.txState = COMPLETED;
+                    //添加操作记录
+                    txRecordDetailMap[txSerialNo].orderNo = orderNo;
+                    txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
+                    txRecordDetailMap[txSerialNo].time = orderCompleteTime;
+                    txRecordDetailMap[txSerialNo].txState = 3;
+                    //添加该订单对应的流水号
+                    txSerialNoList[orderNo].push(txSerialNo);
                 }
             }
             return 0;
@@ -2747,6 +2759,13 @@ uint OUTCOMED = 6;                  //已出库
             if(newState == RECEIVED){
                 if(order.orderState.payerRepoBusiState == INCOMED){
                     order.orderState.txState = COMPLETED;
+                    //添加操作记录
+                    txRecordDetailMap[txSerialNo].orderNo = orderNo;
+                    txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
+                    txRecordDetailMap[txSerialNo].time = orderCompleteTime;
+                    txRecordDetailMap[txSerialNo].txState = 3;
+                    //添加该订单对应的流水号
+                    txSerialNoList[orderNo].push(txSerialNo);
                 }
             }
             return 0;
@@ -2785,7 +2804,6 @@ contract WayBillContract {
     uint CODE_INVALID_USER = 2; //用户不存在
     uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
     uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
-    uint CODE_STATUS_TRANSFER_DENIED = 3002; //状态转换拒绝
 
     //运单信息
     struct WayBill{
@@ -2814,8 +2832,8 @@ contract WayBillContract {
     //状态流转编号—> 运单详情(完整/不完整)
     mapping(bytes32 => WayBill) statusTransIdToWayBillDetail;
 
-    //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
-    //生成待发货运单（初始化 状态为待发货、待发货时间）
+    //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用
+    //生成待发货运单（初始化状态为待发货、待发货时间）。）
     function initWayBillStatus(
         address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress, orderAddress*/
         bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
@@ -2834,7 +2852,7 @@ contract WayBillContract {
         bytes32[] memory logisticsInfo;
 
         //生成初始化运单
-        statusTransIdToWayBillDetail[statusTransId] = WayBill(strs[0], statusTransId, "", logisticsAddress, addrs[0], addrs[1], strs[3], integers[1], integers[2], integers[0], addrs[2], strs[1], addrs[3], strs[2], logisticsInfo, WAYBILL_WAITING);
+        statusTransIdToWayBillDetail[statusTransId] = WayBill(strs[0], statusTransId, "", logisticsAddress, addrs[0], addrs[1], strs[3], integers[1], integers[2], integers[0], addrs[2], strs[2], addrs[3], strs[2], logisticsInfo, WAYBILL_WAITING);
         //
         orderNoToStatusTransIdList[strs[0]].push(statusTransId);
         //
@@ -2842,7 +2860,7 @@ contract WayBillContract {
         addressToOrderNoList[addrs[1]].push(strs[0]);
 
         //TODO 更新订单中的运单状态为待发货
-        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_WAITING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_WAITING, "", 0);
 
         return CODE_SUCCESS;
     }
@@ -2899,7 +2917,7 @@ contract WayBillContract {
             strs[5] //运单号
         );
         //TODO 更新订单中的运单状态为发货待响应
-        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_REQUESTING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_REQUESTING, "", 0);
 
         return CODE_SUCCESS; //成功
     }
@@ -2915,11 +2933,9 @@ contract WayBillContract {
         if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress){ //用户无权限
+        // TODO 权限控制
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress || oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //用户无权限
             return CODE_PERMISSION_DENIED;
-        }
-        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //无状态转换权限
-            return CODE_STATUS_TRANSFER_DENIED;
         }
 
         //生成已确认运单
@@ -2929,7 +2945,7 @@ contract WayBillContract {
         //
 
         //TODO 更新订单中的运单状态为已发货
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING, "", 0);
 
         return CODE_SUCCESS;
     }
@@ -2966,6 +2982,23 @@ contract WayBillContract {
         }
         WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
+        //bytes32 orderNo = waybill.orderNo;
+        // bytes32 wayBillNo = waybill.wayBillNo;
+        // bytes32 productName = waybill.productName;
+        // bytes32 senderRepoCertNo = waybill.senderRepoCertNo;
+        // bytes32 receiverRepoBusinessNo = waybill.receiverRepoBusinessNo;
+        // address logisticsAddress = waybill.logisticsAddress;
+        // address senderAddress = waybill.senderAddress;
+        // address receiverAddress = waybill.receiverAddress;
+        // address senderRepoAddress = waybill.senderRepoAddress;
+        // address receiverRepoAddress = waybill.receiverRepoAddress;
+        // uint productQuantity = waybill.productQuantity;
+        // uint productValue = waybill.productValue;
+        // uint waitTime;
+        // uint requestTime;
+        // uint receiveTime;
+        // uint sendTime;
+        // uint rejectTime;
         var(waitTime, requestTime, sendTime, receiveTime, rejectTime) = getTime(waybill.waybillStatus, statusTransIdList);
 
         ints = new uint[](8);
@@ -3021,18 +3054,18 @@ contract WayBillContract {
     }
 
 
-    //获取运单概要信息。供其他合约调用
+    // for other contract
     function getWayBillOverview(bytes32 orderNo, address accountContractAddr)
         returns(bytes32 wayBillNo, uint requestTime, address logisticsAddress, uint waybillStatus, uint operateTime)
     {
         /*运单号, 下单时间, 物流公司, 物流当前状态, 更新时间*/
         accountContract = AccountContract (accountContractAddr);
 
-        //获取运单最新信息
-        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
         if (statusTransIdList.length == 0) {
             return (wayBillNo,requestTime, logisticsAddress, waybillStatus, operateTime);
         }
+        //获取运单最新信息
+        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
         WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
         requestTime = statusTransIdToWayBillDetail[statusTransIdList[0]].operateTime;
         return (waybill.wayBillNo, requestTime, waybill.logisticsAddress, waybill.waybillStatus, waybill.operateTime);
@@ -3040,7 +3073,7 @@ contract WayBillContract {
 
 
     //更新运单状态为已送达
-    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr) returns (uint code){
+    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr, bytes32 txSerialNo) returns (uint code){
         accountContract = AccountContract (accountContractAddr);
         repositoryContract = RepositoryContract (repoContractAddr);
         orderContract = OrderContract (orderContractAddr);
@@ -3052,8 +3085,6 @@ contract WayBillContract {
         if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
-        //TODO 权限控制：卖家仓储状态为已出库 买家仓储状态为待入库 状态 物流才能更新为已送达
-
 
         //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
@@ -3062,16 +3093,17 @@ contract WayBillContract {
         }
         WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
-        if(oldWaybill.waybillStatus != WAYBILL_SENDING){//无状态流转权限
-            return CODE_STATUS_TRANSFER_DENIED;
+        if(oldWaybill.waybillStatus != WAYBILL_SENDING){//用户无权限（状态流转）
+            return CODE_PERMISSION_DENIED;
         }
+
 
         statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_RECEIVED);
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
         //TODO 更新订单中的运单状态为已完成
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED, txSerialNo, operateTime);
 
         return (CODE_SUCCESS);
     }
@@ -3092,8 +3124,8 @@ contract WayBillContract {
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
         WayBill memory oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
-        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){//无状态流转权限
-            return CODE_STATUS_TRANSFER_DENIED;
+        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){//用户无权限（状态流转）
+            return CODE_PERMISSION_DENIED;
         }
 
         statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_REJECTED);
@@ -3102,23 +3134,9 @@ contract WayBillContract {
         //
 
         //TODO 更新订单中的运单状态为已拒绝
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED, "", 0);
 
         return (CODE_SUCCESS);
-    }
-
-    //根据订单号查询运单号和物流企业address，供其他合约调用
-    function getWaybillMsgForReceviable(bytes32 orderNo, address accountContractAddr) returns (bytes32 waybillNo, bytes32 logisticsEnterpriseName){
-        accountContract = AccountContract (accountContractAddr);
-
-        //获取运单最新信息
-        bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
-        if (statusTransIdList.length == 0) {
-            return (waybillNo, logisticsEnterpriseName);
-        }
-        WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
-        logisticsEnterpriseName = accountContract.getEnterpriseNameByAddress(waybill.logisticsAddress);
-        return (waybill.wayBillNo, logisticsEnterpriseName);
     }
 
 //备注：用户权限控制：用户是否存在，用户身份操作权限，业务状态流转权限

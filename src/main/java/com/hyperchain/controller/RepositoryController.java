@@ -166,6 +166,7 @@ public class RepositoryController {
     @RequestMapping(value = "incomeConfirm",method = RequestMethod.PUT)
     public BaseResult<Object> incomeConfirm(
             @ApiParam(value = "仓储业务编号", required = true) @RequestParam String repoBusinessNo,
+            @ApiParam(value = "仓储业务编号", required = true) @RequestParam String orderNo,
             HttpServletRequest request
     ) throws Exception {
 
@@ -183,7 +184,7 @@ public class RepositoryController {
         String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo("OrderContract");
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
-        Object[] params = new Object[7];
+        Object[] params = new Object[8];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
         params[2] = repoCertNo;
@@ -191,6 +192,7 @@ public class RepositoryController {
         params[4] = repoBusinessNo + REPO_BUSI_INCOMED; //当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + REPO_BUSI_INCOMED
         params[5] = operateTime; //操作时间
         params[6] = acctContractAddress;
+        params[7] = orderNo+"03";
         // 调用合约查询账户，获取返回结果
         return repositoryService.incomeConfirm(contractKey, params);
     }
