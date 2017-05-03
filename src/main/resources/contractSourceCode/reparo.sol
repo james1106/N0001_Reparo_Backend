@@ -2291,13 +2291,13 @@ uint OUTCOMED = 6;                  //已出库
         OrderState orderState;//订单状态
     }
     //for yf
-    function queryPayerRepoAddress(bytes32 orderNo) returns(address){
+    function queryPayerRepoAddress(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
-        return order.payerRepoAddress;
+        return getEnterpriseNameByAddress(order.payerRepoAddress);
     }
-    function queryPayeeRepoAddress(bytes32 orderNo) returns(address){
+    function queryPayeeRepoAddress(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
-        return order.payeeRepoAddress;
+        return getEnterpriseNameByAddress(order.payeeRepoAddress);
     }
     function queryPayerRepoCertNo(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
@@ -2470,7 +2470,6 @@ uint OUTCOMED = 6;                  //已出库
         if(accountContract.queryRoleCode(msg.sender) != 0){
             return (1, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
-        Order order = orderDetailMap[orderNo];
 
         //如果订单不存在，返回"订单不存在"
         if(!orderExists(orderNo)){
@@ -2482,7 +2481,7 @@ uint OUTCOMED = 6;                  //已出库
             return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-
+        Order order = orderDetailMap[orderNo];
         bytes32[] memory param1 = new bytes32[](5);
         uint[] memory param2 = new uint[](8);
         address[] memory param3 = new address[](1);
