@@ -363,6 +363,9 @@ contract ReceivableContract{
         return orderCon.updateOrderState(orderNo, stateType, newState);
     }
 
+    OrderContract orderCon;
+    WayBillContract wayBillCon;
+
 //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
     function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNoAndSerialNo, uint time, address orderAddress) returns(uint code){
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
@@ -393,7 +396,8 @@ contract ReceivableContract{
 
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNoAndSerialNo, time);
-
+        orderCon = OrderContract(orderAddress);
+        orderCon.updateOrderState(orderNo, "receState", 21);
     //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
 
         holdingReceivablesMap[signer].push(receivableNo);
@@ -401,7 +405,8 @@ contract ReceivableContract{
         pyerToReceivableMap[pyer].push(receivableNo);
         pyeeToReceivableMap[pyee].push(receivableNo);
 
-        updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
+        //updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
+
         return (0);
     }
 
@@ -472,7 +477,8 @@ contract ReceivableContract{
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
         }
         receivable.signInDt = time;
-
+        orderCon = OrderContract(orderAddress);
+        orderCon.updateOrderState(receivable.orderNo, "receState", 26);
     //pyerToReceivableMap[receivable.pyer].push(receivableNo);
     //pyeeToReceivableMap[receivable.pyee].push(receivableNo);
         accptrToReceivableMap[receivable.accptr].push(receivableNo);
@@ -480,7 +486,9 @@ contract ReceivableContract{
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, replyerAcctId, response, time, "signOutReply", receivable.isseAmt, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
-        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+
+        //updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+
         return (0);
     }
 
@@ -546,12 +554,15 @@ contract ReceivableContract{
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
-        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+
+        //updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+        orderCon = OrderContract(orderAddress);
+        orderCon.updateOrderState(receivable.orderNo, "receState", 41);
         return(0);
     }
 
 //贴现回复
-    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, address orderAddress) returns(uint) {
+    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, uint discountInHandAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -561,10 +572,11 @@ contract ReceivableContract{
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
+    /*
         if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
             return (1030);
         }
-    /*
+
      if(judgeAccount(msg.sender)){
      return(2);
      }
@@ -577,28 +589,33 @@ contract ReceivableContract{
             return (1);
         }
         receivable.discountInHandAmount = discountInHandAmount;
-        subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo);
-        holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
+        subDiscount(receivableNo, serialNo, responseType, time);
+        //holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
-        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+        //updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+        orderCon = OrderContract(orderAddress);
+        orderCon.updateOrderState(receivable.orderNo, "receState", 46);
         return (0);
     }
 
-    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo) internal {
+    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time) internal {
         Receivable receivable = receivableDetailMap[receivableNo];
         uint oriAmount = receivable.isseAmt;
         if(responseType == ResponseType.NO){
             receivable.status = receivable.lastStatus;
         }else{
+            /*
             Receivable newReceivable = receivableDetailMap[newReceivableNo];
             copyValue(receivableNo, newReceivableNo);
             newReceivable.receivableNo = newReceivableNo;
+            */
             receivable.lastStatus = receivable.status;
-            receivable.status = 49;//已全额贴现
+            receivable.status = 46;//46贴现已签收;49已全额贴现
             receivable.discounted = DiscountedStatus.YES;
             receivable.signInDt = time;
+            /*
             newReceivable.lastStatus = 41;
             newReceivable.status = 46;//贴现已签收
             newReceivable.signInDt = time;
@@ -606,6 +623,7 @@ contract ReceivableContract{
             newReceivable.secondOwner = "";
             newReceivable.discounted = DiscountedStatus.YES;
             newReceivable.signInDt = time;
+            */
         }
     }
 
@@ -720,7 +738,7 @@ contract ReceivableContract{
             return(1005);
         }
 
-     if(receivable.status != 26){
+     if(receivable.status != 26 && receivable.status != 46){
         return(1006);
      }
      /*
@@ -736,19 +754,23 @@ contract ReceivableContract{
         cashedReceivablesMap[receivable.accptr].push(receivableNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
-        updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+        //updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
+        orderCon = OrderContract(orderAddress);
+        orderCon.updateOrderState(receivable.orderNo, "receState", 1);
         return (0);
     }
 
 //带有应收款流水信息的应收款更具体详情
-    function getReceivableAllInfoWithSerial(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
+    function getReceivableAllInfoWithSerial(bytes32[] receivableNoAndAcctId, address[] orderAndWayBillAndAccountAddress) returns (uint, bytes32[], uint[], DiscountedStatus discounted){
         Account account = accountMap[msg.sender];
-        Receivable receivable = receivableDetailMap[receivableNo];
-        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
+        Receivable receivable = receivableDetailMap[receivableNoAndAcctId[0]];
+        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNoAndAcctId[0]];
+        orderCon = OrderContract(orderAndWayBillAndAccountAddress[0]);
+        wayBillCon = WayBillContract(orderAndWayBillAndAccountAddress[1]);
 
         uint[] memory uintInfo = new uint[](historySerialNos.length * 2 + 8);
-        bytes32[] memory bytesInfo1 = new bytes32[](11);
-    //uint[] memory uintSerials = new uint[](historySerialNos.length * 2 + 8);
+        bytes32[] memory bytesInfo1 = new bytes32[](13);
+        address[] memory addressInfo = new address[](2);
     /*
      if(judgeAccount(msg.sender)){
      return (2,
@@ -756,18 +778,15 @@ contract ReceivableContract{
      //bytesInfo2,
      uintInfo,
      uintSerials,
-     discounted,
-     note
+     discounted
      );
      }
      */
-        if(receivableNo == ""){
+        if(receivableNoAndAcctId[0] == ""){
             return (3,
             bytesInfo1,
             uintInfo,
-
-            discounted,
-            note
+            discounted
             );
         }
 
@@ -775,23 +794,19 @@ contract ReceivableContract{
             return(1005,
             bytesInfo1,
             uintInfo,
-
-            discounted,
-            note
+            discounted
             );
         }
 
-    /*
-     if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
-     return(1,
-     bytesInfo1,
-     uintInfo,
-     uintSerials,
-     discounted,
-     note
+
+     if(receivable.signer != receivableNoAndAcctId[1] && receivable.accptr != receivableNoAndAcctId[1] && receivable.pyer != receivableNoAndAcctId[1] && receivable.pyee != receivableNoAndAcctId[1] && receivable.firstOwner != receivableNoAndAcctId[1] && receivable.secondOwner != receivableNoAndAcctId[1]) {
+        return(1,
+        bytesInfo1,
+        uintInfo,
+        discounted
      );
      }
-     */
+
 
         ReceivableRecord memory receivableRecord;
         for(uint i = 0; i < historySerialNos.length; i++){
@@ -808,7 +823,7 @@ contract ReceivableContract{
         uintInfo[historySerialNos.length*2 + 6] = receivable.status;
         uintInfo[historySerialNos.length*2 + 7] = receivable.lastStatus;
 
-        bytesInfo1[0] = receivableNo;
+        bytesInfo1[0] = receivableNoAndAcctId[0];
         bytesInfo1[1] = receivable.orderNo;
         bytesInfo1[2] = receivable.signer;
         bytesInfo1[3] = receivable.accptr;
@@ -819,12 +834,17 @@ contract ReceivableContract{
         bytesInfo1[8] = receivable.rate;
         bytesInfo1[9] = receivable.contractNo;
         bytesInfo1[10] = receivable.invoiceNo;
+        bytesInfo1[11] = orderCon.queryPayerRepoCertNo(receivable.orderNo);
+        bytesInfo1[12] = orderCon.queryPayeeRepoCertNo(receivable.orderNo);
+        bytesInfo1[13] = orderCon.queryPayerRepoCertNo(receivable.orderNo);
+        bytesInfo1[14] = orderCon.queryPayeeRepoCertNo(receivable.orderNo);
+        (bytesInfo1[15], bytesInfo1[16]) = orderCon.getWaybillMsgForReceviable(receivable.orderNo);
+
 
         return (0,
         bytesInfo1,
         uintInfo,
-        receivable.discounted,
-        receivable.note
+        receivable.discounted
         );
     }
 
@@ -2321,6 +2341,25 @@ uint OUTCOMED = 6;                  //已出库
         else {
             return true;
         }
+    }
+
+
+//for yf
+    function queryPayerRepoAddress(bytes32 orderNo) returns(address){
+        Order order = orderDetailMap[orderNo];
+        return order.payerRepoAddress;
+    }
+    function queryPayeeRepoAddress(bytes32 orderNo) returns(address){
+        Order order = orderDetailMap[orderNo];
+        return order.payeeRepoAddress;
+    }
+    function queryPayerRepoCertNo(bytes32 orderNo) returns(bytes32){
+        Order order = orderDetailMap[orderNo];
+        return order.payerRepoCertNo;
+    }
+    function queryPayeeRepoCertNo(bytes32 orderNo) returns(bytes32){
+        Order order = orderDetailMap[orderNo];
+        return order.payeeRepoCertNo;
     }
 
 

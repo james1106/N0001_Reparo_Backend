@@ -228,7 +228,7 @@ public class ReceivableController {
         try {
             long discountReplyTime = System.currentTimeMillis();
             String serialNo = "124" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//贴现回复流水号124
-            String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//新生成的应收款编号
+            //String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//新生成的应收款编号
 
             String address = TokenUtil.getAddressFromCookie(request);//用户address
             UserEntity userEntity = userEntityRepository.findByAddress(address);
@@ -238,18 +238,18 @@ public class ReceivableController {
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             long discountInHandAmountFen = ReparoUtil.convertYuanToCent(discountInHandAmount);
-            Object[] params = new Object[8];
+            Object[] params = new Object[7];
             params[0] = receivableNo;
             params[1] = replyerAcctId;
             params[2] = response;
             params[3] = serialNo;
             params[4] = discountReplyTime;
-            params[5] = newReceivableNo;
-            params[6] = discountInHandAmountFen;
-            params[7] = orderContractAddress;
+            //params[5] = newReceivableNo;
+            params[5] = discountInHandAmountFen;
+            params[6] = orderContractAddress;
 
             // 调用合约查询账户，获取返回结果
-            return receivableService.discountReply(contractKey, params, newReceivableNo);
+            return receivableService.discountReply(contractKey, params);
         }
         catch (Exception e){
             LogUtil.error("调用方法discountReply异常");

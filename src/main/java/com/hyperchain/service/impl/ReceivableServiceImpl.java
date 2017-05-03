@@ -208,7 +208,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         //贴现回复
     @Override
-    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams, String newReceivableNo) {
+    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
         String methodName = "discountReply";
         String[] resultMapKey = new String[]{};
         BaseResult result = new BaseResult();
@@ -227,7 +227,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
-        result.returnWithValue(code, newReceivableNo);
+        result.returnWithoutValue(code);
         return result;//这个result是返回给前端的
 
     }
@@ -324,11 +324,11 @@ public class ReceivableServiceImpl implements ReceivableService{
 //        String pyeeEnterpriseName = partParams1.get(2);
 //        String pyeeAcctSvcrName = partParams1.get(3);
 
-        long isseAmt = Long.parseLong(partParams1.get(0));
+        long isseAmt = (partParams1.get(0).equals("")) ? 0L:Long.parseLong(partParams1.get(0));
         long cashedAmount = (partParams1.get(1).equals("")) ? 0L:Long.parseLong(partParams1.get(1));
-        long isseDt = Long.parseLong(partParams1.get(2));
+        long isseDt = (partParams1.get(2).equals("")) ? 0L:Long.parseLong(partParams1.get(2));
         long signInDt = (partParams1.get(3).equals("")) ? 0L:Long.parseLong(partParams1.get(3));
-        long dueDt = Long.parseLong(partParams1.get(4));
+        long dueDt = (partParams1.get(4).equals("")) ? 0L:Long.parseLong(partParams1.get(4));
         long discountInHandAmount = (partParams1.get(5).equals("")) ? 0L:Long.parseLong(partParams1.get(5));
         int status = (partParams1.get(6).equals("")) ? 0 : Integer.parseInt(partParams1.get(6));
         int lastStatus = (partParams1.get(7).equals("")) ? 0 : Integer.parseInt(partParams1.get(7));
@@ -457,11 +457,11 @@ public class ReceivableServiceImpl implements ReceivableService{
         int length = (partParams1.size() - 8) / 2;
         int lastLength = partParams1.size() - 8;
 
-        long isseAmt = Long.parseLong(partParams1.get(lastLength));
+        long isseAmt = (partParams1.get(lastLength).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength));
         long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 1));
-        long isseDt = Long.parseLong(partParams1.get(lastLength + 2));
+        long isseDt = (partParams1.get(lastLength + 2).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 2));
         long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 3));
-        long dueDt = Long.parseLong(partParams1.get(lastLength + 4));
+        long dueDt = (partParams1.get(lastLength + 4).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 4));
         long discountInHandAmount = (partParams1.get(lastLength + 5).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 5));
         int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
         int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
@@ -691,7 +691,8 @@ public class ReceivableServiceImpl implements ReceivableService{
             long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
 
             receivableSimpleListVo.setProductQuantity(quantity);
-            String isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i*4+1)));
+            long judgeIsseAmtYuan = (String.valueOf(list2.get(i*4+1)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4+1)));
+            String isseAmtYuan = ReparoUtil.convertCentToYuan(judgeIsseAmtYuan);
             receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
 
             receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
