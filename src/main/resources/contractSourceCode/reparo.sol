@@ -2291,13 +2291,13 @@ uint OUTCOMED = 6;                  //已出库
         OrderState orderState;//订单状态
     }
     //for yf
-    function queryPayerRepoAddress(bytes32 orderNo) returns(bytes32){
+    function queryPayerRepoEnterpriseName(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
-        return getEnterpriseNameByAddress(order.payerRepoAddress);
+        return accountContract.getEnterpriseNameByAddress(order.payerRepoAddress);
     }
-    function queryPayeeRepoAddress(bytes32 orderNo) returns(bytes32){
+    function queryPayeeRepoEnterpriseName(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
-        return getEnterpriseNameByAddress(order.payeeRepoAddress);
+        return accountContract.getEnterpriseNameByAddress(order.payeeRepoAddress);
     }
     function queryPayerRepoCertNo(bytes32 orderNo) returns(bytes32){
         Order order = orderDetailMap[orderNo];
