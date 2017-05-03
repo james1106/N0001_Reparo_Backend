@@ -200,7 +200,7 @@ public class OrderController {
         UserEntity payeeRepoEntity = userEntityRepository.findByCompanyName(payeeRepoName);
         if(CommonUtil.isEmpty(payeeRepoEntity)){
             BaseResult result = new BaseResult();
-            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+            result.returnWithoutValue(Code.REPOCOMPANY_NOT_BE_REGISTERED);
             return  result;
         }
         String payeeRepoAddress = payeeRepoEntity.getAddress();

@@ -36,6 +36,7 @@ public enum Code {
     ORDER_ALREADY_CONFIRMED(2006, "该订单已经确认"),
     NOT_PAYEE_FOR_ORDER(2007, "用户不是订单的卖方"),
     BANKACCOUNT_NOT_EXIST(2008, "用户无该银行账号"),
+    REPOCOMPANY_NOT_BE_REGISTERED(2009, "该仓储公司名称未注册"),
 
     //账户管理部分
     PHONE_ALREADY_EXIST(5001, "手机号码已注册"),
@@ -158,6 +159,8 @@ public enum Code {
                 return NOT_PAYEE_FOR_ORDER;
             case 2008:
                 return BANKACCOUNT_NOT_EXIST;
+            case 2009:
+                return REPOCOMPANY_NOT_BE_REGISTERED;
 
             case 3000:
                 return WAY_BILL_ALREADY_EXIST;
