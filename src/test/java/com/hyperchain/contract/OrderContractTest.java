@@ -12,6 +12,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.common.util.CommonUtil;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
@@ -281,9 +282,9 @@ public class OrderContractTest extends SpringBaseTest{
             txDetailVo.setPayerCompanyName(payerCompanyName);
             txDetailVo.setPayeeCompanyName(payeeCompanyName);
             txDetailVo.setPayingMethod(payingMethodInt);
-            txDetailVo.setProductUnitPrice(productUnitPrice);
+            txDetailVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(productUnitPrice));
             txDetailVo.setProductQuantity(productQuantity);
-            txDetailVo.setProductTotalPrice(productTotalPrice);
+            txDetailVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(productTotalPrice));
             txDetailVo.setOrderId(orderId);
             txDetailVo.setOperationRecordVoList(txRecordList);
             txDetailVo.setProductName(productName);
@@ -401,10 +402,10 @@ public class OrderContractTest extends SpringBaseTest{
             orderOverVo.setPayeeRepoName(payeeRepoName);
 
             orderOverVo.setProductQuantity(Long.parseLong(partList3.get(i*5)));
-            orderOverVo.setProductUnitPrice(Long.parseLong(partList3.get(i*5+1))/100);
+            orderOverVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+1))/100));
 
             long orderConfirmTime = partList3.get(i*5+4).equals("")? 0 : Long.parseLong(partList3.get(i*5+4));
-            orderOverVo.setProductTotalPrice(Long.parseLong(partList3.get(i*5+2))/100);
+            orderOverVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+2))/100));
             orderOverVo.setOrderGenerateTime(Long.parseLong(partList3.get(i*5+3)));
             orderOverVo.setOrderConfirmTime(orderConfirmTime);
 

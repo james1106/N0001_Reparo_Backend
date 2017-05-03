@@ -402,8 +402,6 @@ contract ReceivableContract{
         pyeeToReceivableMap[pyee].push(receivableNo);
 
         updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
-
-
         return (0);
     }
 
@@ -472,7 +470,6 @@ contract ReceivableContract{
 
             WayBillContract wayBillCon = WayBillContract(wayBillContractAddress);
             wayBillCon.initWayBillStatus(resultAddress, resultBytes32, resultUint);
-            return (0);
         }
         receivable.signInDt = time;
 
@@ -722,10 +719,11 @@ contract ReceivableContract{
         if(receivable.receivableNo == 0x0) {
             return(1005);
         }
-    /*
-     if(receivable.status != "020006" && receivable.status != "070006"){
-     return(1006);
+
+     if(receivable.status != 26){
+        return(1006);
      }
+     /*
      //到期日才能兑付
      if(time < receivable.dueDt){
      return(1010);
@@ -1403,7 +1401,10 @@ contract RepositoryContract{
             bytesResult[i*2] = repoBusiess.repoCertNo;
             bytesResult[i*2+1] = repoBusiess.productName;
             uintResult[i*2] = repoBusiess.productQuantitiy;
-            uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+
+            //uintResult[i*2+1] = repoCertDetailMap[repoCertList[i]].repoCertStatus;
+            bytes32 repoCertNo = repoBusiToCertMap[repoCertList[i]];
+            uintResult[i*2+1] = repoCertDetailMap[repoCertNo].repoCertStatus;
             resultAddress[i] = repoBusiess.repoEnterpriseAddress;
         }
         return(0, bytesResult, uintResult, resultAddress);
@@ -1664,6 +1665,7 @@ contract RepositoryContract{
         if(accountContract.queryRoleCode(msg.sender) != 2){
             return (1);
         }
+        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
     //加入存货人的列表
         usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
     //加入仓储公司的列表
@@ -1768,7 +1770,7 @@ contract RepositoryContract{
     //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
 
         if(repoCertNoExsit(repoCertNo) == false){
-            return (1, "");
+            return (4001, "");
         }
     //获取仓储业务编号
         RepoCert repoCert =  repoCertDetailMap[repoCertNo];
@@ -1918,7 +1920,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_CERT_INVALID);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
         return (0);
     }
 
@@ -2706,6 +2708,11 @@ uint OUTCOMED = 6;                  //已出库
         }
         if(stateType == "payerRepoBusiState"){
             order.orderState.payerRepoBusiState = newState;
+            if(newState == INCOMED){
+                if(order.orderState.wayBillState == RECEIVED){
+                    order.orderState.txState = COMPLETED;
+                }
+            }
             return 0;
         }
         if(stateType == "payeeRepoBusiState"){
@@ -2714,8 +2721,7 @@ uint OUTCOMED = 6;                  //已出库
         }
 
         if(stateType == "wayBillState"){
-
-        order.orderState.wayBillState = newState;
+            order.orderState.wayBillState = newState;
             if(newState == RECEIVED){
                 if(order.orderState.payerRepoBusiState == INCOMED){
                     order.orderState.txState = COMPLETED;

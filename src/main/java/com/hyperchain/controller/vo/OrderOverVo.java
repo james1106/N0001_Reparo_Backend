@@ -10,8 +10,8 @@ public class OrderOverVo {
     private String orderNo;
     private String productName;
     private long productQuantity;
-    private long productUnitPrice;
-    private long productTotalPrice;
+    private String productUnitPrice;
+    private String productTotalPrice;
     private String payerRepoName;
     private String payeeRepoName;
     private String payerBank;
@@ -121,19 +121,19 @@ public class OrderOverVo {
         this.productQuantity = productQuantity;
     }
 
-    public long getProductUnitPrice() {
+    public String getProductUnitPrice() {
         return productUnitPrice;
     }
 
-    public void setProductUnitPrice(long productUnitPrice) {
+    public void setProductUnitPrice(String productUnitPrice) {
         this.productUnitPrice = productUnitPrice;
     }
 
-    public long getProductTotalPrice() {
+    public String getProductTotalPrice() {
         return productTotalPrice;
     }
 
-    public void setProductTotalPrice(long productTotalPrice) {
+    public void setProductTotalPrice(String productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
     }
 

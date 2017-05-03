@@ -5,6 +5,7 @@ import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.CommonUtil;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.vo.BaseResult;
@@ -55,9 +56,9 @@ public class OrderController {
     public BaseResult<Object> createOrder(
             @ApiParam(value = "卖方公司名称", required = true) @RequestParam String payeeCompanyName,
             @ApiParam(value = "货品名称", required = true) @RequestParam String productName,
-            @ApiParam(value = "货品单价", required = true) @RequestParam long productUnitPrice,
+            @ApiParam(value = "货品单价", required = true) @RequestParam double productUnitPrice,
             @ApiParam(value = "货品数量", required = true) @RequestParam long productQuantity,
-            @ApiParam(value = "货品总价", required = true) @RequestParam long productTotalPrice,
+            @ApiParam(value = "货品总价", required = true) @RequestParam double productTotalPrice,
             @ApiParam(value = "付款人申请仓储公司", required = true) @RequestParam String payerRepo,
             @ApiParam(value = "付款人开户行", required = true) @RequestParam String payerBank,
             @ApiParam(value = "付款账户", required = true) @RequestParam String payerAccount,
@@ -136,9 +137,9 @@ public class OrderController {
         orderParams[0] = acctContractAddress;
         orderParams[1] = payeeAddress;
         orderParams[2] = payerRepoAddress;
-        orderParams[3] = productUnitPrice*100; //单价
+        orderParams[3] = ReparoUtil.convertYuanToCent(productUnitPrice); //单价
         orderParams[4] = productQuantity; //
-        orderParams[5] = productTotalPrice*100; //
+        orderParams[5] = ReparoUtil.convertYuanToCent(productTotalPrice); //
         orderParams[6] = orderParamlist;
         orderParams[7] = payingMethod;
         orderParams[8] = orderGenerateTime;
@@ -155,8 +156,8 @@ public class OrderController {
         repoParams[6] = orderGenerateTime; //操作时间
         repoParams[7] = productName; //  仓储物名称
         repoParams[8] = productQuantity;     //  仓储物数量
-        repoParams[9] = productUnitPrice*100;     //  货品单价(分)
-        repoParams[10] = productTotalPrice*100;    //  货品合计金额(分)
+        repoParams[9] = ReparoUtil.convertYuanToCent(productUnitPrice);     //  货品单价(分)
+        repoParams[10] = ReparoUtil.convertYuanToCent(productTotalPrice);    //  货品合计金额(分)
         // 调用合约查询账户，获取返回结果
 
         BaseResult createOrderResult = orderService.createOrder(contractKey, orderParams, orderNo);
@@ -199,7 +200,7 @@ public class OrderController {
         UserEntity payeeRepoEntity = userEntityRepository.findByCompanyName(payeeRepoName);
         if(CommonUtil.isEmpty(payeeRepoEntity)){
             BaseResult result = new BaseResult();
-            result.returnWithoutValue(Code.COMPANY_NOT_BE_REGISTERED);
+            result.returnWithoutValue(Code.REPOCOMPANY_NOT_BE_REGISTERED);
             return  result;
         }
         String payeeRepoAddress = payeeRepoEntity.getAddress();
@@ -215,8 +216,8 @@ public class OrderController {
         contractParams[3] = payeeRepoCertNo;
         contractParams[4] = txSerialNo;
         contractParams[5] = txConfirmTime;
-        // 调用合约确认订单，获取返回结果
-        BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
+//(移到下面)        // 调用合约确认订单，获取返回结果
+//        BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
 
         Object[] params_1 = new Object[1];
         params_1[0] = payeeRepoCertNo;
@@ -240,12 +241,14 @@ public class OrderController {
 
         // 调用合约查询账户，获取返回结果
         BaseResult outcomeResult = repositoryService.outcomeResponse(contractKey, repoParams);
+        if(outcomeResult.getCode() != 0){
+            return outcomeResult;
+        }
 
+        // 调用合约确认订单，获取返回结果
+        BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
         if(confirmOrderResult.getCode() != 0){
             return confirmOrderResult;
-        }
-        else if(outcomeResult.getCode() != 0){
-            return outcomeResult;
         }
         else{
             BaseResult result = new BaseResult(Code.SUCCESS);

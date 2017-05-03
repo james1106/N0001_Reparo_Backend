@@ -8,9 +8,17 @@ public class ReceivableSimpleListVo {
     private String productName;
     private String enterpriseName;
     private long productQuantity;
-    private long isseAmt;
+    private String isseAmt;
     private long dueDt;
     private int status;
+
+    public String getIsseAmt() {
+        return isseAmt;
+    }
+
+    public void setIsseAmt(String isseAmt) {
+        this.isseAmt = isseAmt;
+    }
 
     public String getReceivableNo() {
         return receivableNo;
@@ -44,13 +52,6 @@ public class ReceivableSimpleListVo {
         this.productQuantity = productQuantity;
     }
 
-    public long getIsseAmt() {
-        return isseAmt;
-    }
-
-    public void setIsseAmt(long isseAmt) {
-        this.isseAmt = isseAmt;
-    }
 
     public long getDueDt() {
         return dueDt;

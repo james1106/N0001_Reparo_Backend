@@ -17,9 +17,9 @@ public class TransactionDetailVo {
     private String payerBank;
     private String payerBankClss;
     private String payerAccount;
-    private long productUnitPrice;
+    private String productUnitPrice;
     private long productQuantity;
-    private long productTotalPrice;
+    private String productTotalPrice;
     private String payerRepo;
     private String payeeRepo;
     private int payingMethod;
@@ -151,11 +151,11 @@ public class TransactionDetailVo {
         this.payeeRepo = payeeRepo;
     }
 
-    public long getProductUnitPrice() {
+    public String getProductUnitPrice() {
         return productUnitPrice;
     }
 
-    public void setProductUnitPrice(long productUnitPrice) {
+    public void setProductUnitPrice(String productUnitPrice) {
         this.productUnitPrice = productUnitPrice;
     }
 
@@ -167,11 +167,11 @@ public class TransactionDetailVo {
         this.productQuantity = productQuantity;
     }
 
-    public long getProductTotalPrice() {
+    public String getProductTotalPrice() {
         return productTotalPrice;
     }
 
-    public void setProductTotalPrice(long productTotalPrice) {
+    public void setProductTotalPrice(String productTotalPrice) {
         this.productTotalPrice = productTotalPrice;
     }
 
