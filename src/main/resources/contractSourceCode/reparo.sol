@@ -2757,6 +2757,7 @@ contract WayBillContract {
     uint CODE_INVALID_USER = 2; //用户不存在
     uint CODE_WAY_BILL_ALREADY_EXIST = 3000; //运单已经存在
     uint CODE_WAY_BILL_NO_DATA = 3001; //该用户暂无数据
+    uint CODE_STATUS_TRANSFER_DENIED = 3002; //状态转换拒绝
 
     //运单信息
     struct WayBill{
@@ -2785,8 +2786,8 @@ contract WayBillContract {
     //状态流转编号—> 运单详情(完整/不完整)
     mapping(bytes32 => WayBill) statusTransIdToWayBillDetail;
 
-    //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用
-    //生成待发货运单（初始化状态为待发货、待发货时间）。）
+    //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
+    //生成待发货运单（初始化 状态为待发货、待发货时间）
     function initWayBillStatus(
         address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress, orderAddress*/
         bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
@@ -2886,9 +2887,11 @@ contract WayBillContract {
         if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return CODE_INVALID_USER;
         }
-        // TODO 权限控制
-        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress || oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //用户无权限
+        if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false || msg.sender != oldWaybill.logisticsAddress){ //用户无权限
             return CODE_PERMISSION_DENIED;
+        }
+        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){ //无状态转换权限
+            return CODE_STATUS_TRANSFER_DENIED;
         }
 
         //生成已确认运单
@@ -2935,23 +2938,6 @@ contract WayBillContract {
         }
         WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
-        //bytes32 orderNo = waybill.orderNo;
-        // bytes32 wayBillNo = waybill.wayBillNo;
-        // bytes32 productName = waybill.productName;
-        // bytes32 senderRepoCertNo = waybill.senderRepoCertNo;
-        // bytes32 receiverRepoBusinessNo = waybill.receiverRepoBusinessNo;
-        // address logisticsAddress = waybill.logisticsAddress;
-        // address senderAddress = waybill.senderAddress;
-        // address receiverAddress = waybill.receiverAddress;
-        // address senderRepoAddress = waybill.senderRepoAddress;
-        // address receiverRepoAddress = waybill.receiverRepoAddress;
-        // uint productQuantity = waybill.productQuantity;
-        // uint productValue = waybill.productValue;
-        // uint waitTime;
-        // uint requestTime;
-        // uint receiveTime;
-        // uint sendTime;
-        // uint rejectTime;
         var(waitTime, requestTime, sendTime, receiveTime, rejectTime) = getTime(waybill.waybillStatus, statusTransIdList);
 
         ints = new uint[](8);
@@ -3007,7 +2993,7 @@ contract WayBillContract {
     }
 
 
-    // for other contract
+    //获取运单概要信息。供其他合约调用
     function getWayBillOverview(bytes32 orderNo, address accountContractAddr)
         returns(bytes32 wayBillNo, uint requestTime, address logisticsAddress, uint waybillStatus, uint operateTime)
     {
@@ -3038,6 +3024,8 @@ contract WayBillContract {
         if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
+        //TODO 权限控制：卖家仓储状态为已出库 买家仓储状态为待入库 状态 物流才能更新为已送达
+
 
         //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
@@ -3046,10 +3034,9 @@ contract WayBillContract {
         }
         WayBill oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
-        if(oldWaybill.waybillStatus != WAYBILL_SENDING){//用户无权限（状态流转）
-            return CODE_PERMISSION_DENIED;
+        if(oldWaybill.waybillStatus != WAYBILL_SENDING){//无状态流转权限
+            return CODE_STATUS_TRANSFER_DENIED;
         }
-
 
         statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_RECEIVED);
         //
@@ -3077,8 +3064,8 @@ contract WayBillContract {
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
         WayBill memory oldWaybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
 
-        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){//用户无权限（状态流转）
-            return CODE_PERMISSION_DENIED;
+        if(oldWaybill.waybillStatus != WAYBILL_REQUESTING){//无状态流转权限
+            return CODE_STATUS_TRANSFER_DENIED;
         }
 
         statusTransIdToWayBillDetail[statusTransId] = WayBill(orderNo, statusTransId, oldWaybill.wayBillNo, oldWaybill.logisticsAddress, oldWaybill.senderAddress, oldWaybill.receiverAddress, oldWaybill.productName, oldWaybill.productQuantity, oldWaybill.productValue, operateTime, oldWaybill.senderRepoAddress, oldWaybill.senderRepoCertNo, oldWaybill.receiverRepoAddress, oldWaybill.receiverRepoBusinessNo, oldWaybill.logisticsInfo, WAYBILL_REJECTED);
