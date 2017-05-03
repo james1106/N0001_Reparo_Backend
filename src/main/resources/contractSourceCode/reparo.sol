@@ -2829,7 +2829,7 @@ contract WayBillContract {
         bytes32[] memory logisticsInfo;
 
         //生成初始化运单
-        statusTransIdToWayBillDetail[statusTransId] = WayBill(strs[0], statusTransId, "", logisticsAddress, addrs[0], addrs[1], strs[3], integers[1], integers[2], integers[0], addrs[2], strs[2], addrs[3], strs[2], logisticsInfo, WAYBILL_WAITING);
+        statusTransIdToWayBillDetail[statusTransId] = WayBill(strs[0], statusTransId, "", logisticsAddress, addrs[0], addrs[1], strs[3], integers[1], integers[2], integers[0], addrs[2], strs[1], addrs[3], strs[2], logisticsInfo, WAYBILL_WAITING);
         //
         orderNoToStatusTransIdList[strs[0]].push(statusTransId);
         //
