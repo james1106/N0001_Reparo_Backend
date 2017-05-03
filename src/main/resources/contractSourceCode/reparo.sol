@@ -140,6 +140,9 @@ contract AccountContract {
         return acctIdToAddress[acctId];
     }
 
+    function getEnterpriseNameByAddress(address accountAddress) returns (bytes32 EnterpriseNameByAddress){
+        return accountMap[accountAddress].enterpriseName;
+    }
 }
 
 contract ReceivableContract{
@@ -3103,14 +3106,17 @@ contract WayBillContract {
     }
 
     //根据订单号查询运单号和物流企业address，供其他合约调用
-    function getWaybillMsgForReceviable(bytes32 orderNo) returns (bytes32 waybillNo, address logisticsAddress){
+    function getWaybillMsgForReceviable(bytes32 orderNo, address accountContractAddr) returns (bytes32 waybillNo, bytes32 logisticsEnterpriseName){
+        accountContract = AccountContract (accountContractAddr);
+
         //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
         if (statusTransIdList.length == 0) {
-            return (waybillNo, logisticsAddress);
+            return (waybillNo, logisticsEnterpriseName);
         }
         WayBill memory waybill = statusTransIdToWayBillDetail[statusTransIdList[statusTransIdList.length - 1]]; //取最新状态的运单信息
-        return (waybill.wayBillNo, waybill.logisticsAddress);
+        logisticsEnterpriseName = accountContract.getEnterpriseNameByAddress(waybill.logisticsAddress);
+        return (waybill.wayBillNo, logisticsEnterpriseName);
     }
 
 //备注：用户权限控制：用户是否存在，用户身份操作权限，业务状态流转权限
