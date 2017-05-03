@@ -2608,7 +2608,7 @@ uint OUTCOMED = 6;                  //已出库
 
     /****************************卖方确认订单**************************************/
 
-    function confirmOrder(address acctContractAddress, bytes32 orderNo, address payeeRepoAddress, bytes32 payeeRepoCertNo, bytes32 txSerialNo, uint orderConfirmTime) returns(
+    function confirmOrder(address acctContractAddress, bytes32 orderNo, address payeeRepoAddress, bytes32 payeeRepoCertNo, bytes32 txSerialNo, uint orderConfirmTime,bytes32 payeeRepoBusinessNo) returns(
     uint){
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         accountContract = AccountContract(acctContractAddress);
@@ -2639,7 +2639,9 @@ uint OUTCOMED = 6;                  //已出库
         updateOrderState(orderNo, "txState", 2);//修改订单详情map中的订单状态
         orderDetailMap[orderNo].payeeRepoAddress = payeeRepoAddress;
         orderDetailMap[orderNo].payeeRepoCertNo = payeeRepoCertNo;
-
+        orderDetailMap[orderNo].payeeRepoBusinessNo = payeeRepoBusinessNo;
+        //orderDetailMap[orderNo].orderState.payeeRepoBusiState = 5;
+        updateOrderState(orderNo, "payeeRepoBusiState", 5);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
             updateOrderState(orderNo, "receState", 2);
@@ -2650,6 +2652,7 @@ uint OUTCOMED = 6;                  //已出库
         txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
         txRecordDetailMap[txSerialNo].time = orderConfirmTime;
         txRecordDetailMap[txSerialNo].txState = 2;
+
 
         //添加该订单对应的流水号
         txSerialNoList[orderNo].push(txSerialNo);
