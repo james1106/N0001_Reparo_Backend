@@ -460,10 +460,22 @@ public class ReceivableController {
             String accountName = userEntity.getAccountName();
             ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-            Object[] params = new Object[2];
-            params[0] = receivableNo;
-            params[1] = operatorAcctId;
+            List<String> list1 = new ArrayList<>();
+            list1.add(receivableNo);
+            list1.add(operatorAcctId);
 
+            String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
+            String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
+            String wayBillContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
+
+            List<String> list2 = new ArrayList<>();
+            list2.add(orderContractAddress);
+            list2.add(accountContractAddress);
+            list2.add(wayBillContractAddress);
+
+            Object[] params = new Object[2];
+            params[0] = list1;
+            params[1] = list2;
 
             // 调用合约查询账户，获取返回结果
             return receivableService.getReceivableAllInfoWithSerial(contractKey, params);

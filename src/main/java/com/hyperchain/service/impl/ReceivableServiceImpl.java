@@ -324,11 +324,11 @@ public class ReceivableServiceImpl implements ReceivableService{
 //        String pyeeEnterpriseName = partParams1.get(2);
 //        String pyeeAcctSvcrName = partParams1.get(3);
 
-        long isseAmt = (partParams1.get(0).equals("")) ? 0L:Long.parseLong(partParams1.get(0));
+        long isseAmt = Long.parseLong(partParams1.get(0));
         long cashedAmount = (partParams1.get(1).equals("")) ? 0L:Long.parseLong(partParams1.get(1));
-        long isseDt = (partParams1.get(2).equals("")) ? 0L:Long.parseLong(partParams1.get(2));
+        long isseDt = Long.parseLong(partParams1.get(2));
         long signInDt = (partParams1.get(3).equals("")) ? 0L:Long.parseLong(partParams1.get(3));
-        long dueDt = (partParams1.get(4).equals("")) ? 0L:Long.parseLong(partParams1.get(4));
+        long dueDt = Long.parseLong(partParams1.get(4));
         long discountInHandAmount = (partParams1.get(5).equals("")) ? 0L:Long.parseLong(partParams1.get(5));
         int status = (partParams1.get(6).equals("")) ? 0 : Integer.parseInt(partParams1.get(6));
         int lastStatus = (partParams1.get(7).equals("")) ? 0 : Integer.parseInt(partParams1.get(7));
@@ -389,7 +389,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfoWithSerial";
-        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted", "note"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -430,10 +430,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         }
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
-        //List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
-        String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
+        //String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
 
         String receivableNo = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -509,7 +508,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setDueDt(dueDt);
         receivableDetailVo.setDiscountInHandAmount(discountInHandAmountYuan);
         receivableDetailVo.setDiscounted(discounted);
-        receivableDetailVo.setNote(note);
+        //receivableDetailVo.setNote(note);
         receivableDetailVo.setPyeeLinkPhone(pyeeLinkPhone);
         receivableDetailVo.setPyerLinkPhone(pyerLinkPhone);
 
@@ -691,8 +690,7 @@ public class ReceivableServiceImpl implements ReceivableService{
             long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
 
             receivableSimpleListVo.setProductQuantity(quantity);
-            long judgeIsseAmtYuan = (String.valueOf(list2.get(i*4+1)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4+1)));
-            String isseAmtYuan = ReparoUtil.convertCentToYuan(judgeIsseAmtYuan);
+            String isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i*4+1)));
             receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
 
             receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
