@@ -470,8 +470,8 @@ public class ReceivableController {
 
             List<String> list2 = new ArrayList<>();
             list2.add(orderContractAddress);
-            list2.add(accountContractAddress);
             list2.add(wayBillContractAddress);
+            list2.add(accountContractAddress);
 
             Object[] params = new Object[2];
             params[0] = list1;
