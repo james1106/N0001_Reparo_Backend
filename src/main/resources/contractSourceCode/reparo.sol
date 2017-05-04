@@ -2670,7 +2670,7 @@ uint OUTCOMED = 6;                  //已出库
         orderDetailMap[orderNo].payeeRepoCertNo = payeeRepoCertNo;
         orderDetailMap[orderNo].payeeRepoBusinessNo = payeeRepoBusinessNo;
         //orderDetailMap[orderNo].orderState.payeeRepoBusiState = 5;
-        updateOrderState(orderNo, "payeeRepoBusiState", 5);
+        updateOrderState(orderNo, "payeeRepoBusiState", 5, txSerialNo, orderConfirmTime);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
             updateOrderState(orderNo, "receState", 2, txSerialNo, orderConfirmTime);
@@ -3064,7 +3064,7 @@ contract WayBillContract {
 
 
     //更新运单状态为已送达
-    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr) returns (uint code){
+    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr, bytes32 txSerialNo) returns (uint code){
         accountContract = AccountContract (accountContractAddr);
         repositoryContract = RepositoryContract (repoContractAddr);
         orderContract = OrderContract (orderContractAddr);
