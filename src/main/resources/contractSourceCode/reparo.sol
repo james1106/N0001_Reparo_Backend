@@ -2269,6 +2269,10 @@ uint OUTCOMED = 6;                  //已出库
         Order order = orderDetailMap[orderNo];
         return order.orderState.payerRepoBusiState;
     }
+    function queryPayeeRepoBusiStateOfOrderState(bytes32 orderNo) returns(uint txState){
+        Order order = orderDetailMap[orderNo];
+        return order.orderState.payeeRepoBusiState;
+    }
 
     //订单
     struct Order{
