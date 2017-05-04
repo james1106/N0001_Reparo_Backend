@@ -2189,10 +2189,11 @@ contract OrderContract{
 address owner;
 //==========运单状态=======
 uint UNDEFINED = 0;           //未定义
-uint REQUESTING = 1;          //发货待响应
-uint REJECTED = 2;            //发货被拒绝
-uint SENDING = 3;             //已发货
-uint RECEIVED = 4;            //已送达
+uint WAITSEND = 1;            //待发货
+uint REQUESTING = 2;          //发货待响应
+uint REJECTED = 3;            //发货被拒绝
+uint SENDING = 4;             //已发货
+uint RECEIVED = 5;            //已送达
 //=========仓储状态=======
 uint WATING_INCOME_RESPONSE = 1;    //入库待响应
 uint WATING_INCOME = 2;             //待入库
@@ -2675,7 +2676,7 @@ uint OUTCOMED = 6;                  //已出库
         updateOrderState(orderNo, "payeeRepoBusiState", 5, txSerialNo, orderConfirmTime);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
-            updateOrderState(orderNo, "receState", 2, txSerialNo, orderConfirmTime);
+            updateOrderState(orderNo, "receState", 10, txSerialNo, orderConfirmTime);
         }
 
         //添加操作记录
