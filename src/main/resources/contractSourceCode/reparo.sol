@@ -522,6 +522,23 @@ contract ReceivableContract{
     }
 
 
+    function getDiscountBankList() returns (uint, uint[], bytes32[]){
+        uint[] memory bankSvcr = new uint[](4);
+        bytes32[] memory bankName = new bytes32[](4);
+        bankSvcr[0] = 316;
+        bankSvcr[1] = 102;
+        bankSvcr[2] = 103;
+        bankSvcr[3] = 104;
+
+        bankName[0] = "浙商银行";
+        bankName[1] = "中国工商银行";
+        bankName[2] = "中国农业银行";
+        bankName[3] = "中国银行";
+
+        return (0, bankSvcr, bankName);
+
+    }
+
 //贴现申请
     function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){

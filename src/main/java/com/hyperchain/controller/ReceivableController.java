@@ -212,6 +212,22 @@ public class ReceivableController {
     }
 
     @LogInterceptor
+    @ApiOperation(value = "贴现金融机构列表2", notes = "贴现金融机构列表2")
+    @ResponseBody
+    @RequestMapping(value = "getDiscountBankList",method = RequestMethod.POST)//路径
+    public BaseResult<Object> getDiscountBankList(
+            HttpServletRequest request
+    ) throws Exception {
+        String address = TokenUtil.getAddressFromCookie(request);//用户address
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String privateKey = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+
+        return receivableService.getDiscountBankList(contractKey,new Object[0]);
+    }
+
+    @LogInterceptor
     @ApiOperation(value = "贴现回复", notes = "贴现回复")
     @ResponseBody
     @RequestMapping(value = "discountReply",method = RequestMethod.POST)//路径
