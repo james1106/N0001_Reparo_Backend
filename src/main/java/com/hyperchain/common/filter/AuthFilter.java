@@ -108,7 +108,6 @@ public class AuthFilter implements javax.servlet.Filter {
     }
 
     //重定向到登录页面
-    //TODO 确定登录页面url
     private void redirectToLogin(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String host = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
         httpServletResponse.sendRedirect(host + "/reparo/module/login.html");
@@ -117,12 +116,12 @@ public class AuthFilter implements javax.servlet.Filter {
     //不需要过滤的url
     private boolean isNoFilterUri(HttpServletRequest httpServletRequest) {
         String uri = httpServletRequest.getRequestURI().toString();
-        if (uri.indexOf("static") > 0 || uri.indexOf("module") > 0 || uri.indexOf("commons") > 0 || uri.indexOf("index") > 0) { //前端页面资源
+        if (uri.indexOf("static") > 0 || uri.indexOf("login") > 0 || uri.indexOf("commons") > 0) { //登录等页面
             return true;
         }
-        if (uri.indexOf("docs") > 0) { //swagger
-            return true;
-        }
+//        if (uri.indexOf("docs") > 0) { //swagger
+//            return true;
+//        }
         switch (uri) { //后台接口
             case "/reparo/v1/account/user":
                 return true;
