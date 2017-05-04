@@ -149,6 +149,9 @@ public class OrderServiceImpl implements OrderService{
         int receLatestStatus = partParams2.get(12).equals("") ? 0 : Integer.parseInt(partParams2.get(12));
         long receUpdateTime = partParams2.get(13).equals("") ? 0 : Long.parseLong(partParams2.get(13));
         long dueDate = partParams2.get(14).equals("") ? 0 : Long.parseLong(partParams2.get(14));
+        long orderCompleteTime = partParams2.get(15).equals("") ? 0:Long.parseLong(partParams2.get(15));
+
+        //System.out.println("********************************"+orderCompleteTime+"********************************");
 
         TransactionDetailVo txDetailVo = new TransactionDetailVo();
         List<OperationRecordVo> txRecordList = new ArrayList<>();
@@ -157,6 +160,10 @@ public class OrderServiceImpl implements OrderService{
         txRecordList.add(new OperationRecordVo(1, orderGenerateTime));
         if(txStateInt == 2){
             txRecordList.add(new OperationRecordVo(txStateInt, orderComfirmTime));
+        }
+        else if(txStateInt == 3){
+            txRecordList.add(new OperationRecordVo(2, orderComfirmTime));
+            txRecordList.add(new OperationRecordVo(txStateInt, orderCompleteTime));
         }
 
         txDetailVo.setPayerCompanyName(payerCompanyName);
@@ -317,3 +324,4 @@ public class OrderServiceImpl implements OrderService{
     }
 
 }
+

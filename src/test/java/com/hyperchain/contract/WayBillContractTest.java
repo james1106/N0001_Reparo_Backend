@@ -3024,13 +3024,14 @@ public class WayBillContractTest extends SpringBaseTest {
         //更新运单状态为已送达
         ContractKey updateToReceivedContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
         String updateToReceivedMethodName = "updateWayBillStatusToReceived";
-        Object[] updateToReceivedMethodParams = new Object[6];
+        Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = "123订单" + random; //orderNo
         updateToReceivedMethodParams[1] = "123订单" + random + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
         updateToReceivedMethodParams[2] = new Date().getTime(); //operateTime
         updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
         updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
         updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
+        updateToReceivedMethodParams[6] = "123订单" + random + "03"; //txSerialNo
         String[] updateToReceivedResultMapKey = new String[]{};
         System.out.println("调用合约updateWayBillStatusToReceived入参：" + updateToReceivedMethodParams);
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果

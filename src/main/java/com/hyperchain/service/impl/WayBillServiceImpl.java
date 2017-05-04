@@ -174,13 +174,14 @@ public class WayBillServiceImpl implements WayBillService {
 
         ContractKey updateToReceivedContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
         String updateToReceivedMethodName = "updateWayBillStatusToReceived";
-        Object[] updateToReceivedMethodParams = new Object[6];
+        Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = orderNo; //orderNo
         updateToReceivedMethodParams[1] = orderNo + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
         updateToReceivedMethodParams[2] = new Date().getTime(); //operateTime
         updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
         updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
         updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
+        updateToReceivedMethodParams[6] = orderNo + "03"; //txSerialNo
         String[] updateToReceivedResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
