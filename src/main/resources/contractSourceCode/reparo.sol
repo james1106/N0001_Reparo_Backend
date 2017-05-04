@@ -363,7 +363,7 @@ contract ReceivableContract{
 
     function updateOrderStateByReceivable(address orderAddress, bytes32 orderNo, bytes32 stateType, uint newState) returns (uint){
         OrderContract orderCon = OrderContract(orderAddress);
-        return orderCon.updateOrderState(orderNo, stateType, newState);
+        return orderCon.updateOrderState(orderNo, stateType, newState, "", 0);
     }
 
     OrderContract orderCon;
@@ -410,7 +410,6 @@ contract ReceivableContract{
         pyeeToReceivableMap[pyee].push(receivableNo);
 
         updateOrderStateByReceivable(orderAddress, orderNo, "receState", 21);
-
         return (0);
     }
 
@@ -1501,7 +1500,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(businessTransNo);
     //更改仓储状态为1（入库待响应）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE);
+        orderContract.updateOrderState(orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME_RESPONSE, "", 0);
 
     //仓储业务详情
         businessDetailMap[businessTransNo].repoBusinessNo = repoBusinessNo;
@@ -1582,7 +1581,7 @@ contract RepositoryContract{
         businessTransNoMap[repoBusinessNo].push(currBusinessTransNo);
     //更改仓储状态为2（待入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_WATING_INCOME, "", 0);
 
 
     //waittodo 待补充 修改订单中的买家仓储状态
@@ -1597,7 +1596,8 @@ contract RepositoryContract{
     bytes32 lastBusinessTransNo,      //  上一个业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 2
     bytes32 currBusinessTransNo,      //  当前业务流转编号（仓储业务编号仓储状态）:仓储业务编号 + 3
     uint operateTime,   //  操作时间(时间戳)
-    address accountContractAddress
+    address accountContractAddress,
+    bytes32 txSerialNo
     ) returns(uint,bytes32){
     //waittodo 待补充，仅允许仓储机构进行入库响应，同时必须是该仓储机构下单仓储业务
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
@@ -1635,7 +1635,7 @@ contract RepositoryContract{
 
     //更改订单仓储状态为3（已入库）
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_INCOMED);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payerRepoBusiState", REPO_BUSI_INCOMED, txSerialNo, operateTime);
 
 
         return repoCertNoApply( repoBusinessNo, repoCertNo, operateTime) ;
@@ -1820,7 +1820,7 @@ contract RepositoryContract{
 
     //更新订单中的卖家状态为 REPO_BUSI_WATING_OUTCOME
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_WATING_OUTCOME, "", 0);
 
         return (0,lastBusinessTransNo);
     }
@@ -1928,7 +1928,7 @@ contract RepositoryContract{
         repoCert.repoCertStatus = REPO_CERT_INVALID;
         //更新订单中的卖家状态为 REPO_CERT_INVALID
         orderContract = OrderContract(orderContractAddress);
-        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED);
+        orderContract.updateOrderState(repoBusinsess.orderNo, "payeeRepoBusiState", REPO_BUSI_OUTCOMED, "", 0);
         return (0);
     }
 
@@ -2193,10 +2193,11 @@ contract OrderContract{
 address owner;
 //==========运单状态=======
 uint UNDEFINED = 0;           //未定义
-uint REQUESTING = 1;          //发货待响应
-uint REJECTED = 2;            //发货被拒绝
-uint SENDING = 3;             //已发货
-uint RECEIVED = 4;            //已送达
+uint WAITSEND = 1;            //待发货
+uint REQUESTING = 2;          //发货待响应
+uint REJECTED = 3;            //发货被拒绝
+uint SENDING = 4;             //已发货
+uint RECEIVED = 5;            //已送达
 //=========仓储状态=======
 uint WATING_INCOME_RESPONSE = 1;    //入库待响应
 uint WATING_INCOME = 2;             //待入库
@@ -2395,7 +2396,7 @@ uint OUTCOMED = 6;                  //已出库
         orderDetailMap[orderNo].productTotalPrice = productTotalPrice;
         orderDetailMap[orderNo].payingMethod = payingMethod;
         orderDetailMap[orderNo].orderGenerateTime = orderGenerateTime;
-        updateOrderState(orderNo, "txState", 1);      //更新买方的所有订单和卖方所有的订单
+        updateOrderState(orderNo, "txState", 1, txSerialNo, orderGenerateTime);      //更新买方的所有订单和卖方所有的订单
         allPayerOrderMap[msg.sender].push(orderNo);
         allPayeeOrderMap[payeeAddress].push(orderNo);
         //提取交易流水号，添加操作记录
@@ -2477,25 +2478,26 @@ uint OUTCOMED = 6;                  //已出库
         if(accountContract.queryRoleCode(msg.sender) != 0){
             return (1, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
-        Order order = orderDetailMap[orderNo];
 
         //如果订单不存在，返回"订单不存在"
         if(!orderExists(orderNo)){
             return (2001, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
+
+        Order order = orderDetailMap[orderNo];
         //如果订单与合约调用者无关，"权限拒绝"
         if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
             return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-        //Order order = orderDetailMap[orderNo];
+
         bytes32[] memory param1 = new bytes32[](5);
         uint[] memory param2 = new uint[](8);
         address[] memory param3 = new address[](1);
 
         (param1, param2, param3) = searchReceAndWayBillInfo(receAddress, wbillContractAddress, accountContractAddr, orderNo);
-        resultUint = new uint[](15);
+        resultUint = new uint[](16);
         resultBytes32 = new bytes32[](14);
         resultAddress = new address[](5);
 
@@ -2514,7 +2516,7 @@ uint OUTCOMED = 6;                  //已出库
         resultUint[1] = order.productQuantity;
         resultUint[2] = order.productTotalPrice;
         resultUint[3] = order.orderGenerateTime;
-        if(txSerialNoList[orderNo].length == 2){
+        if(txSerialNoList[orderNo].length >= 2){
             resultUint[4] = txRecordDetailMap[txSerialNoList[orderNo][1]].time;
         }
         else{
@@ -2543,6 +2545,13 @@ uint OUTCOMED = 6;                  //已出库
         resultUint[12] = param2[2];
         resultUint[13] = param2[3];
         resultUint[14] = param2[4];
+        if(txSerialNoList[orderNo].length == 3){
+            resultUint[15] = txRecordDetailMap[txSerialNoList[orderNo][2]].time;
+        }
+        else{
+            resultUint[15] = 0;
+        }
+
 
         resultBytes32[10] = param1[0];
         resultBytes32[11] = param1[1];
@@ -2635,7 +2644,7 @@ uint OUTCOMED = 6;                  //已出库
 
     /****************************卖方确认订单**************************************/
 
-    function confirmOrder(address acctContractAddress, bytes32 orderNo, address payeeRepoAddress, bytes32 payeeRepoCertNo, bytes32 txSerialNo, uint orderConfirmTime) returns(
+    function confirmOrder(address acctContractAddress, bytes32 orderNo, address payeeRepoAddress, bytes32 payeeRepoCertNo, bytes32 txSerialNo, uint orderConfirmTime,bytes32 payeeRepoBusinessNo) returns(
     uint){
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         accountContract = AccountContract(acctContractAddress);
@@ -2663,13 +2672,15 @@ uint OUTCOMED = 6;                  //已出库
         }
 
         //更新订单的状态为"已确认"，添加卖方指定的仓储公司和仓单编号
-        updateOrderState(orderNo, "txState", 2);//修改订单详情map中的订单状态
+        updateOrderState(orderNo, "txState", CONFIRMED, txSerialNo, orderConfirmTime);//修改订单详情map中的订单状态
         orderDetailMap[orderNo].payeeRepoAddress = payeeRepoAddress;
         orderDetailMap[orderNo].payeeRepoCertNo = payeeRepoCertNo;
-
+        orderDetailMap[orderNo].payeeRepoBusinessNo = payeeRepoBusinessNo;
+        //orderDetailMap[orderNo].orderState.payeeRepoBusiState = 5;
+        updateOrderState(orderNo, "payeeRepoBusiState", 5, txSerialNo, orderConfirmTime);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
-            updateOrderState(orderNo, "receState", 2);
+            updateOrderState(orderNo, "receState", 10, txSerialNo, orderConfirmTime);
         }
 
         //添加操作记录
@@ -2677,6 +2688,7 @@ uint OUTCOMED = 6;                  //已出库
         txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
         txRecordDetailMap[txSerialNo].time = orderConfirmTime;
         txRecordDetailMap[txSerialNo].txState = 2;
+
 
         //添加该订单对应的流水号
         txSerialNoList[orderNo].push(txSerialNo);
@@ -2727,7 +2739,7 @@ uint OUTCOMED = 6;                  //已出库
     }
 
     /***********************根据订单编号更新订单的某状态******************************/
-    function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState)returns(uint){
+    function updateOrderState(bytes32 orderNo, bytes32 stateType, uint newState, bytes32 txSerialNo, uint orderCompleteTime)returns(uint){
         Order order = orderDetailMap[orderNo];
         if(stateType == "txState"){
             order.orderState.txState = newState;
@@ -2738,6 +2750,13 @@ uint OUTCOMED = 6;                  //已出库
             if(newState == INCOMED){
                 if(order.orderState.wayBillState == RECEIVED){
                     order.orderState.txState = COMPLETED;
+                    //添加操作记录
+                    txRecordDetailMap[txSerialNo].orderNo = orderNo;
+                    txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
+                    txRecordDetailMap[txSerialNo].time = orderCompleteTime;
+                    txRecordDetailMap[txSerialNo].txState = COMPLETED;
+                    //添加该订单对应的流水号
+                    txSerialNoList[orderNo].push(txSerialNo);
                 }
             }
             return 0;
@@ -2752,6 +2771,13 @@ uint OUTCOMED = 6;                  //已出库
             if(newState == RECEIVED){
                 if(order.orderState.payerRepoBusiState == INCOMED){
                     order.orderState.txState = COMPLETED;
+                    //添加操作记录
+                    txRecordDetailMap[txSerialNo].orderNo = orderNo;
+                    txRecordDetailMap[txSerialNo].txSerialNo = txSerialNo;
+                    txRecordDetailMap[txSerialNo].time = orderCompleteTime;
+                    txRecordDetailMap[txSerialNo].txState = COMPLETED;
+                    //添加该订单对应的流水号
+                    txSerialNoList[orderNo].push(txSerialNo);
                 }
             }
             return 0;
@@ -2847,7 +2873,7 @@ contract WayBillContract {
         addressToOrderNoList[addrs[1]].push(strs[0]);
 
         //TODO 更新订单中的运单状态为待发货
-        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_WAITING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_WAITING, "", 0);
 
         return CODE_SUCCESS;
     }
@@ -2904,7 +2930,7 @@ contract WayBillContract {
             strs[5] //运单号
         );
         //TODO 更新订单中的运单状态为发货待响应
-        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_REQUESTING);
+        orderContract.updateOrderState(strs[0], "wayBillState", WAYBILL_REQUESTING, "", 0);
 
         return CODE_SUCCESS; //成功
     }
@@ -2934,7 +2960,7 @@ contract WayBillContract {
         //
 
         //TODO 更新订单中的运单状态为已发货
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING, "", 0);
 
         return CODE_SUCCESS;
     }
@@ -3045,7 +3071,7 @@ contract WayBillContract {
 
 
     //更新运单状态为已送达
-    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr) returns (uint code){
+    function updateWayBillStatusToReceived(bytes32 orderNo, bytes32 statusTransId, uint operateTime, address accountContractAddr, address repoContractAddr, address orderContractAddr, bytes32 txSerialNo) returns (uint code){
         accountContract = AccountContract (accountContractAddr);
         repositoryContract = RepositoryContract (repoContractAddr);
         orderContract = OrderContract (orderContractAddr);
@@ -3076,7 +3102,7 @@ contract WayBillContract {
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
         //TODO 更新订单中的运单状态为已完成
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED, txSerialNo, operateTime);
 
         return (CODE_SUCCESS);
     }
@@ -3107,7 +3133,7 @@ contract WayBillContract {
         //
 
         //TODO 更新订单中的运单状态为已拒绝
-        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED);
+        orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED, "", 0);
 
         return (CODE_SUCCESS);
     }

@@ -209,20 +209,21 @@ public class OrderController {
         long txConfirmTime = System.currentTimeMillis();
         String txSerialNo = orderNo + "01";
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
-        Object[] contractParams = new Object[6];
+        Object[] contractParams = new Object[7];
         contractParams[0] = acctContractAddress;
         contractParams[1] = orderNo;
         contractParams[2] = payeeRepoAddress;
         contractParams[3] = payeeRepoCertNo;
         contractParams[4] = txSerialNo;
         contractParams[5] = txConfirmTime;
+
 //(移到下面)        // 调用合约确认订单，获取返回结果
 //        BaseResult confirmOrderResult = orderService.confirmOrder(contractKey, contractParams);
 
         Object[] params_1 = new Object[1];
         params_1[0] = payeeRepoCertNo;
         BaseResult repobusiResult = repositoryService.getRepobusiNoByrepoCert(contractKey, params_1);
-
+        contractParams[6] = (String)repobusiResult.getData();
 
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
