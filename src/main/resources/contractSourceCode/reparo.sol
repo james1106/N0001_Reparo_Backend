@@ -2511,7 +2511,7 @@ uint OUTCOMED = 6;                  //已出库
         resultUint[1] = order.productQuantity;
         resultUint[2] = order.productTotalPrice;
         resultUint[3] = order.orderGenerateTime;
-        if(txSerialNoList[orderNo].length == 2){
+        if(txSerialNoList[orderNo].length >= 2){
             resultUint[4] = txRecordDetailMap[txSerialNoList[orderNo][1]].time;
         }
         else{
