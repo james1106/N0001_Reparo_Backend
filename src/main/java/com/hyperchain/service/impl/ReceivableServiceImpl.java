@@ -208,7 +208,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         //贴现回复
     @Override
-    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams, String newReceivableNo) {
+    public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
         String methodName = "discountReply";
         String[] resultMapKey = new String[]{};
         BaseResult result = new BaseResult();
@@ -227,7 +227,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
-        result.returnWithValue(code, newReceivableNo);
+        result.returnWithoutValue(code);
         return result;//这个result是返回给前端的
 
     }
@@ -389,7 +389,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getReceivableAllInfoWithSerial(ContractKey contractKey, Object[] contractParams) {
         String contractMethodName = "getReceivableAllInfoWithSerial";
-        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted", "note"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -430,10 +430,9 @@ public class ReceivableServiceImpl implements ReceivableService{
         }
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
-        //List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
-        String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
+        //String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
 
         String receivableNo = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -446,6 +445,12 @@ public class ReceivableServiceImpl implements ReceivableService{
         String rate = partParams0.get(8);
         String contractNo = partParams0.get(9);
         String invoiceNo = partParams0.get(10);
+        String payerRepoCertNo = partParams0.get(11);
+        String payeeRepoCertNo = partParams0.get(12);
+        String payerRepoEnterpriseName = partParams0.get(13);
+        String payeeRepoEnterpriseName = partParams0.get(14);
+        String waybillNo = partParams0.get(15);
+        String logisticsEnterpriseName = partParams0.get(16);
 
 //        String pyerEnterpriseName = partParams1.get(0);
 //        String pyerAcctSvcrName = partParams1.get(1);
@@ -457,13 +462,11 @@ public class ReceivableServiceImpl implements ReceivableService{
         int length = (partParams1.size() - 8) / 2;
         int lastLength = partParams1.size() - 8;
 
-        //long isseAmt = Long.parseLong(partParams1.get(lastLength));
         long isseAmt = (partParams1.get(lastLength).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength));
-
         long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 1));
-        long isseDt = Long.parseLong(partParams1.get(lastLength + 2));
+        long isseDt = (partParams1.get(lastLength + 2).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 2));
         long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 3));
-        long dueDt = Long.parseLong(partParams1.get(lastLength + 4));
+        long dueDt = (partParams1.get(lastLength + 4).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 4));
         long discountInHandAmount = (partParams1.get(lastLength + 5).equals("")) ? 0L:Long.parseLong(partParams1.get(lastLength + 5));
         int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
         int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
@@ -500,6 +503,13 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setRate(rate);
         receivableDetailVo.setContractNo(contractNo);
         receivableDetailVo.setInvoiceNo(invoiceNo);
+        receivableDetailVo.setPayeeRepoCertNo(payeeRepoCertNo);
+        receivableDetailVo.setPayerRepoCertNo(payerRepoCertNo);
+        receivableDetailVo.setPayeeRepoEnterpriseName(payeeRepoEnterpriseName);
+        receivableDetailVo.setPayerRepoEnterpriseName(payerRepoEnterpriseName);
+        receivableDetailVo.setWaybillNo(waybillNo);
+        receivableDetailVo.setLogisticsEnterpriseName(logisticsEnterpriseName);
+
         receivableDetailVo.setPyerEnterpriseName(pyerEnterpriseName);
         receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);
         receivableDetailVo.setPyeeEnterpriseName(pyeeEnterpriseName);
@@ -511,7 +521,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setDueDt(dueDt);
         receivableDetailVo.setDiscountInHandAmount(discountInHandAmountYuan);
         receivableDetailVo.setDiscounted(discounted);
-        receivableDetailVo.setNote(note);
+        //receivableDetailVo.setNote(note);
         receivableDetailVo.setPyeeLinkPhone(pyeeLinkPhone);
         receivableDetailVo.setPyerLinkPhone(pyerLinkPhone);
 

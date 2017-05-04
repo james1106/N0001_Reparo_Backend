@@ -28,6 +28,61 @@ public class ReceivableDetailVo {
 
     private String isseAmt;
 
+    private String  payerRepoCertNo ;
+    private String  payeeRepoCertNo ;
+    private String  payerRepoEnterpriseName ;
+    private String  payeeRepoEnterpriseName ;
+    private String  waybillNo ;
+    private String  logisticsEnterpriseName ;
+
+    public String getPayerRepoCertNo() {
+        return payerRepoCertNo;
+    }
+
+    public void setPayerRepoCertNo(String payerRepoCertNo) {
+        this.payerRepoCertNo = payerRepoCertNo;
+    }
+
+    public String getPayeeRepoCertNo() {
+        return payeeRepoCertNo;
+    }
+
+    public void setPayeeRepoCertNo(String payeeRepoCertNo) {
+        this.payeeRepoCertNo = payeeRepoCertNo;
+    }
+
+    public String getPayerRepoEnterpriseName() {
+        return payerRepoEnterpriseName;
+    }
+
+    public void setPayerRepoEnterpriseName(String payerRepoEnterpriseName) {
+        this.payerRepoEnterpriseName = payerRepoEnterpriseName;
+    }
+
+    public String getPayeeRepoEnterpriseName() {
+        return payeeRepoEnterpriseName;
+    }
+
+    public void setPayeeRepoEnterpriseName(String payeeRepoEnterpriseName) {
+        this.payeeRepoEnterpriseName = payeeRepoEnterpriseName;
+    }
+
+    public String getWaybillNo() {
+        return waybillNo;
+    }
+
+    public void setWaybillNo(String waybillNo) {
+        this.waybillNo = waybillNo;
+    }
+
+    public String getLogisticsEnterpriseName() {
+        return logisticsEnterpriseName;
+    }
+
+    public void setLogisticsEnterpriseName(String logisticsEnterpriseName) {
+        this.logisticsEnterpriseName = logisticsEnterpriseName;
+    }
+
     public String getIsseAmt() {
         return isseAmt;
     }

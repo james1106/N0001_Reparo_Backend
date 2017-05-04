@@ -366,6 +366,9 @@ contract ReceivableContract{
         return orderCon.updateOrderState(orderNo, stateType, newState, "", 0);
     }
 
+    OrderContract orderCon;
+    WayBillContract wayBillCon;
+
 //签发申请。签发人是卖家（收款人），承兑人是买家（付款人）
     function signOutApply(bytes32 receivableNo, bytes32 orderNo, bytes32 signer, bytes32 accptr, bytes32 pyee, bytes32 pyer, uint isseAmt, uint dueDt, bytes32 rate, bytes32[] contractAndInvoiceNoAndSerialNo, uint time, address orderAddress) returns(uint code){
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
@@ -396,9 +399,11 @@ contract ReceivableContract{
 
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNoAndSerialNo, time);
-
-    //newReceivableRecord(serialNo, receivableNo, signer, accptr, ResponseType.NULL, time, "signOutApply", isseAmt);
-
+//        orderCon = OrderContract(orderAddress);
+//        orderCon.updateOrderState(orderNo, "receState", 21);
+//        if(orderCon.updateOrderState(orderNo, "receState", 21) == 3){
+//            return (3);
+//        }
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
         pyerToReceivableMap[pyer].push(receivableNo);
@@ -743,34 +748,32 @@ contract ReceivableContract{
         return (0);
     }
 
-//带有应收款流水信息的应收款更具体详情
-    function getReceivableAllInfoWithSerial(bytes32 receivableNo, bytes32 acctId) returns (uint, bytes32[], uint[], DiscountedStatus discounted, bytes note){
+    //带有应收款流水信息的应收款更具体详情
+    function getReceivableAllInfoWithSerial(bytes32[] receivableNoAndAcctId, address[] orderAndWayBillAndAccountAddress) returns (uint, bytes32[], uint[], DiscountedStatus discounted){
         Account account = accountMap[msg.sender];
-        Receivable receivable = receivableDetailMap[receivableNo];
-        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNo];
+        Receivable receivable = receivableDetailMap[receivableNoAndAcctId[0]];
+        bytes32[] memory historySerialNos = receivableTransferHistoryMap[receivableNoAndAcctId[0]];
+        orderCon = OrderContract(orderAndWayBillAndAccountAddress[0]);
+        wayBillCon = WayBillContract(orderAndWayBillAndAccountAddress[1]);
 
         uint[] memory uintInfo = new uint[](historySerialNos.length * 2 + 8);
-        bytes32[] memory bytesInfo1 = new bytes32[](11);
-    //uint[] memory uintSerials = new uint[](historySerialNos.length * 2 + 8);
-    /*
-     if(judgeAccount(msg.sender)){
-     return (2,
-     bytesInfo1,
-     //bytesInfo2,
-     uintInfo,
-     uintSerials,
-     discounted,
-     note
-     );
-     }
-     */
-        if(receivableNo == ""){
+        bytes32[] memory bytesInfo1 = new bytes32[](17);
+        /*
+         if(judgeAccount(msg.sender)){
+         return (2,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         uintSerials,
+         discounted
+         );
+         }
+         */
+        if(receivableNoAndAcctId[0] == ""){
             return (3,
             bytesInfo1,
             uintInfo,
-
-            discounted,
-            note
+            discounted
             );
         }
 
@@ -778,23 +781,19 @@ contract ReceivableContract{
             return(1005,
             bytesInfo1,
             uintInfo,
-
-            discounted,
-            note
+            discounted
             );
         }
 
-    /*
-     if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
-     return(1,
-     bytesInfo1,
-     uintInfo,
-     uintSerials,
-     discounted,
-     note
-     );
-     }
-     */
+
+        if(receivable.signer != receivableNoAndAcctId[1] && receivable.accptr != receivableNoAndAcctId[1] && receivable.pyer != receivableNoAndAcctId[1] && receivable.pyee != receivableNoAndAcctId[1] && receivable.firstOwner != receivableNoAndAcctId[1] && receivable.secondOwner != receivableNoAndAcctId[1]) {
+            return(1,
+            bytesInfo1,
+            uintInfo,
+            discounted
+            );
+        }
+
 
         ReceivableRecord memory receivableRecord;
         for(uint i = 0; i < historySerialNos.length; i++){
@@ -811,7 +810,7 @@ contract ReceivableContract{
         uintInfo[historySerialNos.length*2 + 6] = receivable.status;
         uintInfo[historySerialNos.length*2 + 7] = receivable.lastStatus;
 
-        bytesInfo1[0] = receivableNo;
+        bytesInfo1[0] = receivableNoAndAcctId[0];
         bytesInfo1[1] = receivable.orderNo;
         bytesInfo1[2] = receivable.signer;
         bytesInfo1[3] = receivable.accptr;
@@ -822,12 +821,17 @@ contract ReceivableContract{
         bytesInfo1[8] = receivable.rate;
         bytesInfo1[9] = receivable.contractNo;
         bytesInfo1[10] = receivable.invoiceNo;
+        bytesInfo1[11] = orderCon.queryPayerRepoCertNo(receivable.orderNo);
+        bytesInfo1[12] = orderCon.queryPayeeRepoCertNo(receivable.orderNo);
+        bytesInfo1[13] = orderCon.queryPayerRepoEnterpriseName(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
+        bytesInfo1[14] = orderCon.queryPayeeRepoEnterpriseName(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
+        (bytesInfo1[15], bytesInfo1[16]) = wayBillCon.getWaybillMsgForReceviable(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
+
 
         return (0,
         bytesInfo1,
         uintInfo,
-        receivable.discounted,
-        receivable.note
+        receivable.discounted
         );
     }
 
