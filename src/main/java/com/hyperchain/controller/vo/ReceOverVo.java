@@ -8,7 +8,7 @@ public class ReceOverVo {
     private long receGenerateTime;
     private String receivingSide;
     private String payingSide;
-    private long receAmount;
+    private String receAmount;
     private long coupon;
     private long dueDate;
     private int receLatestStatus;
@@ -54,11 +54,11 @@ public class ReceOverVo {
         this.payingSide = payingSide;
     }
 
-    public long getReceAmount() {
+    public String getReceAmount() {
         return receAmount;
     }
 
-    public void setReceAmount(long receAmount) {
+    public void setReceAmount(String receAmount) {
         this.receAmount = receAmount;
     }
 
