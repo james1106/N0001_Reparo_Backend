@@ -2792,6 +2792,7 @@ uint OUTCOMED = 6;                  //已出库
         }
     }
 }
+
 contract WayBillContract {
     //运单状态
     uint WAYBILL_UNDEFINED = 0; //未定义
@@ -2800,6 +2801,14 @@ contract WayBillContract {
     uint WAYBILL_REJECTED = 3; //发货被拒绝
     uint WAYBILL_SENDING = 4; //已发货
     uint WAYBILL_RECEIVED = 5; //已送达
+
+    //仓储状态
+    uint REPO_WATING_INCOME_RESPONSE = 1;    //入库待响应
+    uint REPO_WATING_INCOME = 2;             //待入库
+    uint REPO_INCOMED = 3;                   //已入库
+    uint REPO_WATING_OUTCOME_RESPONSE = 4;   //出库待响应
+    uint REPO_WATING_OUTCOME = 5;            //待出库
+    uint REPO_OUTCOMED = 6;                  //已出库
 
     //用户角色
     uint ROLE_COMPANY = 0; //融资企业
@@ -3088,7 +3097,9 @@ contract WayBillContract {
             return CODE_PERMISSION_DENIED;
         }
         //TODO 权限控制：卖家仓储状态为已出库 买家仓储状态为待入库 状态 物流才能更新为已送达
-
+        if (orderContract.queryPayeeRepoBusiStateOfOrderState(orderNo) != REPO_OUTCOMED || orderContract.queryPayerRepoBusiStateOfOrderState(orderNo) != REPO_WATING_INCOME){ //无状态流转权限
+            return CODE_STATUS_TRANSFER_DENIED;
+        }
 
         //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
