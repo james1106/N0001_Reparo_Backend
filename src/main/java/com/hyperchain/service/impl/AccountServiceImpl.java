@@ -10,6 +10,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -386,7 +387,7 @@ public class AccountServiceImpl implements AccountService {
                                        String acctSvcrName)
             throws GeneralSecurityException, IOException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        List<String> keyInfo = ESDKUtil.newAccount(ReparoUtil.getPasswordForPrivateKey(accountName));
         String address = keyInfo.get(0);
         String accountJson = keyInfo.get(1);
         LogUtil.debug("accountJson：" + accountJson);
@@ -418,7 +419,7 @@ public class AccountServiceImpl implements AccountService {
         LogUtil.info("存入数据库account表：" + savedAccountEntity.toString());
 
         //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = "newAccount";
         Object[] contractMethodParams = new Object[10];
         contractMethodParams[0] = accountName;
@@ -499,7 +500,7 @@ public class AccountServiceImpl implements AccountService {
 
     private String getRate(String accountJson, String accountName) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = "getRate";
         Object[] contractMethodParams = new Object[0];
         String[] resultMapKey = new String[]{"rate"};
@@ -512,7 +513,7 @@ public class AccountServiceImpl implements AccountService {
 
     private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = "setRate";
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = rate;

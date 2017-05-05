@@ -112,7 +112,7 @@ public class OrderController {
             return  result;
         }
         String payerRepoAddress = payerRepoEntity.getAddress();
-        String payerAccountName = payerRepoEntity.getAddress();
+        String payerAccountName = payerUserEntity.getAccountName();
         String payerPrivateKey = payerUserEntity.getPrivateKey();
         String payeeAddress = payeeUserEntity.getAddress();
 
@@ -131,7 +131,7 @@ public class OrderController {
         orderParamlist.add(payerAccount);
         orderParamlist.add(txSerialNo);
 
-        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         Object[] orderParams = new Object[9];
         orderParams[0] = acctContractAddress;
@@ -204,7 +204,7 @@ public class OrderController {
             return  result;
         }
         String payeeRepoAddress = payeeRepoEntity.getAddress();
-        ContractKey contractKey = new ContractKey(payeePrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payeeAccountName);
+        ContractKey contractKey = new ContractKey(payeePrivateKey, ReparoUtil.getPasswordForPrivateKey(payeeAccountName));
 
         long txConfirmTime = System.currentTimeMillis();
         String txSerialNo = orderNo + "01";
@@ -277,7 +277,7 @@ public class OrderController {
         String receAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_RECEIVABLE);
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
         String wbillContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_WAYBILL);
-        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         Object[] contractParams = new Object[4];
         contractParams[0] = receAddress;
@@ -309,7 +309,7 @@ public class OrderController {
 
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
         Object[] contractParams = new Object[2];
         contractParams[0] = acctContractAddress;

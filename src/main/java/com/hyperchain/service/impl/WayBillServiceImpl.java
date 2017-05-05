@@ -91,7 +91,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
-        ContractKey requestContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey requestContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String requestContractMethodName = "generateUnConfirmedWayBill";
         Object[] requestContractMethodParams = new Object[5];
         Long[] requestLongs = new Long[3];
@@ -143,7 +143,7 @@ public class WayBillServiceImpl implements WayBillService {
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
-        ContractKey confirmContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey confirmContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String confirmContractMethodName = "generateWayBill";
         Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = orderNo; //orderNo
@@ -172,7 +172,7 @@ public class WayBillServiceImpl implements WayBillService {
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
         String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
 
-        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String updateToReceivedMethodName = "updateWayBillStatusToReceived";
         Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = orderNo; //orderNo
@@ -209,7 +209,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
         //获取所有用户相关运单的订单号列表
-        ContractKey listOrderNoContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey listOrderNoContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String listOrderNoContractMethodName = "listWayBillOrderNo";
         Object[] listOrderNoContractMethodParams = new Object[1];
         listOrderNoContractMethodParams[0] = accountContractAddr; //accountContractAddr
@@ -232,7 +232,7 @@ public class WayBillServiceImpl implements WayBillService {
         for (int i = orderNoList.size() - 1; i >= 0 ; i--) {
             LogUtil.info("运单订单号" + i + " : " + orderNoList.get(i));
 
-            ContractKey waybillContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
             String waybillContractMethodName = "getWayBill";
             Object[] waybillContractMethodParams = new Object[2];
             waybillContractMethodParams[0] = orderNoList.get(i); //orderNo
@@ -261,7 +261,7 @@ public class WayBillServiceImpl implements WayBillService {
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
-        ContractKey waybillContractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String waybillContractMethodName = "getWayBill";
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNo; //orderNo

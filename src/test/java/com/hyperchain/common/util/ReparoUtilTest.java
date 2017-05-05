@@ -18,4 +18,9 @@ public class ReparoUtilTest {
         System.out.println(ReparoUtil.convertYuanToCent(100.00));
     }
 
+    @Test
+    public void getPasswordForPrivateKey() {
+        System.out.println(ReparoUtil.getPasswordForPrivateKey("企业名").length());
+    }
+
 }

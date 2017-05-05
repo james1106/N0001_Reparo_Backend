@@ -52,7 +52,7 @@ public class OrderContractTest extends SpringBaseTest{
     @Test
     public void ThisIsTheMethodModelTry() throws Exception {
 
-        //1.获取contractKey：ContractKey contractKey = new ContractKey(调用者的私钥, BaseConstant.SALT_FOR_PRIVATE_KEY+调用者的账户名);
+        //1.获取contractKey：ContractKey contractKey = new ContractKey(调用者的私钥, ReparoUtil.getPasswordForPrivateKey(调用者的账户名));
         //2.创建好需要的 (String)contractMethodName  (Object)contractMethodParams[]  (String)contractReturnsMapKey[]参数列表；
         //3.调用ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, BaseConstant.合约方法名)
         //  方法，得到contractResult结果
@@ -65,7 +65,7 @@ public class OrderContractTest extends SpringBaseTest{
         String payerAccountName = payerUserEntity.getAccountName();
 
         //1.2获取contractKey
-        ContractKey contractKey = new ContractKey(payerPrivateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "updateOrderState";
@@ -100,7 +100,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "createOrder";
@@ -167,7 +167,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "queryOrderDetail";
@@ -304,7 +304,7 @@ public class OrderContractTest extends SpringBaseTest{
             receOverVo.setPayingSide(payingSide);
             receOverVo.setDueDate(dueDate);
             receOverVo.setReceGenerateTime(receGenerateTime);
-            receOverVo.setReceAmount(receAmount);
+//            receOverVo.setReceAmount(receAmount);
             receOverVo.setCoupon(coupon);
             receOverVo.setReceLatestStatus(receLatestStatus);
             receOverVo.setReceUpdateTime(receUpdateTime);
@@ -346,7 +346,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payerAccountName);
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "queryAllOrderOverViewInfoList";
@@ -435,7 +435,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payeeUserEntity = userEntityRepository.findByAddress("f014bae4a69e0e4790214f52b6615a3a5e3d8c28"); //参数为 卖家地址
         String payeePrivateKeyThis = payeeUserEntity.getPrivateKey();
         String payeeAccountName = payeeUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payeePrivateKeyThis, BaseConstant.SALT_FOR_PRIVATE_KEY + payeeAccountName);
+        ContractKey contractKey = new ContractKey(payeePrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payeeAccountName));
 
         //2.1
         String contractMethodName = "confirmOrder";

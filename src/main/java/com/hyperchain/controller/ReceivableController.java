@@ -77,7 +77,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//order合约地址
 
@@ -128,7 +128,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             String wayBillContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_WAYBILL);//wayBill合约地址
@@ -176,7 +176,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             long discountApplyAmountFen = ReparoUtil.convertYuanToCent(discountApplyAmount);
@@ -222,7 +222,7 @@ public class ReceivableController {
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
         return receivableService.getDiscountBankList(contractKey,new Object[0]);
     }
@@ -250,7 +250,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             long discountInHandAmountFen = ReparoUtil.convertYuanToCent(discountInHandAmount);
@@ -295,7 +295,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             long cashedAmountFen = ReparoUtil.convertYuanToCent(cashedAmount);
@@ -334,7 +334,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             Object[] params = new Object[2];
             params[0] = receivableNo;
@@ -368,7 +368,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             Object[] params = new Object[1];
             params[0] = serialNo;
@@ -400,7 +400,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             Object[] params = new Object[1];
             params[0] = receivableNo;
@@ -432,7 +432,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//Account合约地址
@@ -474,7 +474,7 @@ public class ReceivableController {
             UserEntity userEntity = userEntityRepository.findByAddress(address);
             String privateKey = userEntity.getPrivateKey();
             String accountName = userEntity.getAccountName();
-            ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+            ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
             List<String> list1 = new ArrayList<>();
             list1.add(receivableNo);
