@@ -191,7 +191,7 @@ public class OrderServiceImpl implements OrderService{
         receOverVo.setPayingSide(payingSide);
         receOverVo.setDueDate(dueDate);
         receOverVo.setReceGenerateTime(receGenerateTime);
-        receOverVo.setReceAmount(receAmount);
+        receOverVo.setReceAmount(ReparoUtil.convertCentToYuan(receAmount));
         receOverVo.setCoupon(coupon);
         receOverVo.setReceLatestStatus(receLatestStatus);
         receOverVo.setReceUpdateTime(receUpdateTime);

@@ -206,6 +206,55 @@ public class ReceivableServiceImpl implements ReceivableService{
         return result;
     }
 
+    //新银行列表
+    @Override
+    public BaseResult<Object> getDiscountBankList(ContractKey contractKey, Object[] contractParams) {//第二个参数是给合约的参数
+        String contractMethodName = "getDiscountBankList";
+        String[] resultMapKey = new String[]{"uintBankSvcr[]", "bytes32BankName[]"};//给返回值取了个名称
+
+
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = null;
+        try {
+            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractParams, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.info("调用合约ReceivableContract-getDiscountBankList返回结果：" + contractResult.toString());
+        } catch (ContractInvokeFailException e) {
+            e.printStackTrace();
+        } catch (ValueNullException e) {
+            e.printStackTrace();
+        } catch (PasswordIllegalParam passwordIllegalParam) {
+            passwordIllegalParam.printStackTrace();
+        }
+
+        BaseResult<Object> result = new BaseResult<>();
+        Code code = contractResult.getCode();
+
+        List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
+        List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+
+//        String bankSvcr1 = partParams0.get(0);
+//        String bankSvcr2 = partParams0.get(1);
+//        String bankSvcr3 = partParams0.get(2);
+//        String bankSvcr4 = partParams0.get(3);
+//
+//        String bankName1 = partParams1.get(0);
+//        String bankName2 = partParams1.get(1);
+//        String bankName3 = partParams1.get(2);
+//        String bankName4 = partParams1.get(3);
+
+        List<ReceivableBankListVo> receivableBankListVoList = new ArrayList<>();
+        for(int i = 0; i < partParams0.size(); i++){
+            ReceivableBankListVo receivableBankListVo = new ReceivableBankListVo();
+            receivableBankListVo.setBankSvcr(Integer.parseInt(partParams0.get(i)));
+            receivableBankListVo.setBankName(partParams1.get(i));
+            receivableBankListVoList.add(receivableBankListVo);
+        }
+
+        result.returnWithValue(code, receivableBankListVoList);
+        return result;
+    }
+
+
         //贴现回复
     @Override
     public BaseResult<Object> discountReply(ContractKey contractKey, Object[] contractParams) {
