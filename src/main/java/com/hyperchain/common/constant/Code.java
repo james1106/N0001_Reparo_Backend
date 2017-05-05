@@ -172,14 +172,6 @@ public enum Code {
             case 3050:
                 return WAY_BILL_CONTENT_INVALID;
 
-            /*
-            REPOCERT_NOT_EXSIT(4001, "仓单不存在"),
-    REPOBUSINO_ALREADY_EXSIT(4002, "仓储业务编号已经存在"),
-    BUSITRANSNO_ALREADY_EXSIT(4003, "业务流转编号已经存在"),
-    REPOCERT_ALREADY_EXSIT(4004, "仓单编号已经存在"),
-    REPOBUSINO_NOT_EXSIT(4005, "仓储业务编号不存在"),
-    LASTBUSITRANSNO_NOT_EXSIT(4006, "上一个业务流转编号不存在"),
-             */
             case 4001:
                 return REPOCERT_NOT_EXSIT;
             case 4002:
@@ -193,8 +185,22 @@ public enum Code {
             case 4006:
                 return LASTBUSITRANSNO_NOT_EXSIT;
 
+            case 5001:
+                return PHONE_ALREADY_EXIST;
             case 5002:
                 return ACCOUNT_ALREADY_EXIST;
+            case 5003:
+                return INVALID_SECURITY_CODE;
+            case 5004:
+                return NON_EXIST_SECURITY_CODE;
+            case 5005:
+                return WRONG_SECURITY_CODE;
+            case 5006:
+                return ACCOUNT_STATUS_LOCK;
+            case 5007:
+                return ERROR_PASSWORD;
+            case 5008:
+                return INVALID_TOKEN;
 
             default:
                 return UNDEFINED;

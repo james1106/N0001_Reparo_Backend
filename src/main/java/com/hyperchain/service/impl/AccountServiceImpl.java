@@ -5,6 +5,7 @@ import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
+import com.hyperchain.common.constant.Role;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
@@ -21,6 +22,8 @@ import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.SecurityCodeEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
+import com.hyperchain.exception.PropertiesLoadException;
+import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +39,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ldy on 2017/4/5.
@@ -102,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
                                        String acctSvcrName,
                                        HttpServletRequest request,
                                        HttpServletResponse response)
-            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
+            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
         //判断用户名 或 手机号 或 企业名称 或 开户行账号 是否存在
         if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName) || isAcctIdExist(acctIds)) {
             BaseResult<Object> baseResult = new BaseResult<>();
@@ -128,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) {
+    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
         UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
 
         //用户不存在
@@ -191,6 +195,9 @@ public class AccountServiceImpl implements AccountService {
             setTokenToCookie(userEntity.getAddress(), userEntity.getRoleCode(), request, response);
             //返回成功状态和用户信息
             UserVo userVo = new UserVo(userEntity, accountEntity);
+            if (userVo.getRoleCode() == Role.FINANCE.getCode()) {
+                userVo.setRate(getRate(userEntity.getPrivateKey(), userEntity.getAccountName()));
+            }
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithValue(resultCode, userVo);
             return baseResult;
@@ -212,6 +219,19 @@ public class AccountServiceImpl implements AccountService {
         }
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithValue(Code.SUCCESS, nameList);
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> setRateForFinancial(String rate, String address) throws ContractInvokeFailException, PasswordIllegalParam, PrivateKeyIllegalParam, ValueNullException {
+        //用户信息
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+
+        ContractResult contractResult = setRate(accountJson, accountName, rate);
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithoutValue(contractResult.getCode());
         return baseResult;
     }
 
@@ -475,6 +495,31 @@ public class AccountServiceImpl implements AccountService {
         userEntityRepository.save(userEntity);
         return Code.SUCCESS;
 
+    }
+
+    private String getRate(String accountJson, String accountName) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //账户信息存储到区块链
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        String contractMethodName = "getRate";
+        Object[] contractMethodParams = new Object[0];
+        String[] resultMapKey = new String[]{"rate"};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
+        LogUtil.info("调用合约getRate返回：" + contractResult.toString());
+        List<Object> resultList = contractResult.getValue();
+        return (String)resultList.get(0);
+    }
+
+    private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //账户信息存储到区块链
+        ContractKey contractKey = new ContractKey(accountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
+        String contractMethodName = "setRate";
+        Object[] contractMethodParams = new Object[1];
+        contractMethodParams[0] = rate;
+        String[] resultMapKey = new String[]{};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
+        return contractResult;
     }
 
 }

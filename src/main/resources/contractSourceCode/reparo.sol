@@ -61,9 +61,10 @@ contract AccountContract {
 
 // enum AccountStatus {VALID, INVALID,FROZEN}
 //账户状态，有效、无效、冻结
-    uint STATUS_VALID = 0;
-    uint STATUS_INVALID = 1;
-    uint STATUS_FROZEN = 2;
+    uint CODE_SUCCESS = 0;
+    uint CODE_PERMISSION_DENIED = 1;
+    uint CODE_INVALID_USER = 2;
+    uint CODE_ACCOUNT_ALREADY_EXIST = 5002;
 
 //帐户信息
     struct Account {
@@ -78,6 +79,7 @@ contract AccountContract {
         bytes32 svcrClass; //开户行别
         bytes32 acctSvcr; //开户行行号
         bytes32 acctSvcrName; //开户行名称
+        bytes32 rate; //金融机构利率
     }
 
 
@@ -89,13 +91,13 @@ contract AccountContract {
 
     function newAccount(bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _svcrClass, bytes32 _acctSvcr, bytes32 _acctSvcrName) returns (uint code){
         if(accountMap[msg.sender].accountName != ""){
-            return 5002; //账户已存在
+            return CODE_ACCOUNT_ALREADY_EXIST; //账户已存在
         }
-        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName);
+        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName, "5");
         for (uint i = 0; i < _acctId.length; i++){
             acctIdToAddress[_acctId[i]] = msg.sender;
         }
-        return 0; //成功
+        return CODE_SUCCESS; //成功
     }
 
 
@@ -105,10 +107,35 @@ contract AccountContract {
 
     function getAccountByAddress(address addr) returns (uint code, bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _class, bytes32 _acctSvcr, bytes32 _acctSvcrName){
         if(accountMap[addr].accountName == ""){
-            return (2, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _class, _acctSvcr, _acctSvcrName); //账户不存在，该用户可能未注册或已失效
+            return (CODE_INVALID_USER, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _class, _acctSvcr, _acctSvcrName); //账户不存在，该用户可能未注册或已失效
         }
-        Account account = accountMap[msg.sender];
-        return (0, account.accountName, account.enterpriseName, account.roleCode, account.accountStatus, account.certType, account.certNo, account.acctId, account.svcrClass, account.acctSvcr, account.acctSvcrName); //成功
+        Account account = accountMap[addr];
+        return (CODE_SUCCESS, account.accountName, account.enterpriseName, account.roleCode, account.accountStatus, account.certType, account.certNo, account.acctId, account.svcrClass, account.acctSvcr, account.acctSvcrName); //成功
+    }
+
+    function getRate() returns (uint code, bytes32 rate){
+        return getRateByAddress(msg.sender);
+    }
+
+    function getRateByAddress(address addr) returns (uint code, bytes32 rate){
+        if(accountMap[addr].accountName == ""){
+            return (CODE_INVALID_USER,"0");
+        }
+        Account account = accountMap[addr];
+        return (CODE_SUCCESS, account.rate);
+    }
+
+    function setRate(bytes32 rate) returns (uint code){
+        return setRateByAddress(msg.sender, rate);
+    }
+
+    function setRateByAddress(address addr, bytes32 rate) returns (uint code){
+        if(accountMap[addr].accountName == ""){
+            return (CODE_INVALID_USER);
+        }
+        Account account = accountMap[addr];
+        account.rate = rate;
+        return (CODE_SUCCESS);
     }
 
     function isAccountExist(address accountAddress) returns (bool){
@@ -144,6 +171,7 @@ contract AccountContract {
         return accountMap[accountAddress].enterpriseName;
     }
 }
+
 
 contract ReceivableContract{
 //==============================test===add by liangyue=================================//
