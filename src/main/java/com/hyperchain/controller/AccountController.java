@@ -9,6 +9,8 @@ import com.hyperchain.common.exception.ValueNullException;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.exception.PropertiesLoadException;
+import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -66,7 +68,7 @@ public class AccountController extends BaseController{
             @ApiParam(value = "开户行行号", required = true) @RequestParam("acctSvcr") String acctSvcr,
             @ApiParam(value = "开户行名称", required = true) @RequestParam("acctSvcrName") String acctSvcrName,
             HttpServletRequest request,
-            HttpServletResponse response) throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException {
+            HttpServletResponse response) throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
         return accountService.register(accountName, password, enterpriseName, phone, roleCode, securityCode, securityCodeId, certType, certNo, acctIds, svcrClass, acctSvcr, acctSvcrName, request, response);
     }
 
@@ -78,7 +80,7 @@ public class AccountController extends BaseController{
             @ApiParam(value = "用户名", required = true) @RequestParam("accountName") String accountName,
             @ApiParam(value = "密码", required = true) @RequestParam("password") String password,
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
         return accountService.login(accountName, password,request , response);
     }
 
@@ -105,6 +107,17 @@ public class AccountController extends BaseController{
         return accountService.findAllEnterpriseNameByRoleCode(roleCode);
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "金融机构设置利率", notes = "金融机构设置利率")
+    @ResponseBody
+    @RequestMapping(value = "/rate", method = RequestMethod.PUT)
+    public BaseResult<Object> setRateForFinancial(
+            @ApiParam(value = "利率", required = true) @RequestParam("rate") String rate,
+            HttpServletRequest request)
+            throws ContractInvokeFailException, ValueNullException, PrivateKeyIllegalParam, PasswordIllegalParam {
+        String address = TokenUtil.getAddressFromCookie(request);
+        return accountService.setRateForFinancial(rate, address);
+    }
 
 
     @LogInterceptor
