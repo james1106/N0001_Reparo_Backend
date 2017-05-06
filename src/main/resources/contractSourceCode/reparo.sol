@@ -125,6 +125,12 @@ contract AccountContract {
         return (CODE_SUCCESS, account.rate);
     }
 
+    function getRateByAcctId(bytes32 acctId) returns (bytes32 rate){
+        address addr = acctIdToAddress[acctId];
+        Account account = accountMap[addr];
+        return (account.rate);
+    }
+
     function setRate(bytes32 rate) returns (uint code){
         return setRateByAddress(msg.sender, rate);
     }
