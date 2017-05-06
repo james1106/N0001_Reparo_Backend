@@ -34,6 +34,15 @@ public class ReceivableDetailVo {
     private String  payeeRepoEnterpriseName ;
     private String  waybillNo ;
     private String  logisticsEnterpriseName ;
+    private String discountedRate;
+
+    public String getDiscountedRate() {
+        return discountedRate;
+    }
+
+    public void setDiscountedRate(String discountedRate) {
+        this.discountedRate = discountedRate;
+    }
 
     public String getPayerRepoCertNo() {
         return payerRepoCertNo;

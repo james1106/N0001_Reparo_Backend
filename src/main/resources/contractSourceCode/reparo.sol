@@ -208,6 +208,8 @@ contract ReceivableContract{
     bytes32 invoiceNo;//发票号
     DiscountedStatus discounted;//是否贴现标志
     uint discountInHandAmount;//贴现回复时的到手金额
+    uint discountApplyAmount;//贴现申请金额
+    bytes32 discountedRate;//贴现利率
     bytes note;//备注，暂时不用
     }
 
@@ -540,7 +542,7 @@ contract ReceivableContract{
     }
 
 //贴现申请
-    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount, address orderAddress) returns(uint) {
+    function discountApply(bytes32 receivableNo, bytes32 applicantAcctId, bytes32 replyerAcctId, bytes32 serialNo, uint time, uint discountApplyAmount, address orderAddress, bytes32 discountedRate) returns(uint) {
         if(receivableNo == "" || applicantAcctId == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -566,8 +568,10 @@ contract ReceivableContract{
             return (1038);
         }
         receivable.lastStatus = receivable.status;
-        receivable.status = 41;
+        receivable.status = 41;//贴现待响应
         receivable.secondOwner = replyerAcctId;
+        receivable.discountApplyAmount = discountApplyAmount;
+        receivable.discountedRate = discountedRate;
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
@@ -576,7 +580,7 @@ contract ReceivableContract{
     }
 
 //贴现回复
-    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, bytes32 newReceivableNo, uint discountInHandAmount, address orderAddress) returns(uint) {
+    function discountReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType responseType, bytes32 serialNo, uint time, uint discountInHandAmount, address orderAddress) returns(uint) {
         if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
             return (3);
         }
@@ -586,9 +590,9 @@ contract ReceivableContract{
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
-        if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
-            return (1030);
-        }
+//        if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
+//            return (1030);
+//        }
     /*
      if(judgeAccount(msg.sender)){
      return(2);
@@ -601,16 +605,24 @@ contract ReceivableContract{
         if(receivable.secondOwner != replyerAcctId){
             return (1);
         }
+        //if((receivable.isseAmt - receivable.isseAmt * receivable.)//todo 校验到手金额
+
         receivable.discountInHandAmount = discountInHandAmount;
-        subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo);
-        holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
+        receivable.firstOwner = replyerAcctId;
+        receivable.pyee = replyerAcctId;
+        receivable.lastStatus = receivable.status;
+        receivable.status = 46;// 已贴现    ／贴现已响应？
+        receivable.discounted = DiscountedStatus.YES;
+        receivable.signInDt = time;
+        //subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo);
+        //holdingReceivablesMap[replyerAcctId].push(newReceivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
         newReceivableRecord(serialNo, receivableNo, receivable.firstOwner, replyerAcctId, responseType, time, "discountResponse", discountInHandAmount, receivable.status);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
-
+/*
     function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo) internal {
         Receivable receivable = receivableDetailMap[receivableNo];
         uint oriAmount = receivable.isseAmt;
@@ -633,7 +645,7 @@ contract ReceivableContract{
             newReceivable.signInDt = time;
         }
     }
-
+*/
 /*
  function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo, bytes32 discountApplySerialNo) internal {
  Receivable receivable = receivableDetailMap[receivableNo];
@@ -765,6 +777,13 @@ contract ReceivableContract{
         return (0);
     }
 
+    //贴现回复时的展示的详情
+    function getLogiAndRepoAndOrderSimpleDetailForDiscountReply(bytes32 receivableNo, address orderAddress) returns (){
+        Receivable receivable = receivableDetailMap[receivableNo];
+
+
+    }
+
     //带有应收款流水信息的应收款更具体详情
     function getReceivableAllInfoWithSerial(bytes32[] receivableNoAndAcctId, address[] orderAndWayBillAndAccountAddress) returns (uint, bytes32[], uint[], DiscountedStatus discounted){
         Account account = accountMap[msg.sender];
@@ -774,7 +793,7 @@ contract ReceivableContract{
         wayBillCon = WayBillContract(orderAndWayBillAndAccountAddress[1]);
 
         uint[] memory uintInfo = new uint[](historySerialNos.length * 2 + 8);
-        bytes32[] memory bytesInfo1 = new bytes32[](17);
+        bytes32[] memory bytesInfo1 = new bytes32[](18);
         /*
          if(judgeAccount(msg.sender)){
          return (2,
@@ -843,7 +862,7 @@ contract ReceivableContract{
         bytesInfo1[13] = orderCon.queryPayerRepoEnterpriseName(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
         bytesInfo1[14] = orderCon.queryPayeeRepoEnterpriseName(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
         (bytesInfo1[15], bytesInfo1[16]) = wayBillCon.getWaybillMsgForReceviable(receivable.orderNo, orderAndWayBillAndAccountAddress[2]);
-
+        bytesInfo1[17] = receivable.discountedRate;
 
         return (0,
         bytesInfo1,

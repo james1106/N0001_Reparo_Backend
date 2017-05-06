@@ -500,6 +500,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         String payeeRepoEnterpriseName = partParams0.get(14);
         String waybillNo = partParams0.get(15);
         String logisticsEnterpriseName = partParams0.get(16);
+        String discountedRate = partParams0.get(17);
 
 //        String pyerEnterpriseName = partParams1.get(0);
 //        String pyerAcctSvcrName = partParams1.get(1);
@@ -558,6 +559,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setPayerRepoEnterpriseName(payerRepoEnterpriseName);
         receivableDetailVo.setWaybillNo(waybillNo);
         receivableDetailVo.setLogisticsEnterpriseName(logisticsEnterpriseName);
+        receivableDetailVo.setDiscountedRate(discountedRate);
 
         receivableDetailVo.setPyerEnterpriseName(pyerEnterpriseName);
         receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);
