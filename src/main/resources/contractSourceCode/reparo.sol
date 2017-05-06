@@ -557,21 +557,27 @@ contract ReceivableContract{
         return (param1, param2, param3);
     }
 
-
-    function getDiscountBankList() returns (uint, uint[], bytes32[]){
-        uint[] memory bankSvcr = new uint[](4);
+    //新贴现列表
+    function getDiscountBankList(address accountAddress) returns (uint, bytes32[], bytes32[], bytes32[]){
+        bytes32[] memory bankSvcr = new bytes32[](4);
         bytes32[] memory bankName = new bytes32[](4);
-        bankSvcr[0] = 316;
-        bankSvcr[1] = 102;
-        bankSvcr[2] = 103;
-        bankSvcr[3] = 104;
+        bytes32[] memory bankDiscountRate = new bytes32[](4);
+        bankSvcr[0] = "316";
+        bankSvcr[1] = "102";
+        bankSvcr[2] = "103";
+        bankSvcr[3] = "104";
 
         bankName[0] = "浙商银行";
         bankName[1] = "中国工商银行";
         bankName[2] = "中国农业银行";
         bankName[3] = "中国银行";
 
-        return (0, bankSvcr, bankName);
+        AccountContract accountCon = AccountContract(accountAddress);
+        bankDiscountRate[0] = accountCon.getRateByAcctId(bankSvcr[0]);
+        bankDiscountRate[1] = accountCon.getRateByAcctId(bankSvcr[1]);
+        bankDiscountRate[2] = accountCon.getRateByAcctId(bankSvcr[2]);
+        bankDiscountRate[3] = accountCon.getRateByAcctId(bankSvcr[3]);
+        return (0, bankSvcr, bankName, bankDiscountRate);
 
     }
 
@@ -809,13 +815,6 @@ contract ReceivableContract{
         newReceivableRecord(serialNo, receivableNo, receivable.signer, receivable.accptr, ResponseType.YES, time, "Cash", cashedAmount, receivable.status);
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
-    }
-
-    //贴现回复时的展示的详情
-    function getLogiAndRepoAndOrderSimpleDetailForDiscountReply(bytes32 receivableNo, address orderAddress) returns (){
-        Receivable receivable = receivableDetailMap[receivableNo];
-
-
     }
 
     //带有应收款流水信息的应收款更具体详情

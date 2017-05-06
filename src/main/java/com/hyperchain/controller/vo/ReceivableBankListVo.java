@@ -6,6 +6,15 @@ package com.hyperchain.controller.vo;
 public class ReceivableBankListVo {
     private int bankSvcr;
     private String bankName;
+    private String bankDicountRate;
+
+    public String getBankDicountRate() {
+        return bankDicountRate;
+    }
+
+    public void setBankDicountRate(String bankDicountRate) {
+        this.bankDicountRate = bankDicountRate;
+    }
 
     public int getBankSvcr() {
         return bankSvcr;

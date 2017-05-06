@@ -226,7 +226,10 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, BaseConstant.SALT_FOR_PRIVATE_KEY + accountName);
 
-        return receivableService.getDiscountBankList(contractKey,new Object[0]);
+        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//account合约地址
+        Object[] params = new Object[1];
+        params[0] = accountContractAddress;
+        return receivableService.getDiscountBankList(contractKey,params);
     }
 
     @LogInterceptor
