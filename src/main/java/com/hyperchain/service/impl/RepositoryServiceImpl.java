@@ -401,13 +401,15 @@ public class RepositoryServiceImpl implements RepositoryService{
         repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
         repoCertVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1))));
         repoCertVo.setRepoCreateDate(uintList.get(2).equals("") ? 0 : Long.parseLong(uintList.get(2)));
-        repoCertVo.setRepoCertStatus(uintList.get(3).equals("") ? 0 : Integer.parseInt(uintList.get(3)));
+        //repoCertVo.setRepoCertStatus(uintList.get(3).equals("") ? 0 : Integer.parseInt(uintList.get(3)));
         List<OperationRecordVo> recordVos = new ArrayList<>();
 
         int length = (uintList.size()-3) / 2;
         for(int i = 3; i < length+3; i++){
             OperationRecordVo recordVo = new OperationRecordVo();
-            recordVo.setState(uintList.get(i).equals("")? 0 : Integer.parseInt(uintList.get(i)));
+            int status = uintList.get(i).equals("")? 0 : Integer.parseInt(uintList.get(i));
+            recordVo.setState(status);
+            repoCertVo.setRepoCertStatus(status);
             recordVo.setOperateTime(uintList.get(i + length).equals("")? 0 : Long.parseLong(uintList.get(i + length)));
             recordVos.add(recordVo);
         }
