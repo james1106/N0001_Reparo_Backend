@@ -69,7 +69,8 @@ public enum Code {
     RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录"),
     TXSTATE_ERROR(1002,"订单状态错误"),
     PAYER_REPOBUSI_STATE_ERROR(1003,"买方仓储状态错误"),
-    NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人");
+    NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人"),
+    DISOCOUNT_BANK_NOT_EXITS(1041,"贴现金融机构不存在");
 
     private int code;
     private String msg;
@@ -147,6 +148,8 @@ public enum Code {
                 return TXSTATE_ERROR;
             case 1003:
                 return PAYER_REPOBUSI_STATE_ERROR;
+            case 1041:
+                return DISOCOUNT_BANK_NOT_EXITS;
 
             case 2001:
                 return ORDER_NOT_EXIST;

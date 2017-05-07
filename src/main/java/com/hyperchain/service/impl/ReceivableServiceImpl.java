@@ -228,6 +228,10 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         BaseResult<Object> result = new BaseResult<>();
         Code code = contractResult.getCode();
+        if(code == Code.DISOCOUNT_BANK_NOT_EXITS){
+            result.returnWithoutValue(code);
+            return result;
+        }
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);

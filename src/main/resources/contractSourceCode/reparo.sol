@@ -573,10 +573,18 @@ contract ReceivableContract{
         bankName[3] = "中国银行";
 
         AccountContract accountCon = AccountContract(accountAddress);
+        if(accountCon.getRateByAcctId(bankSvcr[0]) == "" || accountCon.getRateByAcctId(bankSvcr[1]) == "" || accountCon.getRateByAcctId(bankSvcr[2]) == "" || accountCon.getRateByAcctId(bankSvcr[3]) == "") {
+            return (1041, bankSvcr, bankName, bankDiscountRate);
+        }
+
         bankDiscountRate[0] = accountCon.getRateByAcctId(bankSvcr[0]);
         bankDiscountRate[1] = accountCon.getRateByAcctId(bankSvcr[1]);
         bankDiscountRate[2] = accountCon.getRateByAcctId(bankSvcr[2]);
         bankDiscountRate[3] = accountCon.getRateByAcctId(bankSvcr[3]);
+//                bankDiscountRate[0] = "0.1";
+//                bankDiscountRate[1] = "0.2";
+//                bankDiscountRate[2] = "0.3";
+//                bankDiscountRate[3] = "0.4";
         return (0, bankSvcr, bankName, bankDiscountRate);
 
     }
