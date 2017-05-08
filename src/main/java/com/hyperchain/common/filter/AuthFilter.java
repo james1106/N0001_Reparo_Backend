@@ -119,9 +119,9 @@ public class AuthFilter implements javax.servlet.Filter {
         if (uri.indexOf("static") > 0 || uri.indexOf("login") > 0 || uri.indexOf("commons") > 0) { //登录等页面
             return true;
         }
-//        if (uri.indexOf("docs") > 0) { //swagger
-//            return true;
-//        }
+        if (uri.indexOf("docs") > 0) { //swagger
+            return true;
+        }
         switch (uri) { //后台接口
             case "/reparo/v1/account/user":
                 return true;

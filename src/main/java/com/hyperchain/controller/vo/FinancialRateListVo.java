@@ -8,10 +8,12 @@ import java.util.List;
 public class FinancialRateListVo {
     private List<String> enterpriseNameList;
     private List<String> rateList;
+    private List<String> acctIdList;
 
-    public FinancialRateListVo(List<String> enterpriseNameList, List<String> rateList) {
+    public FinancialRateListVo(List<String> enterpriseNameList, List<String> rateList, List<String> acctIdList) {
         this.enterpriseNameList = enterpriseNameList;
         this.rateList = rateList;
+        this.acctIdList = acctIdList;
     }
 
     public List<String> getEnterpriseNameList() {
@@ -30,11 +32,20 @@ public class FinancialRateListVo {
         this.rateList = rateList;
     }
 
+    public List<String> getAcctIdList() {
+        return acctIdList;
+    }
+
+    public void setAcctIdList(List<String> acctIdList) {
+        this.acctIdList = acctIdList;
+    }
+
     @Override
     public String toString() {
         return "FinancialRateListVo{" +
                 "enterpriseNameList=" + enterpriseNameList +
                 ", rateList=" + rateList +
+                ", acctIdList=" + acctIdList +
                 '}';
     }
 }

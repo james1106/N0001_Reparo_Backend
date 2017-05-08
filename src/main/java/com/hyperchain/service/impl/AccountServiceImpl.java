@@ -241,11 +241,14 @@ public class AccountServiceImpl implements AccountService {
         List<UserEntity> userEntityList = userEntityRepository.findByRoleCode(3);
         List<String> enterpriseNameList = new ArrayList<>();
         List<String> rateList = new ArrayList<>();
+        List<String> acctIdList = new ArrayList<>();
         for (UserEntity userEntity : userEntityList) {
             enterpriseNameList.add(userEntity.getCompanyName());
             rateList.add(userEntity.getRate());
+            List<AccountEntity> accountEntityList = accountEntityRepository.findByAddress(userEntity.getAddress());
+            acctIdList.add(accountEntityList.get(0).getAcctId());
         }
-        FinancialRateListVo financialRateListVo = new FinancialRateListVo(enterpriseNameList, rateList);
+        FinancialRateListVo financialRateListVo = new FinancialRateListVo(enterpriseNameList, rateList, acctIdList);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithValue(Code.SUCCESS, financialRateListVo);
         return baseResult;
@@ -530,19 +533,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //更新数据库账户利率
-        UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
-        userEntity.setRate(rate);
-        userEntityRepository.save(userEntity);
 
         //更新区块链账户利率
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String contractMethodName = "setRateList";
+        String contractMethodName = "setRate";
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = rate;
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
+
+        //更新数据库账户利率
+        UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
+        userEntity.setRate(rate);
+        userEntityRepository.save(userEntity);
+
         return contractResult;
     }
 
