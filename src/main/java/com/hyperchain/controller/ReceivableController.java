@@ -242,6 +242,8 @@ public class ReceivableController {
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
             @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
             @ApiParam(value = "回复到手金额", required = true) @RequestParam double discountInHandAmount,//回复到手金额
+//利率
+            //piaomianjine
 //            @ApiParam(value = "贴现申请时的流水号", required = true) @RequestParam long discountApplySerialNo,//贴现申请时的流水号
             HttpServletRequest request//http请求实体
     ) throws Exception {
