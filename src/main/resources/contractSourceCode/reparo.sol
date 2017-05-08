@@ -2604,8 +2604,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
@@ -2703,8 +2703,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, partList1, partList2, partList3, methodList, stateList);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, partList1, partList2, partList3, methodList, stateList);
         }
 
