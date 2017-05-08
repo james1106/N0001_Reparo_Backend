@@ -304,6 +304,8 @@ contract ReceivableContract{
 //签发人账号signer -> 应收款编号
     mapping(bytes32 => bytes32[]) signerToReceivableMap;
 
+//金融机构acctID =》 应收款编号
+    mapping(bytes32 => bytes32[]) bankToReceivableMap;
 
 //订单编号 -> 应收款编号
     mapping(bytes32 => bytes32) orderNoToReceivableNoMap;
@@ -623,6 +625,7 @@ contract ReceivableContract{
         newReceivableRecord(serialNo, receivableNo, applicantAcctId, replyerAcctId, ResponseType.NULL, time, "discountApply", discountApplyAmount, receivable.status);
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
+        bankToReceivableMap[replyerAcctId].push(receivableNo);
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return(0);
     }
@@ -659,7 +662,7 @@ contract ReceivableContract{
         receivable.firstOwner = replyerAcctId;
         receivable.pyee = replyerAcctId;
         receivable.lastStatus = receivable.status;
-        receivable.status = 46;// 已贴现    ／贴现已响应？
+        receivable.status = 46;// 贴现已响应
         receivable.discounted = DiscountedStatus.YES;
         receivable.signInDt = time;
         //subDiscount(receivableNo, serialNo, responseType, time, newReceivableNo);
@@ -994,14 +997,17 @@ contract ReceivableContract{
         );
     }
 
-//获取买卖方列表
+//获取买卖方、贴现金融机构列表
     function receivableSimpleDetailList(uint roleCode, bytes32 acctId, address orderAddress, address accountAddress) returns (uint, bytes32[], uint[]) {
         bytes32[] memory receivableNos;
         if(roleCode == 0){//买家(付款人)
             receivableNos = pyerToReceivableMap[acctId];
         }else if(roleCode == 1){//卖家
             receivableNos = pyeeToReceivableMap[acctId];
+        }else if(roleCode == 3){//贴现金融机构
+            receivableNos = bankToReceivableMap[acctId];
         }
+
         uint receivableNosLength = receivableNos.length;
         bytes32[] memory list1 = new bytes32[](receivableNosLength * 3);//receivableNo，productName,收款人企业名enterpriseName
         uint[] memory list2 = new uint[](receivableNosLength * 4);//productQuantity,isseAmt, dueDt,status
