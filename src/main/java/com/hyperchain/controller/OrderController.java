@@ -227,12 +227,13 @@ public class OrderController {
 
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+ (new Random().nextInt(900)+100);
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
-        Object[] repoParams = new Object[5];
+        Object[] repoParams = new Object[6];
         repoParams[0] = orderContractAddress;
         repoParams[1] = payeeRepoCertNo;
         repoParams[2] = (String)repobusiResult.getData() + REPO_BUSI_INCOMED;
         repoParams[3] = (String)repobusiResult.getData() + REPO_BUSI_WATING_OUTCOME;//
         repoParams[4] = txConfirmTime;
+        repoParams[5] = orderNo;//订单确认是，将订单编号保存到卖家到仓储结构体中。因为卖家通过swagger的api接口生成的仓储结构体中是没有订单号的。 陈晓阳 20170507修改
 
         /*String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         Object[] repoParams = new Object[3];

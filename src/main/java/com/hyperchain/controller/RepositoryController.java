@@ -391,6 +391,8 @@ public class RepositoryController {
             @ApiParam(value = "计量单位 如：箱", required = true) @RequestParam String measureUnit,
             @ApiParam(value = "产品单价", required = true) @RequestParam long productUnitPrice,
             @ApiParam(value = "产品总价", required = true) @RequestParam long productTotalPrice,
+            @ApiParam(value = "入库物流公司", required = true) @RequestParam String inLogisticEnterpriseName,
+            @ApiParam(value = "入库运单号", required = true) @RequestParam String inWillBillNo,
             HttpServletRequest request) throws Exception {
         BaseResult result = new BaseResult();
         try{
@@ -412,14 +414,17 @@ public class RepositoryController {
             String storerAddress = storerEntity.getAddress();        //  存货人=持有人holderAddress
             UserEntity repoEnterpriseEntity = userEntityRepository.findByCompanyName(repoEnterpriseName);
             String repoEnterpriseAddress = repoEnterpriseEntity.getAddress();//  保管人(仓储公司)
-            //String measureUnit = measureUnit;// 仓储物计量单位
+
+            UserEntity inLogisticsEnterpriseEntity = userEntityRepository.findByCompanyName(inLogisticEnterpriseName);
+            String inLogisticsEnterpriseAddress = inLogisticsEnterpriseEntity.getAddress();//  物流公司
 
 
             long    operateOperateTime = System.currentTimeMillis();;  //  操作时间(时间戳)
 
             Object[] params = new Object[10];
             params[0] = repoBusinessNo;
-            params[1] = repoCertNo;
+            String[] noList ={repoCertNo,inWillBillNo};
+            params[1] = noList ;
             params[2] = businessTransNo;
             params[3] = storerAddress;
             params[4] = repoEnterpriseAddress;
@@ -435,12 +440,10 @@ public class RepositoryController {
             productIntInfo[3] = operateOperateTime;
             params[8] = productIntInfo;
             String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
-            params[9] = acctContractAddress;
-            /*params[8] = productQuantitiy;
-            params[9] = productUnitPrice * 100;//金额以分为单位
-            params[10] = productTotalPrice * 100;
-            params[11] = operateOperateTime;*/
-            //params[1] = role;
+            String[] addList ={acctContractAddress,inLogisticsEnterpriseAddress};
+            params[9] = addList;
+
+
             // 调用合约查询账户，获取返回结果
             return repositoryService.createRepoCertForRepoeEnterprise(contractKey, params);
         }

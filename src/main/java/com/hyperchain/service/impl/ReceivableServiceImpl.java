@@ -210,7 +210,7 @@ public class ReceivableServiceImpl implements ReceivableService{
     @Override
     public BaseResult<Object> getDiscountBankList(ContractKey contractKey, Object[] contractParams) {//第二个参数是给合约的参数
         String contractMethodName = "getDiscountBankList";
-        String[] resultMapKey = new String[]{"uintBankSvcr[]", "bytes32BankName[]"};//给返回值取了个名称
+        String[] resultMapKey = new String[]{"bytes32BankSvcr[]", "bytes32BankName[]", "bytes32BankDiscountRate[]"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
@@ -228,9 +228,14 @@ public class ReceivableServiceImpl implements ReceivableService{
 
         BaseResult<Object> result = new BaseResult<>();
         Code code = contractResult.getCode();
+        if(code == Code.DISOCOUNT_BANK_NOT_EXITS){
+            result.returnWithoutValue(code);
+            return result;
+        }
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
         List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        List<String> partParams2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
 
 //        String bankSvcr1 = partParams0.get(0);
 //        String bankSvcr2 = partParams0.get(1);
@@ -247,6 +252,7 @@ public class ReceivableServiceImpl implements ReceivableService{
             ReceivableBankListVo receivableBankListVo = new ReceivableBankListVo();
             receivableBankListVo.setBankSvcr(Integer.parseInt(partParams0.get(i)));
             receivableBankListVo.setBankName(partParams1.get(i));
+            receivableBankListVo.setBankDicountRate(partParams2.get(i));
             receivableBankListVoList.add(receivableBankListVo);
         }
 
@@ -500,6 +506,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         String payeeRepoEnterpriseName = partParams0.get(14);
         String waybillNo = partParams0.get(15);
         String logisticsEnterpriseName = partParams0.get(16);
+        String discountedRate = partParams0.get(17);
 
 //        String pyerEnterpriseName = partParams1.get(0);
 //        String pyerAcctSvcrName = partParams1.get(1);
@@ -558,6 +565,7 @@ public class ReceivableServiceImpl implements ReceivableService{
         receivableDetailVo.setPayerRepoEnterpriseName(payerRepoEnterpriseName);
         receivableDetailVo.setWaybillNo(waybillNo);
         receivableDetailVo.setLogisticsEnterpriseName(logisticsEnterpriseName);
+        receivableDetailVo.setDiscountedRate(discountedRate);
 
         receivableDetailVo.setPyerEnterpriseName(pyerEnterpriseName);
         receivableDetailVo.setPyerAcctSvcrName(pyerAcctSvcrName);

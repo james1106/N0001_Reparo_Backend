@@ -164,6 +164,7 @@ public class ReceivableController {
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
             @ApiParam(value = "申请贴现金额", required = true) @RequestParam double discountApplyAmount,//申请贴现金额
+            @ApiParam(value = "贴现利率", required = true) @RequestParam String discountedRate,//贴现利率
             HttpServletRequest request
     ) throws Exception {
         BaseResult result = new BaseResult();
@@ -180,7 +181,7 @@ public class ReceivableController {
 
             String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
             long discountApplyAmountFen = ReparoUtil.convertYuanToCent(discountApplyAmount);
-            Object[] params = new Object[7];
+            Object[] params = new Object[8];
             params[0] = receivableNo;
             params[1] = applicantAcctId;
             params[2] = replyerAcctId;
@@ -188,6 +189,7 @@ public class ReceivableController {
             params[4] = discountApplyTime;
             params[5] = discountApplyAmountFen;
             params[6] = orderContractAddress;
+            params[7] = discountedRate;
 
             // 调用合约查询账户，获取返回结果
             return receivableService.discountApply(contractKey, params, receivableNo);
@@ -224,7 +226,10 @@ public class ReceivableController {
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
-        return receivableService.getDiscountBankList(contractKey,new Object[0]);
+        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//account合约地址
+        Object[] params = new Object[1];
+        params[0] = accountContractAddress;
+        return receivableService.getDiscountBankList(contractKey,params);
     }
 
     @LogInterceptor
