@@ -242,13 +242,19 @@ public class ReceivableController {
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
             @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
             @ApiParam(value = "回复到手金额", required = true) @RequestParam double discountInHandAmount,//回复到手金额
-//利率
-            //piaomianjine
+            @ApiParam(value = "贴现利率", required = true) @RequestParam String discountRate,//利率
+            @ApiParam(value = "票面金额", required = true) @RequestParam double isseAmt,//票面金额
 //            @ApiParam(value = "贴现申请时的流水号", required = true) @RequestParam long discountApplySerialNo,//贴现申请时的流水号
             HttpServletRequest request//http请求实体
     ) throws Exception {
         BaseResult result = new BaseResult();
         try {
+
+            double doubleDiscountRate = Double.parseDouble(discountRate);
+            if((1-doubleDiscountRate/100) * isseAmt != discountInHandAmount){
+                 result.returnWithoutValue(Code.DISCOUNTAMOUNT_NOT_MATCH);
+                 return result;
+            }
             long discountReplyTime = System.currentTimeMillis();
             String serialNo = "124" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//贴现回复流水号124
             //String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//新生成的应收款编号
