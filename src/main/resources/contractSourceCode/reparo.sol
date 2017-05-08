@@ -2618,8 +2618,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
@@ -2717,8 +2717,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, partList1, partList2, partList3, methodList, stateList);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, partList1, partList2, partList3, methodList, stateList);
         }
 
@@ -3244,8 +3244,10 @@ contract WayBillContract {
         if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false){ //用户无权限
             return CODE_PERMISSION_DENIED;
         }
-        //TODO 权限控制：卖家仓储状态为已出库 买家仓储状态为待入库 状态 物流才能更新为已送达
-        if (orderContract.queryPayeeRepoBusiStateOfOrderState(orderNo) != REPO_OUTCOMED || orderContract.queryPayerRepoBusiStateOfOrderState(orderNo) != REPO_WATING_INCOME){ //无状态流转权限
+        //TODO 权限控制：卖家仓储状态为已出库 买家仓储状态为待入库或已入库 状态 物流才能更新为已送达
+        if (orderContract.queryPayeeRepoBusiStateOfOrderState(orderNo) != REPO_OUTCOMED
+            || orderContract.queryPayerRepoBusiStateOfOrderState(orderNo) != REPO_WATING_INCOME
+            || orderContract.queryPayerRepoBusiStateOfOrderState(orderNo) != REPO_INCOMED){ //无状态流转权限
             return CODE_STATUS_TRANSFER_DENIED;
         }
 
