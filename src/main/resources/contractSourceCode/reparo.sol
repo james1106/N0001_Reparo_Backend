@@ -89,11 +89,11 @@ contract AccountContract {
     mapping (bytes32 => address) acctIdToAddress;
 
 
-    function newAccount(bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _svcrClass, bytes32 _acctSvcr, bytes32 _acctSvcrName) returns (uint code){
+    function newAccount(bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _svcrClass, bytes32 _acctSvcr, bytes32 _acctSvcrName, bytes32 rate) returns (uint code){
         if(accountMap[msg.sender].accountName != ""){
             return CODE_ACCOUNT_ALREADY_EXIST; //账户已存在
         }
-        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName, "5");
+        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName, rate);
         for (uint i = 0; i < _acctId.length; i++){
             acctIdToAddress[_acctId[i]] = msg.sender;
         }
@@ -1367,9 +1367,11 @@ contract RepositoryContract{
         bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
         uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4（取消）-出库待响应,5-待出库,6-已出库）
         bytes32 orderNo ;// 订单号
-        bytes32 wayBillNo   ;// 运单号
+        bytes32 inWayBillNo   ;// 入库运单号
         bytes32 repoCertNo  ;// 仓单编号
-        address logisticsEnterpriseAddress  ;// 物流公司
+        address inLogisticsEnterpriseAddress  ;// 入库物流公司
+        bytes32 outWayBillNo   ;// 入库运单号
+        address outLogisticsEnterpriseAddress  ;// 出库物流公司
         address repoEnterpriseAddress   ;// 保管人(仓储公司)
         address storerAddress   ;// 存货人
         address holderAddress   ;// 持有人：最初为存货人，经过背书转让后，即为受让人(公司名称)
@@ -1447,28 +1449,55 @@ contract RepositoryContract{
             return true;
         }
     }
-//更新仓储结构体中的物流信息
-    function updateLogisInfo(bytes32 repoCertNo,//仓单编号
+
+    //更新仓储结构体中的物流信息,入库物流公司address，入库运单号，出库物流公司address，出库运单号
+    /*
+     function updateLogisInfo(bytes32 repoCertNo,//仓单编号
+     address logisticsEnterpriseAddress,//物流公司address
+     bytes32 wayBillNo //运单号
+     ) returns (uint){
+
+     //判断仓单编号是否存在，不存在返回“仓单不存在”
+     if(repoCertNoExsit(repoCertNo) == false){
+     return 4001;//“仓单不存在”
+     }
+
+     RepoCert repoCert = repoCertDetailMap[repoCertNo];
+     bytes32 repoBusinessNo = repoCert.repoBusinessNo;
+     //
+     bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
+     uint length = repoBusinessTransNoList.length;
+     bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
+
+     //更新出库物流公司，出库运单号
+     businessDetailMap[newestBusinessTransNo].logisticsEnterpriseAddress = logisticsEnterpriseAddress;
+     businessDetailMap[newestBusinessTransNo].wayBillNo = wayBillNo;
+     return (0);
+     }
+     */
+
+    //更新仓储结构体中的物流信息,入库物流公司address，入库运单号，出库物流公司address，出库运单号
+    function updateLogisInfo2(
+        bytes32 payerRepoBusinessNo,//买家仓储业务编号
+        bytes32 payeeRepoBusinessNo,//卖家仓储业务编号
         address logisticsEnterpriseAddress,//物流公司address
         bytes32 wayBillNo //运单号
 ) returns (uint){
+        bytes32[]  payerRepoBusinessTransNoList = businessTransNoMap[payerRepoBusinessNo];
+        uint payerlength = payerRepoBusinessTransNoList.length;
+        bytes32 payerNewestBusinessTransNo = payerRepoBusinessTransNoList[payerlength - 1];
 
-        //判断仓单编号是否存在，不存在返回“仓单不存在”
-        if(repoCertNoExsit(repoCertNo) == false){
-            return 4001;//“仓单不存在”
-        }
+        bytes32[]  payeeRepoBusinessTransNoList = businessTransNoMap[payeeRepoBusinessNo];
+        uint payeelength = payeeRepoBusinessTransNoList.length;
+        bytes32 payeeNewestBusinessTransNo = payeeRepoBusinessTransNoList[payeelength - 1];
 
-        RepoCert repoCert = repoCertDetailMap[repoCertNo];
-        bytes32 repoBusinessNo = repoCert.repoBusinessNo;
-        //
-        bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
-        uint length = repoBusinessTransNoList.length;
-        bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
-        //        RepoBusiness repoBusinsess = businessDetailMap[newestBusinessTransNo];
-        //        repoBusinsess.logisticsEnterpriseAddress = logisticsEnterpriseAddress;
-        //        repoBusinsess.wayBillNo = wayBillNo;
-        businessDetailMap[newestBusinessTransNo].logisticsEnterpriseAddress = logisticsEnterpriseAddress;
-        businessDetailMap[newestBusinessTransNo].wayBillNo = wayBillNo;
+        //更新买家入库物流公司，入库运单号
+        businessDetailMap[payerNewestBusinessTransNo].inLogisticsEnterpriseAddress = logisticsEnterpriseAddress;
+        businessDetailMap[payerNewestBusinessTransNo].inWayBillNo = wayBillNo;
+
+        //更新卖家出库物流公司，出库运单号
+        businessDetailMap[payeeNewestBusinessTransNo].outLogisticsEnterpriseAddress = logisticsEnterpriseAddress;
+        businessDetailMap[payeeNewestBusinessTransNo].outWayBillNo = wayBillNo;
         return (0);
     }
 
@@ -1610,10 +1639,14 @@ contract RepositoryContract{
         dest.repoBusiStatus             = sorce.repoBusiStatus      ;
         dest.businessTransNo        = sorce.businessTransNo     ;
         dest.orderNo                = sorce.orderNo             ;
-
-        dest.wayBillNo                = sorce.wayBillNo             ;
         dest.repoCertNo                = sorce.repoCertNo             ;
-        dest.logisticsEnterpriseAddress                = sorce.logisticsEnterpriseAddress             ;
+
+        dest.inWayBillNo                = sorce.inWayBillNo             ;
+        dest.inLogisticsEnterpriseAddress                = sorce.inLogisticsEnterpriseAddress             ;
+
+        dest.outWayBillNo                = sorce.outWayBillNo             ;
+        dest.outLogisticsEnterpriseAddress                = sorce.outLogisticsEnterpriseAddress             ;
+
         dest.incomeCert                = sorce.incomeCert             ;
         dest.measureUnit                = sorce.measureUnit             ;
         dest.norms                = sorce.norms             ;
@@ -1728,7 +1761,7 @@ contract RepositoryContract{
 //仓储机构生成仓单, 货品入库时生成，与订单无关,注意与incomeConfirm()的区别
     function  createRepoCertForRepoEnter(
         bytes32 repoBusinessNo,       //  仓储业务编号
-        bytes32 repoCertNo, //仓单编码
+        bytes32[2] noList ,//noList[0]=repoCertNo, //仓单编码,noList[1]=inWayBillNo //入库运单编号
         bytes32 businessTransNo,      //  仓储业务业务流转编号
         address storerAddress,        //  存货人=持有人holderAddress
         address repoEnterpriseAddress,//  保管人(仓储公司)
@@ -1736,19 +1769,14 @@ contract RepositoryContract{
         bytes32 productName,  //  仓储物名称
         bytes32 productLocation,//
         uint[4] productIntInfo,  //0-productQuantitiy ,1-productUnitPrice ,2-productTotalPrice ,3-operateOperateTime
-        address accountContractAddress
-    /*uint    productQuantitiy,     //  仓储物数量
-     uint    productUnitPrice,     //  货品单价(分)
-     uint    productTotalPrice ,    //  货品合计金额(分)
-     uint    operateOperateTime   //  操作时间(时间戳)
-     */
+        address[2] addrList //addrList[0]=accountContractAddress,/addrList[1]=inLogisticsEnterpriseAddress 入库物流公司
 ) returns(uint) {
         //waittodo待补充验证存货人，仓储公司是否有效，账户合约提供接口
-        if(repoCertNoExsit(repoCertNo) == true){
+        if(repoCertNoExsit(noList[0]) == true){
             return 4004;//“仓单已存在”
         }
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
-        accountContract = AccountContract(accountContractAddress);
+        accountContract = AccountContract(addrList[0]);
         if(!accountContract.isAccountExist(msg.sender)){
             return (2);
         }
@@ -1756,7 +1784,7 @@ contract RepositoryContract{
         if(accountContract.queryRoleCode(msg.sender) != 2){
             return (1);
         }
-        repoBusiToCertMap[repoBusinessNo] = repoCertNo;
+        repoBusiToCertMap[repoBusinessNo] = noList[0];//repoCertNo;
         //加入存货人的列表
         usrRepoBusinessMap[storerAddress].push(repoBusinessNo);
         //加入仓储公司的列表
@@ -1764,13 +1792,13 @@ contract RepositoryContract{
         //加入业务流转编号列表
         businessTransNoMap[repoBusinessNo].push(businessTransNo);
 
-        usrRepoCertListMap[storerAddress].push(repoCertNo);//持有人仓单列表
-        usrRepoCertListMap[repoEnterpriseAddress].push(repoCertNo);//仓储公司仓单列表
+        usrRepoCertListMap[storerAddress].push(noList[0]);//持有人仓单列表
+        usrRepoCertListMap[repoEnterpriseAddress].push(noList[0]);//仓储公司仓单列表
 
 
 
-        repoCertDetailMap[repoCertNo] = RepoCert("",
-            repoCertNo,
+        repoCertDetailMap[noList[0]] = RepoCert("",
+            noList[0],
             repoBusinessNo,
             repoEnterpriseAddress,
             storerAddress,
@@ -1785,7 +1813,7 @@ contract RepositoryContract{
             REPO_CERT_TRANSABLE
         );
         //记录仓单历史
-        RepoCertOperationRecord opRecode = repoCertRecordMap[repoCertNo];
+        RepoCertOperationRecord opRecode = repoCertRecordMap[noList[0]];
         opRecode.repoCertState.push(REPO_CERT_TRANSABLE);
         opRecode.operationTime.push(productIntInfo[3]);
 
@@ -1801,7 +1829,9 @@ contract RepositoryContract{
         businessDetailMap[businessTransNo].productQuantitiy = productIntInfo[0];
         businessDetailMap[businessTransNo].productUnitPrice = productIntInfo[1];
         businessDetailMap[businessTransNo].productTotalPrice = productIntInfo[2];
-        businessDetailMap[businessTransNo].repoCertNo = repoCertNo;
+        businessDetailMap[businessTransNo].repoCertNo = noList[0];
+        businessDetailMap[businessTransNo].inWayBillNo = noList[1];
+        businessDetailMap[businessTransNo].inLogisticsEnterpriseAddress = addrList[1];
 
         return (0);
     }
@@ -2105,25 +2135,26 @@ contract RepositoryContract{
         }
 
         //===================获取仓储详情=================
-        bytes32[]   memory detailInfoList1 = new bytes32[](5);//5个值
+        bytes32[]   memory detailInfoList1 = new bytes32[](6);//6个值
         uint[]      memory detailInfoList2 = new uint[](4);//4个值
-        address[]   memory detailInfoList3 = new address[](3);//个值
+        address[]   memory detailInfoList3 = new address[](4);//4个值
 
         detailInfoList1[0] = repoBusinsess.repoBusinessNo;
-        detailInfoList1[1] = repoBusinsess.wayBillNo;
+        detailInfoList1[1] = repoBusinsess.inWayBillNo;
         detailInfoList1[2] = repoBusinsess.repoCertNo;
         detailInfoList1[3] = repoBusinsess.productName;
         detailInfoList1[4] = repoBusinsess.measureUnit;
-        //detailInfoList1[5] = repoBusinsess.operateOperateTime;
+        detailInfoList1[5] = repoBusinsess.outWayBillNo;
 
         detailInfoList2[0] = repoBusinsess.repoBusiStatus;
         detailInfoList2[1] = repoBusinsess.productQuantitiy;
         detailInfoList2[2] = repoBusinsess.productTotalPrice;
         detailInfoList2[3] = repoBusinsess.operateOperateTime;
 
-        detailInfoList3[0] = repoBusinsess.logisticsEnterpriseAddress;
+        detailInfoList3[0] = repoBusinsess.inLogisticsEnterpriseAddress;
         detailInfoList3[1] = repoBusinsess.repoEnterpriseAddress;
         detailInfoList3[2] = repoBusinsess.storerAddress;
+        detailInfoList3[3] = repoBusinsess.outLogisticsEnterpriseAddress;
 
         return (0,historyList,detailInfoList1,detailInfoList2,detailInfoList3);
     }
@@ -2548,6 +2579,16 @@ uint OUTCOMED = 6;                  //已出库
         return(param1, param2, param3);
     }
 
+    /*******************************根据订单编号买家，卖家仓储我业务编号***********************************/
+    function qryRepoBusiNos(bytes32 orderNo) returns (uint exeFlag,bytes32 payerRepoBusinessNo,bytes32 payeeRepoBusinessNo){
+        //如果订单不存在，返回"订单不存在"
+        if(!orderExists(orderNo)){
+            return (2001, "0", "0");
+        }
+        Order order = orderDetailMap[orderNo];
+        return (0,order.payerRepoBusinessNo,order.payeeRepoBusinessNo);
+
+    }
 
     /*******************************根据订单编号获取订单详情***********************************/
     function queryOrderDetail(address receAddress, address wbillContractAddress, address accountContractAddr, bytes32 orderNo) returns(
@@ -3022,8 +3063,16 @@ contract WayBillContract {
         addressToOrderNoList[addrs[0]].push(strs[0]);
 
         //TODO 更新仓储结构体中的物流信息
-        repositoryContract.updateLogisInfo(
-            strs[2],//仓单编号
+        /*repositoryContract.updateLogisInfo(
+         strs[2],//仓单编号
+         addrs[0],//物流公司address
+         strs[5] //运单号
+         );*/
+
+        var( tmpcode, payerRepoBusinessNo, payeeRepoBusinessNo) = orderContract.qryRepoBusiNos(strs[0]);
+        repositoryContract.updateLogisInfo2(
+            payerRepoBusinessNo,//买家仓储业务编号
+            payeeRepoBusinessNo,//卖家仓储业务编号
             addrs[0],//物流公司address
             strs[5] //运单号
         );

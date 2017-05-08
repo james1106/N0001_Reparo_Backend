@@ -49,4 +49,6 @@ public interface AccountService {
     BaseResult<Object> findAllEnterpriseNameByRoleCode(int roleCode);
 
     BaseResult<Object> setRateForFinancial(String rate, String address) throws ContractInvokeFailException, PasswordIllegalParam, PrivateKeyIllegalParam, ValueNullException;
+
+    BaseResult<Object> getAllFinancialEnterpriseNameAndRate();
 }

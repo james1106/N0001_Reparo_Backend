@@ -8,6 +8,7 @@ import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.PrivateKeyIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
@@ -18,6 +19,7 @@ import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import com.hyperchain.test.TestUtil;
 import com.hyperchain.test.base.SpringBaseTest;
+import com.sun.org.apache.regexp.internal.RE;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -2861,7 +2863,7 @@ public class WayBillContractTest extends SpringBaseTest {
         String random = TestUtil.getRandomString();
 
         //初始化运单状态（当应收账款状态为承兑已签收）-- 仅对ldy.sol测试
-        ContractKey initContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
+        ContractKey initContractKey = new ContractKey(senderAccountJson, ReparoUtil.getPasswordForPrivateKey(senderAccountName));
         String initContractMethodName = "initWayBillStatus";
         Object[] initContractMethodParams = new Object[3];
         String[] addrs00 = new String[4];
@@ -2891,7 +2893,7 @@ public class WayBillContractTest extends SpringBaseTest {
 //        testReceivable("123订单" + random);
 
         //获取待发货运单信息
-        ContractKey waybillContractKey0 = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
+        ContractKey waybillContractKey0 = new ContractKey(senderAccountJson, ReparoUtil.getPasswordForPrivateKey(senderAccountName));
         String waybillContractMethodName0 = "getWayBill";
         Object[] waybillContractMethodParams0 = new Object[2];
         waybillContractMethodParams0[0] = "123订单" + random; //orderNo
@@ -2931,7 +2933,7 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("logisticsInfo: " + logisticsInfo0);
 
         //卖家企业发货申请，生成未完善运单
-        ContractKey requestContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
+        ContractKey requestContractKey = new ContractKey(senderAccountJson, ReparoUtil.getPasswordForPrivateKey(senderAccountName));
         String requestContractMethodName = "generateUnConfirmedWayBill";
         Object[] requestContractMethodParams = new Object[5];
         Long[] requestLongs = new Long[3];
@@ -2966,7 +2968,7 @@ public class WayBillContractTest extends SpringBaseTest {
 
 
         //获取发货待确认运单信息
-        ContractKey waybillContractKey33 = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
+        ContractKey waybillContractKey33 = new ContractKey(senderAccountJson, ReparoUtil.getPasswordForPrivateKey(senderAccountName));
         String waybillContractMethodName33 = "getWayBill";
         Object[] waybillContractMethodParams33 = new Object[2];
         waybillContractMethodParams33[0] = "123订单" + random; //orderNo
@@ -3006,8 +3008,8 @@ public class WayBillContractTest extends SpringBaseTest {
         System.out.println("logisticsInfo: " + logisticsInfo33);
 
         //物流确认发货，生成完整运单
-//        ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
-        ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
+//        ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, ReparoUtil.getPasswordForPrivateKey(logisticsAccountName));
+        ContractKey confirmContractKey = new ContractKey(logisticsAccountJson, ReparoUtil.getPasswordForPrivateKey(logisticsAccountName));
         String confirmContractMethodName = "generateWayBill";
         Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = "123订单" + random; //orderNo
@@ -3023,7 +3025,7 @@ public class WayBillContractTest extends SpringBaseTest {
         Assert.assertEquals(Code.SUCCESS, confirmContractResult.getCode());
 
         //更新运单状态为已送达
-        ContractKey updateToReceivedContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
+        ContractKey updateToReceivedContractKey = new ContractKey(logisticsAccountJson, ReparoUtil.getPasswordForPrivateKey(logisticsAccountName));
         String updateToReceivedMethodName = "updateWayBillStatusToReceived";
         Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = "123订单" + random; //orderNo
@@ -3042,7 +3044,7 @@ public class WayBillContractTest extends SpringBaseTest {
         Assert.assertEquals(Code.SUCCESS, updateToReceivedResult.getCode());
 
         //获取所有用户相关运单的订单号列表
-        ContractKey listOrderNoContractKey = new ContractKey(logisticsAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + logisticsAccountName);
+        ContractKey listOrderNoContractKey = new ContractKey(logisticsAccountJson, ReparoUtil.getPasswordForPrivateKey(logisticsAccountName));
         String listOrderNoContractMethodName = "listWayBillOrderNo";
         Object[] listOrderNoContractMethodParams = new Object[1];
         listOrderNoContractMethodParams[0] = accountContractAddr; //accountContractAddr
@@ -3059,7 +3061,7 @@ public class WayBillContractTest extends SpringBaseTest {
         }
 
         //获取最新的一个运单信息
-        ContractKey waybillContractKey = new ContractKey(senderAccountJson, BaseConstant.SALT_FOR_PRIVATE_KEY + senderAccountName);
+        ContractKey waybillContractKey = new ContractKey(senderAccountJson, ReparoUtil.getPasswordForPrivateKey(senderAccountName));
         String waybillContractMethodName = "getWayBill";
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNoList.get(0); //orderNo

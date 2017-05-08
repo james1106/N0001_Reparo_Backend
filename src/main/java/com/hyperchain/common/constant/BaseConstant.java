@@ -29,4 +29,5 @@ public class BaseConstant {
     public static final String REPO_BUSI_WATING_OUTCOME = "5";//待出库
     public static final String REPO_BUSI_OUTCOMED = "6";//已出库
 
+    public static final String DEFAULT_RATE = "5"; //金融机构默认利率
 }

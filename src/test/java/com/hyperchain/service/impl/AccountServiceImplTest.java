@@ -4426,6 +4426,7 @@ public class AccountServiceImplTest extends SpringBaseTest {
         Assert.assertEquals(Code.SUCCESS.getCode(), baseResult3.getCode());
     }
 
+    //金融机构设置与修改利率
     @Test
     public void setRateAndGetRate()
             throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
@@ -5524,6 +5525,11 @@ public class AccountServiceImplTest extends SpringBaseTest {
         Assert.assertEquals(baseResult.getCode(), Code.SUCCESS.getCode());
         JSONObject jsonObject = JSONObject.fromObject(baseResult);
         String rate = jsonObject.getJSONObject("data").getString("rate");
+        Assert.assertEquals(rate, "100");
+
+        //从数据库获取利率
+        UserEntity userEntity1 = userEntityRepository.findByAccountName("financial" + randomString);
+        rate = userEntity1.getRate();
         Assert.assertEquals(rate, "100");
     }
 
