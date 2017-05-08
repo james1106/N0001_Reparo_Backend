@@ -101,10 +101,18 @@ public class AccountController extends BaseController{
     @ApiOperation(value = "根据角色获取所有企业名称", notes = "获取所有企业名称")
     @ResponseBody
     @RequestMapping(value = "/allEnterpriseName", method = RequestMethod.GET)
-    public BaseResult<Object> getAllEnterpriseName(
+    public BaseResult<Object> getAllEnterpriseNameByRoleCode(
             @ApiParam(value = "角色code", required = true) @RequestParam("roleCode") int roleCode,
             HttpServletRequest request) {
         return accountService.findAllEnterpriseNameByRoleCode(roleCode);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询所有金融机构的企业名称和相应利率", notes = "查询所有金融机构的企业名称和相应利率")
+    @ResponseBody
+    @RequestMapping(value = "/allFinancialEnterpriseNameAndRate", method = RequestMethod.GET)
+    public BaseResult<Object> getAllFinancialEnterpriseNameAndRate() {
+        return accountService.getAllFinancialEnterpriseNameAndRate();
     }
 
     @LogInterceptor

@@ -16,6 +16,7 @@ import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.controller.vo.FinancialRateListVo;
 import com.hyperchain.controller.vo.UserVo;
 import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.SecurityCodeEntity;
@@ -27,10 +28,10 @@ import com.hyperchain.exception.PropertiesLoadException;
 import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.AccountService;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.jvm.hotspot.tools.FinalizerInfo;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ldy on 2017/4/5.
@@ -127,7 +127,7 @@ public class AccountServiceImpl implements AccountService {
         //生成账号
         String[] acctIdList = new String[1];
         acctIdList[0] = acctIds;
-        ContractResult contractResult = saveAccount(accountName, password, enterpriseName, phone, roleCode, certType, certNo, acctIdList, svcrClass, acctSvcr, acctSvcrName);
+        ContractResult contractResult = saveAccount(accountName, password, enterpriseName, phone, roleCode, certType, certNo, acctIdList, svcrClass, acctSvcr, acctSvcrName, BaseConstant.DEFAULT_RATE);
         BaseResult<Object> baseResult = login(accountName, password, request, response);
         return baseResult;
     }
@@ -233,6 +233,21 @@ public class AccountServiceImpl implements AccountService {
         ContractResult contractResult = setRate(accountJson, accountName, rate);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(contractResult.getCode());
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> getAllFinancialEnterpriseNameAndRate() {
+        List<UserEntity> userEntityList = userEntityRepository.findByRoleCode(3);
+        List<String> enterpriseNameList = new ArrayList<>();
+        List<String> rateList = new ArrayList<>();
+        for (UserEntity userEntity : userEntityList) {
+            enterpriseNameList.add(userEntity.getCompanyName());
+            rateList.add(userEntity.getRate());
+        }
+        FinancialRateListVo financialRateListVo = new FinancialRateListVo(enterpriseNameList, rateList);
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(Code.SUCCESS, financialRateListVo);
         return baseResult;
     }
 
@@ -384,7 +399,8 @@ public class AccountServiceImpl implements AccountService {
                                        String[] acctIds,
                                        String svcrClass,
                                        String acctSvcr,
-                                       String acctSvcrName)
+                                       String acctSvcrName,
+                                       String rate)
             throws GeneralSecurityException, IOException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //生成公私钥和用户地址
         List<String> keyInfo = ESDKUtil.newAccount(ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -405,6 +421,7 @@ public class AccountServiceImpl implements AccountService {
         userEntity.setUserStatus(AccountStatus.VALID.getCode());
         userEntity.setAddress(address);
         userEntity.setPrivateKey(accountJson);
+        userEntity.setRate(rate);
         UserEntity savedUserEntity = userEntityRepository.save(userEntity);
         LogUtil.info("存入数据库user表：" + savedUserEntity.toString());
         AccountEntity accountEntity = new AccountEntity();
@@ -421,7 +438,7 @@ public class AccountServiceImpl implements AccountService {
         //账户信息存储到区块链
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = "newAccount";
-        Object[] contractMethodParams = new Object[10];
+        Object[] contractMethodParams = new Object[11];
         contractMethodParams[0] = accountName;
         contractMethodParams[1] = companyName;
         contractMethodParams[2] = roleCode;
@@ -432,6 +449,7 @@ public class AccountServiceImpl implements AccountService {
         contractMethodParams[7] = svcrClass;
         contractMethodParams[8] = acctSvcr;
         contractMethodParams[9] = acctSvcrName;
+        contractMethodParams[10] = rate;
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
@@ -512,9 +530,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //账户信息存储到区块链
+        //更新数据库账户利率
+        UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
+        userEntity.setRate(rate);
+        userEntityRepository.save(userEntity);
+
+        //更新区块链账户利率
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String contractMethodName = "setRate";
+        String contractMethodName = "setRateList";
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = rate;
         String[] resultMapKey = new String[]{};

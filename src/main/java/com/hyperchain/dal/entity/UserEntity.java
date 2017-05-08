@@ -8,7 +8,7 @@ import javax.persistence.*;
  * Created by ldy on 2017/4/5.
  */
 @Entity
-@Table(name = "user11")
+@Table(name = "user01")
 public class UserEntity {
     @ApiModelProperty(value = "用户id")
     private Long id;
@@ -26,6 +26,8 @@ public class UserEntity {
     private String phone;
     @ApiModelProperty(value = "用户角色（0：融资企业、1：物流公司；2：仓储公司；3：金融机构）")
     private int roleCode;
+    @ApiModelProperty(value = "金融机构利率")
+    private String rate;
     @ApiModelProperty(value = "连续密码错误次数")
     private int errorPasswordCount;
     @ApiModelProperty(value = "用户状态（0：有效、1：无效、2：冻结、3：锁定）")
@@ -140,6 +142,15 @@ public class UserEntity {
         this.lockTime = lockTime;
     }
 
+    @Column(nullable = true, length = 5)
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
+
     @Override
     public String toString() {
         return "UserEntity{" +
@@ -151,6 +162,7 @@ public class UserEntity {
                 ", companyName='" + companyName + '\'' +
                 ", phone='" + phone + '\'' +
                 ", roleCode=" + roleCode +
+                ", rate='" + rate + '\'' +
                 ", errorPasswordCount=" + errorPasswordCount +
                 ", userStatus=" + userStatus +
                 ", lockTime=" + lockTime +

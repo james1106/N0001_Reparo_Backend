@@ -89,11 +89,11 @@ contract AccountContract {
     mapping (bytes32 => address) acctIdToAddress;
 
 
-    function newAccount(bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _svcrClass, bytes32 _acctSvcr, bytes32 _acctSvcrName) returns (uint code){
+    function newAccount(bytes32 _accountName, bytes32 _enterpriseName, uint _roleCode, uint _accountStatus, bytes32 _certType, bytes32 _certNo, bytes32[] _acctId, bytes32 _svcrClass, bytes32 _acctSvcr, bytes32 _acctSvcrName, bytes32 rate) returns (uint code){
         if(accountMap[msg.sender].accountName != ""){
             return CODE_ACCOUNT_ALREADY_EXIST; //账户已存在
         }
-        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName, "5");
+        accountMap[msg.sender] = Account(msg.sender, _accountName, _enterpriseName, _roleCode, _accountStatus, _certType, _certNo, _acctId, _svcrClass, _acctSvcr, _acctSvcrName, rate);
         for (uint i = 0; i < _acctId.length; i++){
             acctIdToAddress[_acctId[i]] = msg.sender;
         }
