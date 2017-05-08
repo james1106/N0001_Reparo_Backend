@@ -2631,9 +2631,9 @@ uint OUTCOMED = 6;                  //已出库
 
         Order order = orderDetailMap[orderNo];
         //如果订单与合约调用者无关，"权限拒绝"
-        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
-            return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
-        }
+//        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
+//            return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
+//        }
 
 
         bytes32[] memory param1 = new bytes32[](5);
