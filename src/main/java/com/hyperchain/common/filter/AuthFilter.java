@@ -57,6 +57,9 @@ public class AuthFilter implements javax.servlet.Filter {
                     //token为空
                     if (CommonUtil.isEmpty(token)) {
                         LogUtil.info("token为空");
+                        cookie.setMaxAge(0); //清除cookie
+                        cookie.setPath("/");
+                        httpServletResponse.addCookie(cookie);
                         redirectToLogin(httpServletRequest, httpServletResponse);
                         return;
                     }
@@ -77,6 +80,9 @@ public class AuthFilter implements javax.servlet.Filter {
                         UserEntity userEntity = userEntityRepository.findByAddress(address);
                         if (null == userEntity) {
                             LogUtil.info("token用户未注册");
+                            cookie.setMaxAge(0); //清除cookie
+                            cookie.setPath("/");
+                            httpServletResponse.addCookie(cookie);
                             redirectToLogin(httpServletRequest, httpServletResponse);
                             return;
                         } else {
@@ -92,6 +98,9 @@ public class AuthFilter implements javax.servlet.Filter {
                         }
                     } catch (JSONException e) {
                         LogUtil.info("token json解析失败");
+                        cookie.setMaxAge(0); //清除cookie
+                        cookie.setPath("/");
+                        httpServletResponse.addCookie(cookie);
                         redirectToLogin(httpServletRequest, httpServletResponse);
                         return;
                     }
