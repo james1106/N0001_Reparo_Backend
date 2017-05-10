@@ -42,8 +42,8 @@
  31     已兑付 CASHED
  36     已部分兑付 PART_CASHED
  39     兑付失败 CASH_REFUSED
- 41     贴现待签收 WAITING_DISCOUNT
- 46     贴现已签收 DISCOUNTED
+ 41     贴现待响应 WAITING_DISCOUNT
+ 46     贴现已响应 DISCOUNTED
  48     已部分贴现 PART_DISCOUNTED
  49     已全额贴现 ALL_DISCOUNTED
  ==========应收款状态=======
@@ -660,6 +660,9 @@ contract ReceivableContract{
         if(receivable.secondOwner != replyerAcctId){
             return (1);
         }
+        if(receivable.status != 41){
+            return (1038);
+        }
         //if((receivable.isseAmt - receivable.isseAmt * receivable.)//todo 校验到手金额
 
         receivable.discountInHandAmount = discountInHandAmount;
@@ -831,6 +834,9 @@ contract ReceivableContract{
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
+
+    //返回应收帐款个数
+//    function()
 
     //带有应收款流水信息的应收款更具体详情
     function getReceivableAllInfoWithSerial(bytes32[] receivableNoAndAcctId, address[] orderAndWayBillAndAccountAddress) returns (uint, bytes32[], uint[], DiscountedStatus discounted){
@@ -1018,15 +1024,15 @@ contract ReceivableContract{
 
 
         for(uint i = 0; i < receivableNosLength; i++){
-            list1[i*3] = receivableNos[i];
-            list1[i*3+1] = callOrderContractGetProductName(orderAddress, receivableNos[i]);
+            list1[i*5] = receivableNos[i];
+            list1[i*5+1] = callOrderContractGetProductName(orderAddress, receivableNos[i]);
             if(roleCode == 0){
-                list1[i*3+2] = callAccountContractGetPyeeEnterpriseName(accountAddress, receivableNos[i]);
+                list1[i*5+2] = callAccountContractGetPyeeEnterpriseName(accountAddress, receivableNos[i]);
             }else if(roleCode ==1){
-                list1[i*3+2] = callAccountContractGetPyerEnterpriseName(accountAddress, receivableNos[i]);
+                list1[i*5+2] = callAccountContractGetPyerEnterpriseName(accountAddress, receivableNos[i]);
             }
-            list1[i*3+3] = receivableDetailMap[receivableNos[i]].firstOwner;
-            list1[i*3+4] = receivableDetailMap[receivableNos[i]].accptr;
+            list1[i*5+3] = receivableDetailMap[receivableNos[i]].firstOwner;
+            list1[i*5+4] = receivableDetailMap[receivableNos[i]].accptr;
 
             list2[i*4] = callOrderContractGetProductQuantity(orderAddress, receivableNos[i]);
             list2[i*4+1] = receivableDetailMap[receivableNos[i]].isseAmt;
