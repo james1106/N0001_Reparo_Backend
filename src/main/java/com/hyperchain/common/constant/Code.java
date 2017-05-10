@@ -11,6 +11,7 @@ public enum Code {
     INVALID_USER(2, "账户不存在，该用户可能未注册或已失效"),
     PARAMETER_EMPTY(3, "入参为空"),
     UNKNOWN_ABNORMAL(4,"未知异常"),
+    QUERY_USER_ERROR(5,"获取账户信息异常"),
 
     HYPERCHAIN_ERROR(15, "区块链异常"),
     INVALID_PARAM_PRIVATE_KEY(16, "参数输入错误：私钥private-key"),

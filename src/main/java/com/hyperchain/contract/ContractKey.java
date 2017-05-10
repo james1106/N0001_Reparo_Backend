@@ -22,7 +22,7 @@ public class ContractKey {
         } catch (Exception e) {
             LogUtil.error(e);
             LogUtil.error("从私钥获取公钥失败。\n*privateKey=" + privateKey);
-            throw new PrivateKeyIllegalParam(Code.INVALID_PARAM_PRIVATE_KEY, "private-key=" + privateKey);
+            throw new PrivateKeyIllegalParam();
         }
     }
 
@@ -33,7 +33,7 @@ public class ContractKey {
         } catch (Exception e) {
             LogUtil.error(e);
             LogUtil.error("从私钥获取公钥失败。\n*privateKey=" + privateKey);
-            throw new PrivateKeyIllegalParam(Code.INVALID_PARAM_PRIVATE_KEY, "private-key=" + privateKey);
+            throw new PrivateKeyIllegalParam();
         }
     }
 

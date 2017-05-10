@@ -2984,6 +2984,15 @@ contract WayBillContract {
     //状态流转编号—> 运单详情(完整/不完整)
     mapping(bytes32 => WayBill) statusTransIdToWayBillDetail;
 
+    //用户地址 => 所有运单数量
+    mapping(address => uint) allWaybillCount;
+    //用户地址 => 待发货运单数量
+    mapping(address => uint) waitingWaybillCount;
+    //用户地址 => 发货待响应运单数量
+    mapping(address => uint) requestingWaybillCount;
+    //用户地址 => 待送达运单数量
+    mapping(address => uint) sendingWaybillCount;
+
     //内部调用：供应收账款模块调用（当应收款状态为承兑已签收时调用）
     //生成待发货运单（初始化 状态为待发货、待发货时间）
     function initWayBillStatus(
@@ -3008,6 +3017,11 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[strs[0]].push(statusTransId);
         //
+        allWaybillCount[addrs[0]] = allWaybillCount[addrs[0]] + 1; //发货企业
+        allWaybillCount[addrs[1]] = allWaybillCount[addrs[1]] + 1; //收货企业
+        waitingWaybillCount[addrs[0]] = waitingWaybillCount[addrs[0]] + 1; //发货企业
+        waitingWaybillCount[addrs[1]] = waitingWaybillCount[addrs[1]] + 1; //收货企业
+        //
         addressToOrderNoList[addrs[0]].push(strs[0]);
         addressToOrderNoList[addrs[1]].push(strs[0]);
 
@@ -3017,7 +3031,7 @@ contract WayBillContract {
         return CODE_SUCCESS;
     }
 
-    //生成待确认运单
+    //生成发货待响应运单
     function generateUnConfirmedWayBill(
         uint[] integers,  /*requestTime, productValue, productQuantity, */
         address[] addrs,  /*logisticsAddress, senderAddress, receiverAddress, receiverRepoAddress, senderRepoAddress*/
@@ -3059,6 +3073,14 @@ contract WayBillContract {
         statusTransIdToWayBillDetail[strs[4]] = WayBill(strs[0], strs[4], strs[5], addrs[0], addrs[1], addrs[2], strs[1], integers[2], integers[1], integers[0], addrs[4], strs[2], addrs[3], strs[3], logisticsInfo, WAYBILL_REQUESTING);
         //
         orderNoToStatusTransIdList[strs[0]].push(strs[4]);
+        //
+        allWaybillCount[addrs[0]] = allWaybillCount[addrs[0]] + 1; //物流
+        waitingWaybillCount[addrs[1]] = waitingWaybillCount[addrs[1]] - 1; //发货企业
+        waitingWaybillCount[addrs[2]] = waitingWaybillCount[addrs[2]] - 1; //收货企业
+        requestingWaybillCount[addrs[1]] = requestingWaybillCount[addrs[1]] + 1; //发货企业
+        requestingWaybillCount[addrs[2]] = requestingWaybillCount[addrs[2]] + 1; //收货企业
+        requestingWaybillCount[addrs[0]] = requestingWaybillCount[addrs[0]] + 1; //物流
+
         //
         addressToOrderNoList[addrs[0]].push(strs[0]);
 
@@ -3105,6 +3127,12 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
+        requestingWaybillCount[oldWaybill.senderAddress] = requestingWaybillCount[oldWaybill.senderAddress] - 1; //发货企业
+        requestingWaybillCount[oldWaybill.receiverAddress] = requestingWaybillCount[oldWaybill.receiverAddress] - 1; //收货企业
+        requestingWaybillCount[oldWaybill.logisticsAddress] = requestingWaybillCount[oldWaybill.logisticsAddress] - 1; //物流
+        sendingWaybillCount[oldWaybill.senderAddress] = sendingWaybillCount[oldWaybill.senderAddress] + 1; //发货企业
+        sendingWaybillCount[oldWaybill.receiverAddress] = sendingWaybillCount[oldWaybill.receiverAddress] + 1; //收货企业
+        sendingWaybillCount[oldWaybill.logisticsAddress] = sendingWaybillCount[oldWaybill.logisticsAddress] + 1; //物流
 
         //TODO 更新订单中的运单状态为已发货
         orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_SENDING, "", 0);
@@ -3252,6 +3280,11 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
+        sendingWaybillCount[oldWaybill.senderAddress] = sendingWaybillCount[oldWaybill.senderAddress] - 1; //发货企业
+        sendingWaybillCount[oldWaybill.receiverAddress] = sendingWaybillCount[oldWaybill.receiverAddress] - 1; //收货企业
+        sendingWaybillCount[oldWaybill.logisticsAddress] = sendingWaybillCount[oldWaybill.logisticsAddress] - 1; //物流
+
+
         //TODO 更新订单中的运单状态为已完成
         orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_RECEIVED, txSerialNo, operateTime);
 
@@ -3282,11 +3315,30 @@ contract WayBillContract {
         //
         orderNoToStatusTransIdList[orderNo].push(statusTransId);
         //
+        requestingWaybillCount[oldWaybill.senderAddress] = requestingWaybillCount[oldWaybill.senderAddress] - 1; //发货企业
+        requestingWaybillCount[oldWaybill.receiverAddress] = requestingWaybillCount[oldWaybill.receiverAddress] - 1; //收货企业
+        requestingWaybillCount[oldWaybill.logisticsAddress] = requestingWaybillCount[oldWaybill.logisticsAddress] - 1; //物流
 
         //TODO 更新订单中的运单状态为已拒绝
         orderContract.updateOrderState(orderNo, "wayBillState", WAYBILL_REJECTED, "", 0);
 
         return (CODE_SUCCESS);
+    }
+
+    function getAllWaybillCount() returns(uint code, uint count){
+        return (CODE_SUCCESS, allWaybillCount[msg.sender]);
+    }
+
+    function getWaitingWaybillCount() returns(uint code, uint count){
+        return (CODE_SUCCESS, waitingWaybillCount[msg.sender]);
+    }
+
+    function getRequestingWaybillCount() returns(uint code, uint count){
+        return (CODE_SUCCESS, requestingWaybillCount[msg.sender]);
+    }
+
+    function getSendingWaybillCount() returns(uint code, uint count){
+        return (CODE_SUCCESS, sendingWaybillCount[msg.sender]);
     }
 
     //根据订单号查询运单号和物流企业address，供其他合约调用

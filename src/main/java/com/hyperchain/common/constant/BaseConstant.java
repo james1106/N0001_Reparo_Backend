@@ -30,4 +30,11 @@ public class BaseConstant {
     public static final String REPO_BUSI_OUTCOMED = "6";//已出库
 
     public static final String DEFAULT_RATE = "5"; //金融机构默认利率
+
+    public static final String TOKEN_NAME = "token";
+    public static final String COOKIE_PATH = "/";
+    public static final String KEY_ADDRESS = "address";
+    public static final String KEY_TIMESTAMP = "timestamp";
+    public static final String KEY_ROLECODE = "roleCode";
+
 }

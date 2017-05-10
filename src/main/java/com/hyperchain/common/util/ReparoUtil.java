@@ -5,6 +5,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by ldy on 2017/4/24.
@@ -44,5 +47,15 @@ public class ReparoUtil {
         byte[] hashBytes = DigestUtils.md5(BaseConstant.SALT_FOR_PRIVATE_KEY + accountName); //16个字节，128位
         String hash = new String(hashBytes);
         return hash.substring(0, 8); //des密钥为64位，8个字节
+    }
+
+    /**
+     * 生成业务编号
+     * @param prefix 业务编号前缀
+     * @return
+     */
+    public static String generateBusinessNo(String prefix) {
+        String businessNo = prefix + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
+        return businessNo;
     }
 }

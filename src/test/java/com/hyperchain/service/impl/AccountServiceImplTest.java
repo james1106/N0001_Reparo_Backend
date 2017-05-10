@@ -2,10 +2,7 @@ package com.hyperchain.service.impl;
 
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.controller.vo.UserVo;
 import com.hyperchain.dal.entity.UserEntity;
@@ -28,10 +25,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by ldy on 2017/4/7.
@@ -4429,7 +4423,7 @@ public class AccountServiceImplTest extends SpringBaseTest {
     //金融机构设置与修改利率
     @Test
     public void setRateAndGetRate()
-            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
+            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException, UserInvalidException {
         //注册
         String randomString = TestUtil.getRandomString();
         BaseResult<Object> result = accountService.register("financial" + randomString, //unique

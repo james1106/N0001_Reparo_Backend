@@ -5,10 +5,7 @@ import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.WayBillStatus;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
@@ -23,12 +20,10 @@ import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.exception.PropertiesLoadException;
 import com.hyperchain.exception.ReadFileException;
 import com.hyperchain.service.WayBillService;
-import org.apache.velocity.util.ArrayListWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -36,6 +31,28 @@ import java.util.*;
  */
 @Service
 public class WayBillServiceImpl implements WayBillService {
+
+    //合约函数名
+    public static final String FUNCTION_GENERATE_UN_CONFIRMED_WAY_BILL = "generateUnConfirmedWayBill";
+    public static final String FUNCTION_GENERATE_WAY_BILL = "generateWayBill";
+    public static final String FUNCTION_UPDATE_WAY_BILL_STATUS_TO_RECEIVED = "updateWayBillStatusToReceived";
+    public static final String FUNCTION_GET_ALL_WAYBILL_COUNT = "getAllWaybillCount";
+    public static final String FUNCTION_GET_WAITING_WAYBILL_COUNT = "getWaitingWaybillCount";
+    public static final String FUNCTION_GET_REQUESTING_WAYBILL_COUNT = "getRequestingWaybillCount";
+    public static final String FUNCTION_GET_SENDING_WAYBILL_COUNT = "getSendingWaybillCount";
+    public static final String FUNCTION_LIST_WAY_BILL_ORDER_NO = "listWayBillOrderNo";
+    public static final String FUNCTION_GET_WAY_BILL = "getWayBill";
+    //合约返回值key
+    public static final String KEY_LONGS = "longs";
+    public static final String KEY_COUNT = "count";
+    public static final String KEY_ORDER_NO_LIST = "orderNoList";
+    public static final String KEY_STRS = "strs";
+    public static final String KEY_ADDRS = "addrs";
+    public static final String KEY_LOGISTICS_INFO = "logisticsInfo";
+    //订单状态编号后缀
+    public static final String POSTFIX_TX_SERIAL_NO_FINISHED = "03";
+    //运单编号前缀
+    private static final String WAYBILL_NO_PREFIX = "110";
 
     @Autowired
     UserEntityRepository userEntityRepository;
@@ -64,10 +81,13 @@ public class WayBillServiceImpl implements WayBillService {
      * @throws PasswordIllegalParam
      */
     @Override
-    public BaseResult<Object> generateUnConfirmedWaybill(String orderNo, String logisticsEnterpriseName, String senderEnterpriseName, String receiverEnterpriseName, String productName, long productQuantity, double productValue, String senderRepoEnterpriseName, String senderRepoCertNo, String receiverRepoEnterpriseName, String receiverRepoBusinessNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> generateUnConfirmedWaybill(String orderNo, String logisticsEnterpriseName, String senderEnterpriseName, String receiverEnterpriseName, String productName, long productQuantity, double productValue, String senderRepoEnterpriseName, String senderRepoCertNo, String receiverRepoEnterpriseName, String receiverRepoBusinessNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
@@ -92,7 +112,7 @@ public class WayBillServiceImpl implements WayBillService {
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
         ContractKey requestContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String requestContractMethodName = "generateUnConfirmedWayBill";
+        String requestContractMethodName = FUNCTION_GENERATE_UN_CONFIRMED_WAY_BILL;
         Object[] requestContractMethodParams = new Object[5];
         Long[] requestLongs = new Long[3];
         requestLongs[0] = new Date().getTime(); //requestTime
@@ -110,7 +130,7 @@ public class WayBillServiceImpl implements WayBillService {
         requestStrs[2] = senderRepoCertNo; //senderRepoCertNo
         requestStrs[3] = receiverRepoBusinessNo; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
-        requestStrs[5] = generateWayBillNo(); //waybillNo
+        requestStrs[5] = ReparoUtil.generateBusinessNo(WAYBILL_NO_PREFIX); //waybillNo
         requestContractMethodParams[0] = requestLongs;
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
@@ -119,7 +139,7 @@ public class WayBillServiceImpl implements WayBillService {
         String[] requestResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult requestContractResult = ContractUtil.invokeContract(requestContractKey, requestContractMethodName, requestContractMethodParams, requestResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约generateUnConfirmedWayBill返回结果：" + requestContractResult.toString());
+        LogUtil.debug("调用合约generateUnConfirmedWayBill返回结果：" + requestContractResult.toString());
 
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(requestContractResult.getCode());
@@ -134,17 +154,20 @@ public class WayBillServiceImpl implements WayBillService {
      * @return
      */
     @Override
-    public BaseResult<Object> generateConfirmedWaybill(String orderNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> generateConfirmedWaybill(String orderNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
         ContractKey confirmContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String confirmContractMethodName = "generateWayBill";
+        String confirmContractMethodName = FUNCTION_GENERATE_WAY_BILL;
         Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = orderNo; //orderNo
         confirmContractMethodParams[1] = orderNo + WayBillStatus.SENDING.getCode(); //statusTransId: orderNo + WayBillStatus
@@ -153,7 +176,7 @@ public class WayBillServiceImpl implements WayBillService {
         String[] confirmResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult confirmContractResult = ContractUtil.invokeContract(confirmContractKey, confirmContractMethodName, confirmContractMethodParams, confirmResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约generateWayBill返回结果：" + confirmContractResult.toString());
+        LogUtil.debug("调用合约generateWayBill返回结果：" + confirmContractResult.toString());
 
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(confirmContractResult.getCode());
@@ -161,10 +184,13 @@ public class WayBillServiceImpl implements WayBillService {
     }
 
     @Override
-    public BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> updateWayBillStatusToReceived(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         //合约名称
@@ -173,7 +199,7 @@ public class WayBillServiceImpl implements WayBillService {
         String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
 
         ContractKey updateToReceivedContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String updateToReceivedMethodName = "updateWayBillStatusToReceived";
+        String updateToReceivedMethodName = FUNCTION_UPDATE_WAY_BILL_STATUS_TO_RECEIVED;
         Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = orderNo; //orderNo
         updateToReceivedMethodParams[1] = orderNo + WayBillStatus.RECEIVED.getCode(); //statusTransId: orderNo + WayBillStatus
@@ -181,14 +207,110 @@ public class WayBillServiceImpl implements WayBillService {
         updateToReceivedMethodParams[3] = accountContractAddr; //accountContractAddr
         updateToReceivedMethodParams[4] = repoContractAddr; //repoContractAddr
         updateToReceivedMethodParams[5] = orderContractAddr; //orderContractAddr
-        updateToReceivedMethodParams[6] = orderNo + "03"; //txSerialNo
+        updateToReceivedMethodParams[6] = orderNo + POSTFIX_TX_SERIAL_NO_FINISHED; //txSerialNo
         String[] updateToReceivedResultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult updateToReceivedResult = ContractUtil.invokeContract(updateToReceivedContractKey, updateToReceivedMethodName, updateToReceivedMethodParams, updateToReceivedResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
+        LogUtil.debug("调用合约updateWayBillStatusToReceived返回结果：" + updateToReceivedResult.toString());
 
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithoutValue(updateToReceivedResult.getCode());
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> getAllWayBillCount(String address) throws UserInvalidException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //用户信息
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        String methodName = FUNCTION_GET_ALL_WAYBILL_COUNT;
+        Object[] methodParams = new Object[0];
+        String[] resultMapKey = new String[]{KEY_COUNT};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, methodParams, resultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        LogUtil.debug("调用合约getAllWaybillCount返回结果：" + contractResult.toString());
+
+        int count = Integer.parseInt((String)contractResult.getValue().get(0));
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(contractResult.getCode(), count);
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> getWaitingWayBillCount(String address) throws UserInvalidException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //用户信息
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        String methodName = FUNCTION_GET_WAITING_WAYBILL_COUNT;
+        Object[] methodParams = new Object[0];
+        String[] resultMapKey = new String[]{"count"};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, methodParams, resultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        LogUtil.debug("调用合约getWaitingWaybillCount返回结果：" + contractResult.toString());
+
+        int count = Integer.parseInt((String)contractResult.getValue().get(0));
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(contractResult.getCode(), count);
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> getRequestingWayBillCount(String address) throws UserInvalidException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //用户信息
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        String methodName = FUNCTION_GET_REQUESTING_WAYBILL_COUNT;
+        Object[] methodParams = new Object[0];
+        String[] resultMapKey = new String[]{KEY_COUNT};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, methodParams, resultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        LogUtil.debug("调用合约getRequestingWaybillCount返回结果：" + contractResult.toString());
+
+        int count = Integer.parseInt((String)contractResult.getValue().get(0));
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(contractResult.getCode(), count);
+        return baseResult;
+    }
+
+    @Override
+    public BaseResult<Object> getSendingWayBillCount(String address) throws UserInvalidException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+        //用户信息
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
+        String accountJson = userEntity.getPrivateKey();
+        String accountName = userEntity.getAccountName();
+
+        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        String methodName = FUNCTION_GET_SENDING_WAYBILL_COUNT;
+        Object[] methodParams = new Object[0];
+        String[] resultMapKey = new String[]{KEY_COUNT};
+        // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
+        ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, methodParams, resultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
+        LogUtil.debug("调用合约getSendingWaybillCount返回结果：" + contractResult.toString());
+
+        int count = Integer.parseInt((String)contractResult.getValue().get(0));
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(contractResult.getCode(), count);
         return baseResult;
     }
 
@@ -199,10 +321,13 @@ public class WayBillServiceImpl implements WayBillService {
      * @return
      */
     @Override
-    public BaseResult<Object> getAllRelatedWayBillDetail(HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> getAllRelatedWayBillDetail(HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException, QueryNotExistUserException {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         //合约名称
@@ -210,14 +335,14 @@ public class WayBillServiceImpl implements WayBillService {
 
         //获取所有用户相关运单的订单号列表
         ContractKey listOrderNoContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String listOrderNoContractMethodName = "listWayBillOrderNo";
+        String listOrderNoContractMethodName = FUNCTION_LIST_WAY_BILL_ORDER_NO;
         Object[] listOrderNoContractMethodParams = new Object[1];
         listOrderNoContractMethodParams[0] = accountContractAddr; //accountContractAddr
-        String[] listOrderNoResultMapKey = new String[]{"orderNoList"};
+        String[] listOrderNoResultMapKey = new String[]{KEY_ORDER_NO_LIST};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult listOrderNoContractResult = ContractUtil.invokeContract(listOrderNoContractKey, listOrderNoContractMethodName, listOrderNoContractMethodParams, listOrderNoResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约listWayBillOrderNo返回结果：" + listOrderNoContractResult.toString());
-        List<String> orderNoList = (List<String>)listOrderNoContractResult.getValue().get(0);
+        LogUtil.debug("调用合约listWayBillOrderNo返回结果：" + listOrderNoContractResult.toString());
+        List<String> orderNoList = (List<String>) listOrderNoContractResult.getValue().get(0);
 
         //查询订单号列表失败
         if (listOrderNoContractResult.getCode() != Code.SUCCESS) {
@@ -229,18 +354,19 @@ public class WayBillServiceImpl implements WayBillService {
         //查询订单号列表成功
         //根据订单号获取运单详情
         List<WayBillDetailVo> wayBillDetailVoList = new ArrayList<>();
-        for (int i = orderNoList.size() - 1; i >= 0 ; i--) {
-            LogUtil.info("运单订单号" + i + " : " + orderNoList.get(i));
+        //按时间最新排序
+        for (int i = orderNoList.size() - 1; i >= 0; i--) {
+            LogUtil.debug("运单订单号" + i + " : " + orderNoList.get(i));
 
             ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-            String waybillContractMethodName = "getWayBill";
+            String waybillContractMethodName = FUNCTION_GET_WAY_BILL;
             Object[] waybillContractMethodParams = new Object[2];
             waybillContractMethodParams[0] = orderNoList.get(i); //orderNo
             waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
-            String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
+            String[] waybillResultMapKey = new String[]{KEY_LONGS, KEY_STRS, KEY_ADDRS, KEY_LOGISTICS_INFO};
             // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
             ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-            LogUtil.info("调用合约getWayBill返回结果：" + waybillContractResult.toString());
+            LogUtil.debug("调用合约getWayBill返回结果：" + waybillContractResult.toString());
             WayBillDetailVo wayBillDetailVo = parseContractResultToWayBillDetailVo(waybillContractResult);
             wayBillDetailVoList.add(wayBillDetailVo);
         }
@@ -252,46 +378,44 @@ public class WayBillServiceImpl implements WayBillService {
     }
 
     @Override
-    public BaseResult<Object> getWayBillDetailByOrderNo(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    public BaseResult<Object> getWayBillDetailByOrderNo(String orderNo, HttpServletRequest request) throws ReadFileException, PropertiesLoadException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException, QueryNotExistUserException {
         //用户信息
         String address = TokenUtil.getAddressFromCookie(request);
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
         ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String waybillContractMethodName = "getWayBill";
+        String waybillContractMethodName = FUNCTION_GET_WAY_BILL;
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNo; //orderNo
         waybillContractMethodParams[1] = accountContractAddr; //accountContractAddr
-        String[] waybillResultMapKey = new String[]{"longs", "strs", "addrs", "logisticsInfo"};
+        String[] waybillResultMapKey = new String[]{KEY_LONGS, KEY_STRS, KEY_ADDRS, KEY_LOGISTICS_INFO};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult waybillContractResult = ContractUtil.invokeContract(waybillContractKey, waybillContractMethodName, waybillContractMethodParams, waybillResultMapKey, BaseConstant.CONTRACT_NAME_WAYBILL);
-        LogUtil.info("调用合约getWayBill返回结果：" + waybillContractResult.toString());
+        LogUtil.debug("调用合约getWayBill返回结果：" + waybillContractResult.toString());
         WayBillDetailVo wayBillDetailVo = parseContractResultToWayBillDetailVo(waybillContractResult);
         BaseResult<Object> baseResult = new BaseResult<>();
         baseResult.returnWithValue(waybillContractResult.getCode(), wayBillDetailVo);
         return baseResult;
     }
 
-    private String generateWayBillNo() {
-        String waybillNo = "110" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
-        return waybillNo;
-    }
-
-    private WayBillDetailVo parseContractResultToWayBillDetailVo(ContractResult waybillContractResult) {
+    private WayBillDetailVo parseContractResultToWayBillDetailVo(ContractResult waybillContractResult) throws UserInvalidException, QueryNotExistUserException {
 
         if (waybillContractResult.getCode() != Code.SUCCESS) {
             return null;
         }
 
         Map<String, Object> waybillResultValueMap = waybillContractResult.getValueMap();
-        List<String> longs = (List<String>) waybillResultValueMap.get("longs");
-        List<String> strs = (List<String>) waybillResultValueMap.get("strs");
-        List<String> addrs = (List<String>) waybillResultValueMap.get("addrs");
-        List<String> logisticsInfo = (List<String>) waybillResultValueMap.get("logisticsInfo");
+        List<String> longs = (List<String>) waybillResultValueMap.get(KEY_LONGS);
+        List<String> strs = (List<String>) waybillResultValueMap.get(KEY_STRS);
+        List<String> addrs = (List<String>) waybillResultValueMap.get(KEY_ADDRS);
+        List<String> logisticsInfo = (List<String>) waybillResultValueMap.get(KEY_LOGISTICS_INFO);
 
         WayBillDetailVo wayBillDetailVo = new WayBillDetailVo();
 //        System.out.println("productQuantity: " + longs.get(0));
@@ -314,7 +438,7 @@ public class WayBillServiceImpl implements WayBillService {
 //        System.out.println("receiverRepoAddress: " + addrs.get(4));
 //        System.out.println("logisticsInfo: " + logisticsInfo);
 
-        if(Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()){ //只有发货待确认(卖家填完发货申请单)之后才有的数据
+        if (Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()) { //只有发货待确认(卖家填完发货申请单)之后才有的数据
             UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
             wayBillDetailVo.setLogisticsEnterpriseName(logisticsUserEntity.getCompanyName());
             wayBillDetailVo.setWayBillNo(strs.get(1));
@@ -331,13 +455,16 @@ public class WayBillServiceImpl implements WayBillService {
         wayBillDetailVo.setProductName(strs.get(2));
         wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
         wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));
-        UserEntity senderUserEntity = userEntityRepository.findByAddress(addrs.get(1).substring(1, addrs.get(1).length()));
-        wayBillDetailVo.setSenderEnterpriseName(senderUserEntity.getCompanyName());
+        UserEntity senderUserEntity = userEntityRepository.findByAddress(addrs.get(1).substring(1, addrs.get(1).length())); //返回address类型的数据是"x"开头（其实应该是"0x"，ESDK中把字符串开头的"0"都去掉了），需要把"x"去掉
         UserEntity receiverUserEntity = userEntityRepository.findByAddress(addrs.get(2).substring(1, addrs.get(2).length()));
-        wayBillDetailVo.setReceiverEnterpriseName(receiverUserEntity.getCompanyName());
         UserEntity senderRepoUserEntity = userEntityRepository.findByAddress(addrs.get(3).substring(1, addrs.get(3).length()));
-        wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
         UserEntity receiverRepoUserEntity = userEntityRepository.findByAddress(addrs.get(4).substring(1, addrs.get(4).length()));
+        if (null == senderRepoUserEntity || null == receiverRepoUserEntity || null == senderUserEntity || null == receiverUserEntity) {
+            throw new QueryNotExistUserException();
+        }
+        wayBillDetailVo.setSenderEnterpriseName(senderUserEntity.getCompanyName());
+        wayBillDetailVo.setReceiverEnterpriseName(receiverUserEntity.getCompanyName());
+        wayBillDetailVo.setSenderRepoEnterpriseName(senderRepoUserEntity.getCompanyName());
         wayBillDetailVo.setReceiverRepoEnterpriseName(receiverRepoUserEntity.getCompanyName());
         //历史状态
         int wayBillStatus = Integer.parseInt(longs.get(7));

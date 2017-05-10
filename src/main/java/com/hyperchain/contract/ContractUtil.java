@@ -49,15 +49,15 @@ public class ContractUtil {
             LogUtil.error(e);
             LogUtil.error("调用合约方法失败。\n*合约公私钥=" + contractKey + "\n*合约方法名=" + methodName + "\n*参数=" + Arrays.toString(params) + "\n*返回值名=" + Arrays.toString(resultMapKey));
             if (CommonUtil.isNotEmpty(e.getMessage())&&e.getMessage().contains("Given final block not properly padded")){
-                throw new PasswordIllegalParam(Code.INVALID_PASSWORD);
+                throw new PasswordIllegalParam();
             }else{
-                throw new ContractInvokeFailException(Code.HYPERCHAIN_ERROR);
+                throw new ContractInvokeFailException();
             }
         }
         // 如果返回结果为空，返回null
         if (CommonUtil.isEmpty(lists)) {
             LogUtil.error("调用合约方法返回为空。\n*合约公私钥=" + contractKey + "\n*合约方法名=" + methodName + "\n*参数=" + Arrays.toString(params) + "\n*返回值名=" + Arrays.toString(resultMapKey));
-            throw new ValueNullException(Code.HYPERCHAIN_ERROR, "调用合约方法返回为空。");
+            throw new ValueNullException();
         } else {
             // 将返回的整数转化为枚举类型Code
             int codeInt = Integer.parseInt(lists.get(0).toString());

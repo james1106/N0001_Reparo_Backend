@@ -10,11 +10,7 @@ import org.apache.poi.ss.formula.functions.T;
  * Created by linbo on 16/12/15.
  */
 public class ValueNullException extends BaseException {
-    public ValueNullException(Code code) {
-        super(code);
-    }
-
-    public ValueNullException(Code code, String errorValue) {
-        super(code, errorValue);
+    public ValueNullException() {
+        super(Code.HYPERCHAIN_ERROR, "调用合约方法返回为空");
     }
 }
