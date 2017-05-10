@@ -6,10 +6,7 @@ import com.hyperchain.common.constant.AccountStatus;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.Role;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
@@ -31,11 +28,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.jvm.hotspot.tools.FinalizerInfo;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -47,6 +44,13 @@ import java.util.List;
  */
 @Service
 public class AccountServiceImpl implements AccountService {
+
+    //合约方法名
+    public static final String FUNCTION_NEW_ACCOUNT = "newAccount";
+    public static final String FUNCTION_GET_RATE = "getRate";
+    public static final String FUNCTION_SET_RATE = "setRate";
+    //合约返回值key
+    public static final String KEY_RATE = "rate";
 
     @Autowired
     private UserEntityRepository userEntityRepository;
@@ -64,22 +68,22 @@ public class AccountServiceImpl implements AccountService {
         if (isPhoneExist(phone)) {
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(Code.PHONE_ALREADY_EXIST);
-            LogUtil.info("手机号已存在：" + phone);
+            LogUtil.debug("手机号已存在：" + phone);
             return baseResult;
         }
 
         //生成验证码并存入数据库
         String securityCode = generateSecurityCode(100000, 999999);
-        LogUtil.info("生成验证码：" + securityCode);
+        LogUtil.debug("生成验证码：" + securityCode);
         long securityCodeId = saveSecurityCode(phone, securityCode);
-        LogUtil.info("验证码id：" + securityCodeId);
+        LogUtil.debug("验证码id：" + securityCodeId);
 
         //请求第三方发送验证码，并返回验证码id
         try {
             sendSecurityCode(phone, securityCode);
             BaseResult<Object> baseResult = new BaseResult<Object>();
             baseResult.returnWithValue(Code.SUCCESS, securityCodeId);
-            LogUtil.info("生成验证码返回：" + baseResult.toString());
+            LogUtil.debug("生成验证码返回：" + baseResult.toString());
             return baseResult;
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,6 +95,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Transactional
     @Override
     public BaseResult<Object> register(String accountName,
                                        String password,
@@ -107,12 +112,12 @@ public class AccountServiceImpl implements AccountService {
                                        String acctSvcrName,
                                        HttpServletRequest request,
                                        HttpServletResponse response)
-            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
+            throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException, UserInvalidException {
         //判断用户名 或 手机号 或 企业名称 或 开户行账号 是否存在
         if (isAccountExist(accountName) || isPhoneExist(phone) || isCompanyExist(enterpriseName) || isAcctIdExist(acctIds)) {
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(Code.ACCOUNT_ALREADY_EXIST);
-            LogUtil.info("账户已存在");
+            LogUtil.debug("账户已存在");
             return baseResult;
         }
 
@@ -133,56 +138,59 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+    public BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException {
         UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
-
         //用户不存在
         if (null == userEntity) {
-            LogUtil.info("用户不存在");
+            LogUtil.debug("用户不存在");
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(Code.INVALID_USER);
             return baseResult;
         }
-
-        AccountEntity accountEntity = accountEntityRepository.findByAddress(userEntity.getAddress()).get(0); //TODO 暂时每个address只有一个账号
+        List<AccountEntity> accountEntityList = accountEntityRepository.findByAddress(userEntity.getAddress());
+        if (null == accountEntityList) {
+            throw new UserInvalidException();
+        }
+        AccountEntity accountEntity = accountEntityList.get(0); //TODO 暂时每个address只有一个账号
 
         //用户已被锁定
         if (AccountStatus.LOCK.getCode() == userEntity.getUserStatus()) {
-            LogUtil.info("用户在锁定状态");
+            LogUtil.debug("用户在锁定状态");
             Date currentDate = new Date();
 //            Date lockDate = DateUtils.addMinutes(currentDate, -5); // 锁定时间为为5分钟
             Date lockDate = DateUtils.addSeconds(currentDate, BaseConstant.ACCOUNT_LOCK_SECOND); // 锁定时间
             if (lockDate.getTime() <= userEntity.getLockTime()) { //在锁定时间内
-                LogUtil.info("在锁定时间内");
+                LogUtil.debug("在锁定时间内");
                 BaseResult<Object> baseResult = new BaseResult<>();
                 baseResult.returnWithoutValue(Code.ACCOUNT_STATUS_LOCK);
                 return baseResult;
-            } else { //锁定时间过期
-                //解锁
-                LogUtil.info("锁定时间过期，解锁");
-                userEntity.setUserStatus(AccountStatus.VALID.getCode());
-                userEntityRepository.save(userEntity);
-                //正常检查密码登录
-                Code resultCode = checkPassword(userEntity, accountName, password);
-                if (resultCode != Code.SUCCESS) { //密码不正确
-                    BaseResult<Object> baseResult = new BaseResult<>();
-                    baseResult.returnWithoutValue(resultCode);
-                    return baseResult;
-                } else { //密码正确：生成token
-                    String address = userEntity.getAddress();
-                    String token = TokenUtil.generateToken(address, userEntity.getRoleCode());
-                    LogUtil.info("生成token：" + token);
-                    //把token存到cookie中
-                    Cookie cookie = new Cookie("token", token);
-                    cookie.setPath("/");
-                    response.addCookie(cookie);
-                    //返回成功状态和用户信息
-                    UserVo userVo = new UserVo(userEntity, accountEntity);
-                    BaseResult<Object> baseResult = new BaseResult<>();
-                    baseResult.returnWithValue(resultCode, userVo);
-                    return baseResult;
-                }
             }
+            //锁定时间过期
+            //解锁
+            LogUtil.debug("锁定时间过期，解锁");
+            userEntity.setUserStatus(AccountStatus.VALID.getCode());
+            userEntityRepository.save(userEntity);
+
+            //正常检查密码登录
+            Code resultCode = checkPassword(userEntity, accountName, password);
+            if (resultCode != Code.SUCCESS) { //密码不正确
+                BaseResult<Object> baseResult = new BaseResult<>();
+                baseResult.returnWithoutValue(resultCode);
+                return baseResult;
+            }
+            //密码正确：生成token
+            String address = userEntity.getAddress();
+            String token = TokenUtil.generateToken(address, userEntity.getRoleCode());
+            LogUtil.debug("生成token：" + token);
+            //把token存到cookie中
+            Cookie cookie = new Cookie(BaseConstant.TOKEN_NAME, token);
+            cookie.setPath(BaseConstant.COOKIE_PATH);
+            response.addCookie(cookie);
+            //返回成功状态和用户信息
+            UserVo userVo = new UserVo(userEntity, accountEntity);
+            BaseResult<Object> baseResult = new BaseResult<>();
+            baseResult.returnWithValue(resultCode, userVo);
+            return baseResult;
         }
 
         //正常检查密码登录
@@ -191,18 +199,19 @@ public class AccountServiceImpl implements AccountService {
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(resultCode);
             return baseResult;
-        } else { //密码正确：生成token
-            //把token存到cookie中
-            setTokenToCookie(userEntity.getAddress(), userEntity.getRoleCode(), request, response);
-            //返回成功状态和用户信息
-            UserVo userVo = new UserVo(userEntity, accountEntity);
-            if (userVo.getRoleCode() == Role.FINANCE.getCode()) {
-                userVo.setRate(getRate(userEntity.getPrivateKey(), userEntity.getAccountName()));
-            }
-            BaseResult<Object> baseResult = new BaseResult<>();
-            baseResult.returnWithValue(resultCode, userVo);
-            return baseResult;
         }
+        //密码正确：生成token
+        //把token存到cookie中
+        setTokenToCookie(userEntity.getAddress(), userEntity.getRoleCode(), request, response);
+        //返回成功状态和用户信息
+        UserVo userVo = new UserVo(userEntity, accountEntity);
+        if (userVo.getRoleCode() == Role.FINANCE.getCode()) {
+//                userVo.setRate(getRateFromHyperchain(userEntity.getPrivateKey(), userEntity.getAccountName()));
+            userVo.setRate(userEntity.getRate());
+        }
+        BaseResult<Object> baseResult = new BaseResult<>();
+        baseResult.returnWithValue(resultCode, userVo);
+        return baseResult;
     }
 
     @Override
@@ -223,10 +232,14 @@ public class AccountServiceImpl implements AccountService {
         return baseResult;
     }
 
+    @Transactional
     @Override
-    public BaseResult<Object> setRateForFinancial(String rate, String address) throws ContractInvokeFailException, PasswordIllegalParam, PrivateKeyIllegalParam, ValueNullException {
+    public BaseResult<Object> setRateForFinancial(String rate, String address) throws ContractInvokeFailException, PasswordIllegalParam, PrivateKeyIllegalParam, ValueNullException, UserInvalidException {
         //用户信息
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
@@ -297,7 +310,7 @@ public class AccountServiceImpl implements AccountService {
         AccountEntity accountEntity = accountEntityRepository.findByAcctId(acctId);
         if (accountEntity == null) {
             return false;
-        }else {
+        } else {
             return true;
         }
     }
@@ -353,7 +366,7 @@ public class AccountServiceImpl implements AccountService {
 
         //验证码不存在
         if (securityCodeEntity == null) {
-            LogUtil.info("验证码不存在");
+            LogUtil.debug("验证码不存在");
             return Code.NON_EXIST_SECURITY_CODE;
         }
 
@@ -361,21 +374,21 @@ public class AccountServiceImpl implements AccountService {
         Date currentDate = new Date();
         Date validDate = DateUtils.addMinutes(currentDate, -5); // 有效期为5分钟
         if (validDate.getTime() > securityCodeEntity.getCreateTime()) {
-            LogUtil.info("验证码已过期");
-            LogUtil.info("需要重新发送验证码");
+            LogUtil.debug("验证码已过期");
+            LogUtil.debug("需要重新发送验证码");
             securityCodeEntityRepository.delete(securityCodeEntity);
             return Code.INVALID_SECURITY_CODE;
         }
 
         //验证码存在但不一致
         if (!securityCodeEntity.getSecurityCode().equals(securityCode)) {
-            LogUtil.info("验证码不一致");
+            LogUtil.debug("验证码不一致");
             if (securityCodeEntity.getErrorCodeCount() >= 3) {
-                LogUtil.info("需要重新发送验证码");
+                LogUtil.debug("需要重新发送验证码");
                 securityCodeEntityRepository.delete(securityCodeEntity);
                 return Code.INVALID_SECURITY_CODE;
             } else {
-                LogUtil.info("还可以重新输入验证码：" + (2 - securityCodeEntity.getErrorCodeCount()) + "次");
+                LogUtil.debug("还可以重新输入验证码：" + (2 - securityCodeEntity.getErrorCodeCount()) + "次");
                 Code code = Code.WRONG_SECURITY_CODE;
                 code.setMsg(code.getMsg() + (2 - securityCodeEntity.getErrorCodeCount()) + "次");
                 securityCodeEntity.setErrorCodeCount(securityCodeEntity.getErrorCodeCount() + 1);
@@ -392,6 +405,7 @@ public class AccountServiceImpl implements AccountService {
     /**
      * 存储账户信息到数据库和区块链
      */
+    @Transactional
     private ContractResult saveAccount(String accountName,
                                        String password,
                                        String companyName,
@@ -426,7 +440,7 @@ public class AccountServiceImpl implements AccountService {
         userEntity.setPrivateKey(accountJson);
         userEntity.setRate(rate);
         UserEntity savedUserEntity = userEntityRepository.save(userEntity);
-        LogUtil.info("存入数据库user表：" + savedUserEntity.toString());
+        LogUtil.debug("存入数据库user表：" + savedUserEntity.toString());
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setAddress(address);
         accountEntity.setCertType(certType);
@@ -436,11 +450,11 @@ public class AccountServiceImpl implements AccountService {
         accountEntity.setAcctSvcr(acctSvcr);
         accountEntity.setAcctSvcrName(acctSvcrName);
         AccountEntity savedAccountEntity = accountEntityRepository.save(accountEntity);
-        LogUtil.info("存入数据库account表：" + savedAccountEntity.toString());
+        LogUtil.debug("存入数据库account表：" + savedAccountEntity.toString());
 
         //账户信息存储到区块链
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String contractMethodName = "newAccount";
+        String contractMethodName = FUNCTION_NEW_ACCOUNT;
         Object[] contractMethodParams = new Object[11];
         contractMethodParams[0] = accountName;
         contractMethodParams[1] = companyName;
@@ -456,7 +470,7 @@ public class AccountServiceImpl implements AccountService {
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
-        LogUtil.info("调用合约newAccount返回code：" + contractResult.getCode());
+        LogUtil.debug("调用合约newAccount返回code：" + contractResult.getCode());
         return contractResult;
     }
 
@@ -466,11 +480,11 @@ public class AccountServiceImpl implements AccountService {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
+                if (cookie.getName().equals(BaseConstant.TOKEN_NAME)) {
                     String token = TokenUtil.generateToken(address, roleCode);
-                    LogUtil.info("生成token：" + token);
+                    LogUtil.debug("生成token：" + token);
                     cookie.setValue(token);
-                    cookie.setPath("/");
+                    cookie.setPath(BaseConstant.COOKIE_PATH);
                     response.addCookie(cookie);
                     isSet = true;
                 }
@@ -478,9 +492,9 @@ public class AccountServiceImpl implements AccountService {
         }
         if (isSet == false) {
             String token = TokenUtil.generateToken(address, roleCode);
-            LogUtil.info("生成token：" + token);
-            Cookie cookie = new Cookie("token", token);
-            cookie.setPath("/");
+            LogUtil.debug("生成token：" + token);
+            Cookie cookie = new Cookie(BaseConstant.TOKEN_NAME, token);
+            cookie.setPath(BaseConstant.COOKIE_PATH);
             response.addCookie(cookie);
         }
     }
@@ -496,16 +510,16 @@ public class AccountServiceImpl implements AccountService {
     private Code checkPassword(UserEntity userEntity, String accountName, String password) {
         //密码不正确
         if (!DigestUtils.md5Hex(password + BaseConstant.SALT_FOR_PASSWORD + accountName).equals(userEntity.getPassword())) {
-            LogUtil.info("用户密码不正确");
+            LogUtil.debug("用户密码不正确");
             if (userEntity.getErrorPasswordCount() >= 3) { //连续输错密码三次
                 userEntity.setErrorPasswordCount(0);
                 userEntity.setLockTime(new Date().getTime());
                 userEntity.setUserStatus(AccountStatus.LOCK.getCode());
-                LogUtil.info("连续输错密码三次，账户被锁定");
+                LogUtil.debug("连续输错密码三次，账户被锁定");
                 userEntityRepository.save(userEntity);
                 return Code.ACCOUNT_STATUS_LOCK;
             } else {
-                LogUtil.info("密码错误次数 + 1");
+                LogUtil.debug("密码错误次数 + 1");
                 userEntity.setErrorPasswordCount(userEntity.getErrorPasswordCount() + 1);
                 userEntityRepository.save(userEntity);
                 return Code.ERROR_PASSWORD;
@@ -519,34 +533,49 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-    private String getRate(String accountJson, String accountName) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        //账户信息存储到区块链
+    /**
+     * 从区块链获取金融机构利率
+     *
+     * @param accountJson
+     * @param accountName
+     * @return
+     * @throws PrivateKeyIllegalParam
+     * @throws ReadFileException
+     * @throws PropertiesLoadException
+     * @throws ContractInvokeFailException
+     * @throws ValueNullException
+     * @throws PasswordIllegalParam
+     */
+    private String getRateFromHyperchain(String accountJson, String accountName) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String contractMethodName = "getRate";
+        String contractMethodName = FUNCTION_GET_RATE;
         Object[] contractMethodParams = new Object[0];
-        String[] resultMapKey = new String[]{"rate"};
+        String[] resultMapKey = new String[]{KEY_RATE};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
-        LogUtil.info("调用合约getRate返回：" + contractResult.toString());
+        LogUtil.debug("调用合约getRate返回：" + contractResult.toString());
         List<Object> resultList = contractResult.getValue();
-        return (String)resultList.get(0);
+        return (String) resultList.get(0);
     }
 
-    private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
+    private ContractResult setRate(String accountJson, String accountName, String rate) throws PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam, UserInvalidException {
+
+        //更新数据库账户利率
+        UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
+        if (null == userEntity) {
+            throw new UserInvalidException();
+        }
+        userEntity.setRate(rate);
+        userEntityRepository.save(userEntity);
 
         //更新区块链账户利率
         ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
-        String contractMethodName = "setRate";
+        String contractMethodName = FUNCTION_SET_RATE;
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = rate;
         String[] resultMapKey = new String[]{};
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, resultMapKey, BaseConstant.CONTRACT_NAME_ACCOUNT);
-
-        //更新数据库账户利率
-        UserEntity userEntity = userEntityRepository.findByAccountName(accountName);
-        userEntity.setRate(rate);
-        userEntityRepository.save(userEntity);
 
         return contractResult;
     }

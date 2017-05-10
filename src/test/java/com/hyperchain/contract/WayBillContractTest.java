@@ -4,10 +4,7 @@ import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.WayBillStatus;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.dal.entity.AccountEntity;
@@ -65,7 +62,7 @@ public class WayBillContractTest extends SpringBaseTest {
 
 
     @Before
-    public void init() throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException {
+    public void init() throws PasswordIllegalParam, GeneralSecurityException, PrivateKeyIllegalParam, ContractInvokeFailException, IOException, ValueNullException, ReadFileException, PropertiesLoadException, UserInvalidException {
         //发货企业注册
         String randomString = TestUtil.getRandomString();
         BaseResult<Object> result = accountService.register("account" + randomString, //unique

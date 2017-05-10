@@ -11,7 +11,7 @@ public enum Code {
     INVALID_USER(2, "账户不存在，该用户可能未注册或已失效"),
     PARAMETER_EMPTY(3, "入参为空"),
     UNKNOWN_ABNORMAL(4,"未知异常"),
-    ENTITY_EMPTY(5, "未找到数据表对应实体"),
+    QUERY_USER_ERROR(5,"获取账户信息异常"),
 
     HYPERCHAIN_ERROR(15, "区块链异常"),
     INVALID_PARAM_PRIVATE_KEY(16, "参数输入错误：私钥private-key"),
@@ -72,8 +72,7 @@ public enum Code {
     PAYER_REPOBUSI_STATE_ERROR(1003,"买方仓储状态错误"),
     NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人"),
     DISOCOUNT_BANK_NOT_EXITS(1041,"贴现金融机构不存在"),
-    DISCOUNTAMOUNT_NOT_MATCH(1042,"实际贴现金额不等于票面金额*（1-贴现利率）"),
-    RETURN_VALUE_EMPTY(1043,"合约返回数组为空");
+    DISCOUNTAMOUNT_NOT_MATCH(1042,"实际贴现金额不等于票面金额*（1-贴现利率）");
 
     private int code;
     private String msg;
@@ -120,10 +119,6 @@ public enum Code {
                 return INVALID_USER;
             case 3:
                 return PARAMETER_EMPTY;
-            case 4:
-                return UNKNOWN_ABNORMAL;
-            case 5:
-                return ENTITY_EMPTY;
 
             case 1032:
                 return SERIALNO_EXIST;
@@ -159,8 +154,6 @@ public enum Code {
                 return DISOCOUNT_BANK_NOT_EXITS;
             case 1042:
                 return DISCOUNTAMOUNT_NOT_MATCH;
-            case 1043:
-                return RETURN_VALUE_EMPTY;
 
             case 2001:
                 return ORDER_NOT_EXIST;
