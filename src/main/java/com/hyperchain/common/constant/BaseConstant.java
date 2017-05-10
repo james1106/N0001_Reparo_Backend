@@ -37,4 +37,10 @@ public class BaseConstant {
     public static final String KEY_TIMESTAMP = "timestamp";
     public static final String KEY_ROLECODE = "roleCode";
 
+    public static final String RECEIVABLE_NO_GENERATE = "120";
+    public static final String SIGNOUT_APPLY_SERIALNO = "121";
+    public static final String SIGNOUT_REPLY_SERIALNO = "122";
+    public static final String DISCOUNT_APPLY_SERIALNO = "123";
+    public static final String DISCOUNT_REPLY_SERIALNO = "124";
+    public static final String CASH_SERIALNO = "125";
 }

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.hyperchain.common.constant.BaseConstant.CONTRACT_NAME_RECEIVABLE;
+import static com.hyperchain.common.constant.BaseConstant.*;
 
 /**
  * Created by YanYufei on 2017/4/9.
@@ -44,14 +44,14 @@ public class ReceivableServiceImpl implements ReceivableService {
     public static final String SIGN_OUT_APPLY = "signOutApply";
     public static final String SIGN_OUT_REPLY = "signOutReply";
     public static final String DISCOUNT_APPLY = "discountApply";
-    public static final String GET_DISCOUNT_BANK_LIST = "getDiscountBankList";
     public static final String DISCOUNT_REPLY = "discountReply";
     public static final String CASH = "cash";
-    public static final String GET_RECEIVABLE_ALL_INFO = "getReceivableAllInfo";
     public static final String GET_RECEIVABLE_ALL_INFO_WITH_SERIAL = "getReceivableAllInfoWithSerial";
-    public static final String GET_RECORD_BY_SERIAL_NO = "getRecordBySerialNo";
-    public static final String GET_RECEIVABLE_HISTORY_SERIAL_NO = "getReceivableHistorySerialNo";
     public static final String RECEIVABLE_SIMPLE_DETAIL_LIST = "receivableSimpleDetailList";
+    //    public static final String GET_DISCOUNT_BANK_LIST = "getDiscountBankList";
+//    public static final String GET_RECEIVABLE_ALL_INFO = "getReceivableAllInfo";
+//    public static final String GET_RECORD_BY_SERIAL_NO = "getRecordBySerialNo";
+//    public static final String GET_RECEIVABLE_HISTORY_SERIAL_NO = "getReceivableHistorySerialNo";
     @Autowired
     AccountEntityRepository accountEntityRepository;
     @Autowired
@@ -60,16 +60,22 @@ public class ReceivableServiceImpl implements ReceivableService {
     //签发申请
     @Override
     public BaseResult<Object> signOutApply(String orderNo, String pyer, String pyee, double isseAmt, long dueDt, String rate, String contractNo, String invoiceNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {//第二个参数是给合约的参数
+        BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
-        UserEntity userEntity = userEntityRepository.findByAddress(address);//todo
+        UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
-        BaseResult<Object> result = new BaseResult<>();
+
         long receivableGenerateTime = System.currentTimeMillis();
-        String receivableNo = "120" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//应收款编号
-        String serialNo = "121" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//签发申请流水号121
+
+        String receivableNo = ReparoUtil.generateBusinessNo(RECEIVABLE_NO_GENERATE);
+        String serialNo = ReparoUtil.generateBusinessNo(SIGN_OUT_APPLY);
         List<String> list = new ArrayList<>();
         list.add(contractNo);
         list.add(invoiceNo);
@@ -92,13 +98,12 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[10] = receivableGenerateTime;
         params[11] = orderContractAddress;
 
-        String methodName = SIGN_OUT_APPLY;
         String[] resultMapKey = new String[]{};
 
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            contractResult = ContractUtil.invokeContract(contractKey, SIGN_OUT_APPLY, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.debug("调用合约ReceivableContract-signOutApply返回结果：" + contractResult.toString());
         } catch (
                 ContractInvokeFailException e) {
@@ -133,10 +138,14 @@ public class ReceivableServiceImpl implements ReceivableService {
 //        }
         BaseResult result = new BaseResult();
         long signOutReplyTime = System.currentTimeMillis();
-        String serialNo = "122" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//签发回复流水号122
+        String serialNo = ReparoUtil.generateBusinessNo(SIGN_OUT_REPLY);
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -155,15 +164,12 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[6] = wayBillContractAddress;
 
 
-        String methodName = SIGN_OUT_REPLY;
         String[] resultMapKey = new String[]{};
 
-
+        ContractResult contractResult = null;
         try {
-            ContractResult contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
-            LogUtil.info("调用合约ReceivableContract-signOutReply返回结果：" + contractResult.toString());
-            Code code = contractResult.getCode();
-            result.returnWithoutValue(code);
+            contractResult = ContractUtil.invokeContract(contractKey, SIGN_OUT_REPLY, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            LogUtil.debug("调用合约ReceivableContract-signOutReply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -171,7 +177,19 @@ public class ReceivableServiceImpl implements ReceivableService {
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
         }
+
+
+//         将合约结果转化为接口返回数据
+        int resultCode = contractResult.getCode().getCode();
+        Code code = Code.fromInt(resultCode);
+        if (code != Code.SUCCESS) {
+            result.returnWithoutValue(code);
+            return result;
+        }
+
+        result.returnWithValue(code, receivableNo);
         return result;//这个result是返回给前端的
+
 
     }
 
@@ -181,11 +199,14 @@ public class ReceivableServiceImpl implements ReceivableService {
         BaseResult<Object> result = new BaseResult<>();
 
         long discountApplyTime = System.currentTimeMillis();
-        String serialNo = "123" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//贴现申请流水号123
+        String serialNo = ReparoUtil.generateBusinessNo(DISCOUNT_APPLY_SERIALNO);
 
-//        ContractKey contractKey = new ContractKey(applicantAddress);
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -203,12 +224,11 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[7] = discountedRate;
 
 
-        String methodName = DISCOUNT_APPLY;
         String[] resultMapKey = new String[]{};
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            contractResult = ContractUtil.invokeContract(contractKey, DISCOUNT_APPLY, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.debug("调用合约ReceivableContract-discountApply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -243,11 +263,14 @@ public class ReceivableServiceImpl implements ReceivableService {
             return result;
         }
         long discountReplyTime = System.currentTimeMillis();
-        String serialNo = "124" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//贴现回复流水号124
-        //String newReceivableNo = "129" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//新生成的应收款编号
+        String serialNo = ReparoUtil.generateBusinessNo(DISCOUNT_REPLY_SERIALNO);
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -265,11 +288,10 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[6] = orderContractAddress;
 
 
-        String methodName = DISCOUNT_REPLY;
         String[] resultMapKey = new String[]{};
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            contractResult = ContractUtil.invokeContract(contractKey, DISCOUNT_REPLY, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.debug("调用合约ReceivableContract-discountReply返回结果：" + contractResult.toString());
 //            Code code = contractResult.getCode();
 //            result.returnWithoutValue(code);
@@ -282,7 +304,11 @@ public class ReceivableServiceImpl implements ReceivableService {
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
-        result.returnWithoutValue(code);
+        if (code != Code.SUCCESS) {
+            result.returnWithoutValue(code);
+            return result;
+        }
+        result.returnWithValue(code, receivableNo);
         return result;//这个result是返回给前端的
 
     }
@@ -293,10 +319,14 @@ public class ReceivableServiceImpl implements ReceivableService {
         BaseResult<Object> result = new BaseResult<>();
 
         long cashTime = System.currentTimeMillis();
-        String serialNo = "125" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//兑付流水号125
+        String serialNo = ReparoUtil.generateBusinessNo(CASH_SERIALNO);
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -311,12 +341,11 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[4] = response;
         params[5] = orderContractAddress;
 
-        String methodName = CASH;
         String[] resultMapKey = new String[]{};
 
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, methodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            contractResult = ContractUtil.invokeContract(contractKey, CASH, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.debug("调用合约ReceivableContract-cash返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -327,6 +356,10 @@ public class ReceivableServiceImpl implements ReceivableService {
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
+        if (code != Code.SUCCESS) {
+            result.returnWithoutValue(code);
+            return result;
+        }
         result.returnWithValue(code, receivableNo);
         return result;//这个result是返回给前端的
 
@@ -338,6 +371,10 @@ public class ReceivableServiceImpl implements ReceivableService {
         BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
+        if (userEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
@@ -359,14 +396,13 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[0] = list1;
         params[1] = list2;
 
-        String contractMethodName = GET_RECEIVABLE_ALL_INFO_WITH_SERIAL;
         String[] resultMapKey = new String[]{"receivable[]", "uint[]", "discounted"};//给返回值取了个名称
 
 
         // 利用（合约钥匙，合约方法名，合约方法参数，合约方法返回值名）获取调用合约结果
         ContractResult contractResult = null;
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
+            contractResult = ContractUtil.invokeContract(contractKey, GET_RECEIVABLE_ALL_INFO_WITH_SERIAL, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.info("调用合约ReceivableContract-getReceivableAllInfoWithSerial返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
@@ -387,11 +423,16 @@ public class ReceivableServiceImpl implements ReceivableService {
 
 
         List<String> partParams0 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);//取的时候是已经去掉了第一个code的情况，所以是从0开始
-        List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);//todo 长度校验
+        if (partParams0.size() == 0) {
+            result.returnWithoutValue(Code.RETURN_VALUE_EMPTY);
+            return result;
+        }
+        List<String> partParams1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        if (partParams1.size() == 0) {
+            result.returnWithoutValue(Code.RETURN_VALUE_EMPTY);
+            return result;
+        }
         int discounted = Integer.parseInt(String.valueOf(contractResult.getValueMap().get(resultMapKey[2])));
-        //String note = (String) contractResult.getValueMap().get(resultMapKey[3]);
-
-//        int t = Integer.parseInt((String)partParams0.get(0));
 
         String receivableNo1 = partParams0.get(0);
         String orderNo = partParams0.get(1);
@@ -421,23 +462,84 @@ public class ReceivableServiceImpl implements ReceivableService {
         List<ReceivableDetailVo> receivableDetailVoList = new ArrayList<>();
         int length = (partParams1.size() - 8) / 2;
         int lastLength = partParams1.size() - 8;
+        long isseAmt;
+        long cashedAmount;
+        long isseDt;
+        long signInDt;
+        long dueDt;
+        long discountInHandAmount;
+        int status;
+        int lastStatus;
+        if (StringUtils.isBlank(partParams1.get(lastLength))) {
+            isseAmt = 0;
+        } else {
+            isseAmt = Long.parseLong(partParams1.get(lastLength));
+        }
 
-        long isseAmt = (partParams1.get(lastLength).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength));
-        long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 1));
-        long isseDt = (partParams1.get(lastLength + 2).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 2));
-        long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 3));
-        long dueDt = (partParams1.get(lastLength + 4).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 4));
-        long discountInHandAmount = (partParams1.get(lastLength + 5).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 5));
-        int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
-        int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
+        if (StringUtils.isBlank(partParams1.get(lastLength + 1))) {
+            cashedAmount = 0;
+        } else {
+            cashedAmount = Long.parseLong(partParams1.get(lastLength + 1));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 2))) {
+            isseDt = 0;
+        } else {
+            isseDt = Long.parseLong(partParams1.get(lastLength + 2));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 3))) {
+            signInDt = 0;
+        } else {
+            signInDt = Long.parseLong(partParams1.get(lastLength + 3));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 4))) {
+            dueDt = 0;
+        } else {
+            dueDt = Long.parseLong(partParams1.get(lastLength + 4));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 5))) {
+            discountInHandAmount = 0;
+        } else {
+            discountInHandAmount = Long.parseLong(partParams1.get(lastLength + 5));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 6))) {
+            status = 0;
+        } else {
+            status = Integer.parseInt(partParams1.get(lastLength + 6));
+        }
+
+        if (StringUtils.isBlank(partParams1.get(lastLength + 7))) {
+            lastStatus = 0;
+        } else {
+            lastStatus = Integer.parseInt(partParams1.get(lastLength + 7));
+        }
+//        long isseAmt = (partParams1.get(lastLength).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength));
+//        long cashedAmount = (partParams1.get(lastLength + 1).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 1));
+//        long isseDt = (partParams1.get(lastLength + 2).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 2));
+//        long signInDt = (partParams1.get(lastLength + 3).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 3));
+//        long dueDt = (partParams1.get(lastLength + 4).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 4));
+//        long discountInHandAmount = (partParams1.get(lastLength + 5).equals("")) ? 0L : Long.parseLong(partParams1.get(lastLength + 5));
+//        int status = (partParams1.get(lastLength + 6).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 6));
+//        int lastStatus = (partParams1.get(lastLength + 7).equals("")) ? 0 : Integer.parseInt(partParams1.get(lastLength + 7));
 
         String isseAmtYuan = ReparoUtil.convertCentToYuan(isseAmt);
         String cashedAmountYuan = ReparoUtil.convertCentToYuan(cashedAmount);
         String discountInHandAmountYuan = ReparoUtil.convertCentToYuan(discountInHandAmount);
 
         AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
+        if (pyerAccountEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);//todo
-
+        if (pyeeAccountEntity == null) {
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
+            return result;
+        }
         String pyerAddress = pyerAccountEntity.getAddress();
         String pyeeAddress = pyeeAccountEntity.getAddress();
         String pyerAcctSvcrName = pyerAccountEntity.getAcctSvcrName();//付款人开户行
@@ -491,8 +593,16 @@ public class ReceivableServiceImpl implements ReceivableService {
 
         for (int i = 0; i < length; i++) {
             ReceivableSimpleSerialVo receivableSimpleSerialVo = new ReceivableSimpleSerialVo();
-            receivableSimpleSerialVo.setReceivableStatus(Integer.parseInt(partParams1.get(i * 2)));//todo
-            receivableSimpleSerialVo.setTime(Long.parseLong(partParams1.get(i * 2 + 1)));
+            if (StringUtils.isBlank(partParams1.get(i * 2))) {
+                receivableSimpleSerialVo.setReceivableStatus(0);
+            } else {
+                receivableSimpleSerialVo.setReceivableStatus(Integer.parseInt(partParams1.get(i * 2)));
+            }
+            if (StringUtils.isBlank(partParams1.get(i * 2 + 1))) {
+                receivableSimpleSerialVo.setTime(0);
+            } else {
+                receivableSimpleSerialVo.setTime(Long.parseLong(partParams1.get(i * 2 + 1)));
+            }
 
             receivableSimpleSerialVoList.add(receivableSimpleSerialVo);
         }
@@ -538,13 +648,12 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[3] = accountContractAddress;
 
 
-        String contractMethodName = RECEIVABLE_SIMPLE_DETAIL_LIST;
         String[] resultMapKey = new String[]{"list1", "list2"};
         ContractResult contractResult = null;
         Code code = null;
 
         try {
-            contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, params, resultMapKey, "ReceivableContract");
+            contractResult = ContractUtil.invokeContract(contractKey, RECEIVABLE_SIMPLE_DETAIL_LIST, params, resultMapKey, "ReceivableContract");
             LogUtil.info("调用合约ReceivableContract-receivableSimpleDetailList返回结果：" + contractResult.toString());
             code = contractResult.getCode();
             if (code != Code.SUCCESS) {
@@ -560,8 +669,12 @@ public class ReceivableServiceImpl implements ReceivableService {
         }
 
         List<String> list1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
-        List<String> list2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         if (list1.size() == 0) {
+            result.returnWithoutValue(Code.RETURN_VALUE_EMPTY);
+            return result;
+        }
+        List<String> list2 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
+        if (list2.size() == 0) {
             result.returnWithoutValue(Code.RETURN_VALUE_EMPTY);
             return result;
         }
@@ -603,29 +716,73 @@ public class ReceivableServiceImpl implements ReceivableService {
             receivableSimpleListVo.setEnterpriseName(list1.get(i * 5 + 2));
 
             firstOwnerAccountEntity = accountEntityRepository.findByAcctId(list1.get(i * 5 + 3));
-            accptrAccountEntity = accountEntityRepository.findByAcctId(list1.get(i * 5 + 4));//todo
+            if (firstOwnerAccountEntity == null) {
+                result.returnWithoutValue(Code.QUERY_USER_ERROR);
+                return result;
+            }
+            accptrAccountEntity = accountEntityRepository.findByAcctId(list1.get(i * 5 + 4));
+            if (accptrAccountEntity == null) {
+                result.returnWithoutValue(Code.QUERY_USER_ERROR);
+                return result;
+            }
             firstOwnerAddress = firstOwnerAccountEntity.getAddress();
             accptrAddress = accptrAccountEntity.getAddress();
             firstOwnerUserEntity = userEntityRepository.findByAddress(firstOwnerAddress);
+            if (firstOwnerUserEntity == null) {
+                result.returnWithoutValue(Code.QUERY_USER_ERROR);
+                return result;
+            }
             accptrUserEntity = userEntityRepository.findByAddress(accptrAddress);
+            if (accptrUserEntity == null) {
+                result.returnWithoutValue(Code.QUERY_USER_ERROR);
+                return result;
+            }
             firstOwnerEnterpriseName = firstOwnerUserEntity.getCompanyName();//持有人企业名
             accptrEnterpriseName = accptrUserEntity.getCompanyName();//承兑人企业名
 
             receivableSimpleListVo.setFirstOwnerName(firstOwnerEnterpriseName);
             receivableSimpleListVo.setAccptrName(accptrEnterpriseName);
 
-//            String quantity =(list2.get(i*4) == null || list2.get(i*4).equals("") )? "0": list2.get(i*4);
-            long quantity = (String.valueOf(list2.get(i * 4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i * 4)));//todo 数组长度判空，提取变量
-
+            long quantity;
+            if (StringUtils.isBlank(list2.get(i * 4))) {
+                quantity = 0;
+            } else {
+                quantity = Long.parseLong(list2.get(i * 4));
+            }
             receivableSimpleListVo.setProductQuantity(quantity);
-            String isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i * 4 + 1)));
+
+            String isseAmtYuan;
+            if (StringUtils.isBlank(list2.get(i * 4 + 1))) {
+                isseAmtYuan = ReparoUtil.convertCentToYuan(0);
+            } else {
+                isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i * 4 + 1)));
+            }
             receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
 
-            long dueDt = (StringUtils.isBlank(String.valueOf(list2.get(i * 4 + 2)))) ? 0 : Long.parseLong(String.valueOf(list2.get(i * 4 + 2)));
+            long dueDt;
+            if (StringUtils.isBlank(list2.get(i * 4 + 2))) {
+                dueDt = 0;
+            } else {
+                dueDt = Long.parseLong(list2.get(i * 4 + 2));
+            }
             receivableSimpleListVo.setDueDt(dueDt);
-            receivableSimpleListVo.setStatus(Integer.parseInt(list2.get(i * 4 + 3)));//todo
-            long discountApplyTime = (String.valueOf(list2.get(i * 4 + 4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i * 4 + 4)));
+
+            int status;
+            if (StringUtils.isBlank(list2.get(i * 4 + 3))) {
+                status = 0;
+            } else {
+                status = Integer.parseInt(list2.get(i * 4 + 3));
+            }
+            receivableSimpleListVo.setStatus(status);
+
+            long discountApplyTime;
+            if (StringUtils.isBlank(list2.get(i * 4 + 4))) {
+                discountApplyTime = 0;
+            } else {
+                discountApplyTime = Long.parseLong(list2.get(i * 4 + 4));
+            }
             receivableSimpleListVo.setDiscountApplyTime(discountApplyTime);
+
             receivableSimpleList.add(receivableSimpleListVo);
         }
 
@@ -940,7 +1097,6 @@ public class ReceivableServiceImpl implements ReceivableService {
         }
 
     */
-
 
 
 }
