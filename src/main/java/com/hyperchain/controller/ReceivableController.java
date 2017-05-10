@@ -90,7 +90,7 @@ public class ReceivableController {
             @ApiParam(value = "申请人账号", required = true) @RequestParam String applicantAcctId,//申请人账号
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号
             @ApiParam(value = "申请贴现金额", required = true) @RequestParam double discountApplyAmount,//申请贴现金额
-            @ApiParam(value = "贴现利率", required = true) @RequestParam String discountedRate,//贴现利率
+            @ApiParam(value = "贴现利率", required = true) @RequestParam double discountedRate,//贴现利率
             HttpServletRequest request
     ) throws Exception {
         // 调用合约查询账户，获取返回结果
@@ -108,14 +108,14 @@ public class ReceivableController {
             @ApiParam(value = "回复人账号", required = true) @RequestParam String replyerAcctId,//回复人账号 todo
             @ApiParam(value = "回复人意见", required = true) @RequestParam int response,//回复人意见
             @ApiParam(value = "回复到手金额", required = true) @RequestParam double discountInHandAmount,//回复到手金额
-            @ApiParam(value = "贴现利率", required = true) @RequestParam String discountRate,//利率
-            @ApiParam(value = "票面金额", required = true) @RequestParam double isseAmt,//票面金额
+            @ApiParam(value = "贴现利率", required = true) @RequestParam double discountRate,//利率
+            @ApiParam(value = "申请贴现金额金额", required = true) @RequestParam double discountApplyAmount,//票面金额
 //            @ApiParam(value = "贴现申请时的流水号", required = true) @RequestParam long discountApplySerialNo,//贴现申请时的流水号
             HttpServletRequest request//http请求实体
     ) throws Exception {
 
         // 调用合约查询账户，获取返回结果
-        return receivableService.discountReply(receivableNo, replyerAcctId, response, discountInHandAmount, discountRate, isseAmt, request);
+        return receivableService.discountReply(receivableNo, replyerAcctId, response, discountInHandAmount, discountRate, discountApplyAmount, request);
 
     }
 

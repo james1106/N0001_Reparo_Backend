@@ -4,10 +4,7 @@ import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
@@ -59,13 +56,12 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //签发申请
     @Override
-    public BaseResult<Object> signOutApply(String orderNo, String pyer, String pyee, double isseAmt, long dueDt, String rate, String contractNo, String invoiceNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {//第二个参数是给合约的参数
+    public BaseResult<Object> signOutApply(String orderNo, String pyer, String pyee, double isseAmt, long dueDt, String rate, String contractNo, String invoiceNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {//第二个参数是给合约的参数
         BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
@@ -130,7 +126,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //签发回复
     @Override
-    public BaseResult<Object> signOutReply(String receivableNo, String replyerAcctId, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {
+    public BaseResult<Object> signOutReply(String receivableNo, String replyerAcctId, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
 //        catch (Exception e) {
 //            LogUtil.error("调用方法signOutReply异常");
 //            e.printStackTrace();
@@ -143,8 +139,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
@@ -195,7 +190,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //贴现申请
     @Override
-    public BaseResult<Object> discountApply(String receivableNo, String applicantAcctId, String replyerAcctId, double discountApplyAmount, String discountedRate, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {//第二个参数是给合约的参数
+    public BaseResult<Object> discountApply(String receivableNo, String applicantAcctId, String replyerAcctId, double discountApplyAmount, double discountedRate, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {//第二个参数是给合约的参数
         BaseResult<Object> result = new BaseResult<>();
 
         long discountApplyTime = System.currentTimeMillis();
@@ -204,8 +199,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
@@ -221,7 +215,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         params[4] = discountApplyTime;
         params[5] = discountApplyAmountFen;
         params[6] = orderContractAddress;
-        params[7] = discountedRate;
+        params[7] = String.valueOf(discountedRate);
 
 
         String[] resultMapKey = new String[]{};
@@ -254,29 +248,36 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //贴现回复
     @Override
-    public BaseResult<Object> discountReply(String receivableNo, String replyerAcctId, int response, double discountInHandAmount, String discountRate, double isseAmt, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {
+    public BaseResult<Object> discountReply(String receivableNo, String replyerAcctId, int response, double discountInHandAmount, double discountRate, double discountApplyAmount, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
         BaseResult<Object> result = new BaseResult<>();
 
-        double doubleDiscountRate = Double.parseDouble(discountRate);
-        if ((1 - doubleDiscountRate / 100) * isseAmt != discountInHandAmount) {//todo 利息保留三位（整型），金额计算一般都用整型
+//        double doubleDiscountRate = Double.parseDouble(discountRate);
+        long discountInHandAmountFen = ReparoUtil.convertYuanToCent(discountInHandAmount);
+        long discountRateEnlarge = ReparoUtil.enlargeRateThousandfold(discountRate);
+        long discountApplyAmountFen = ReparoUtil.convertYuanToCent(discountApplyAmount);
+
+        long calDiscountInterest = discountApplyAmountFen * discountRateEnlarge;
+        long oneHundredThounsand = 100000;
+        long calDiscountInHand = discountApplyAmountFen * oneHundredThounsand - calDiscountInterest;
+        if (calDiscountInHand != discountInHandAmountFen * oneHundredThounsand) {
             result.returnWithoutValue(Code.DISCOUNTAMOUNT_NOT_MATCH);
             return result;
         }
+
         long discountReplyTime = System.currentTimeMillis();
         String serialNo = ReparoUtil.generateBusinessNo(DISCOUNT_REPLY_SERIALNO);
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);//Order合约地址
-        long discountInHandAmountFen = ReparoUtil.convertYuanToCent(discountInHandAmount);
+
         Object[] params = new Object[7];
         params[0] = receivableNo;
         params[1] = replyerAcctId;
@@ -315,7 +316,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //兑付
     @Override
-    public BaseResult<Object> cash(String receivableNo, double cashedAmount, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {
+    public BaseResult<Object> cash(String receivableNo, double cashedAmount, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
         BaseResult<Object> result = new BaseResult<>();
 
         long cashTime = System.currentTimeMillis();
@@ -324,8 +325,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
@@ -367,7 +367,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //单张应收款详情,包含流水信息
     @Override
-    public BaseResult<Object> getReceivableAllInfoWithSerial(String receivableNo, String operatorAcctId, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {
+    public BaseResult<Object> getReceivableAllInfoWithSerial(String receivableNo, String operatorAcctId, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
         BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
@@ -403,7 +403,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         ContractResult contractResult = null;
         try {
             contractResult = ContractUtil.invokeContract(contractKey, GET_RECEIVABLE_ALL_INFO_WITH_SERIAL, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
-            LogUtil.info("调用合约ReceivableContract-getReceivableAllInfoWithSerial返回结果：" + contractResult.toString());
+            LogUtil.debug("调用合约ReceivableContract-getReceivableAllInfoWithSerial返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
         } catch (ValueNullException e) {
@@ -532,20 +532,24 @@ public class ReceivableServiceImpl implements ReceivableService {
 
         AccountEntity pyerAccountEntity = accountEntityRepository.findByAcctId(pyer);
         if (pyerAccountEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         AccountEntity pyeeAccountEntity = accountEntityRepository.findByAcctId(pyee);//todo
         if (pyeeAccountEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String pyerAddress = pyerAccountEntity.getAddress();
         String pyeeAddress = pyeeAccountEntity.getAddress();
         String pyerAcctSvcrName = pyerAccountEntity.getAcctSvcrName();//付款人开户行
         String pyeeAcctSvcrName = pyeeAccountEntity.getAcctSvcrName();//收款人开户行
         UserEntity pyerUserEntity = userEntityRepository.findByAddress(pyerAddress);
+        if (pyerUserEntity == null) {
+            throw new UserInvalidException();
+        }
         UserEntity pyeeUserEntity = userEntityRepository.findByAddress(pyeeAddress);
+        if (pyeeUserEntity == null) {
+            throw new UserInvalidException();
+        }
         String pyerLinkPhone = pyerUserEntity.getPhone();//付款人联系方式
         String pyerEnterpriseName = pyerUserEntity.getCompanyName();//付款人企业名
         String pyeeLinkPhone = pyeeUserEntity.getPhone();//收款人联系方式
@@ -617,7 +621,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //返回买卖方应收款列表
     @Override
-    public BaseResult<Object> receivableSimpleDetailList(int roleCode, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException {
+    public BaseResult<Object> receivableSimpleDetailList(int roleCode, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
         BaseResult<Object> result = new BaseResult<>();
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
@@ -636,8 +640,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         List<AccountEntity> accountEntityList = accountEntityRepository.findByAddress(address);
         AccountEntity accountEntity = accountEntityList.get(0);//取出来的结构体
         if (accountEntity == null) {
-            result.returnWithoutValue(Code.QUERY_USER_ERROR);
-            return result;
+            throw new UserInvalidException();
         }
         String acctId = accountEntity.getAcctId();
 
@@ -654,7 +657,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
         try {
             contractResult = ContractUtil.invokeContract(contractKey, RECEIVABLE_SIMPLE_DETAIL_LIST, params, resultMapKey, "ReceivableContract");
-            LogUtil.info("调用合约ReceivableContract-receivableSimpleDetailList返回结果：" + contractResult.toString());
+            LogUtil.debug("调用合约ReceivableContract-receivableSimpleDetailList返回结果：" + contractResult.toString());
             code = contractResult.getCode();
             if (code != Code.SUCCESS) {
                 result.returnWithoutValue(code);
@@ -717,31 +720,26 @@ public class ReceivableServiceImpl implements ReceivableService {
 
             firstOwnerAccountEntity = accountEntityRepository.findByAcctId(list1.get(i * 5 + 3));
             if (firstOwnerAccountEntity == null) {
-                result.returnWithoutValue(Code.QUERY_USER_ERROR);
-                return result;
+                throw new UserInvalidException();
             }
             accptrAccountEntity = accountEntityRepository.findByAcctId(list1.get(i * 5 + 4));
             if (accptrAccountEntity == null) {
-                result.returnWithoutValue(Code.QUERY_USER_ERROR);
-                return result;
+                throw new UserInvalidException();
             }
             firstOwnerAddress = firstOwnerAccountEntity.getAddress();
             accptrAddress = accptrAccountEntity.getAddress();
             firstOwnerUserEntity = userEntityRepository.findByAddress(firstOwnerAddress);
             if (firstOwnerUserEntity == null) {
-                result.returnWithoutValue(Code.QUERY_USER_ERROR);
-                return result;
+                throw new UserInvalidException();
             }
             accptrUserEntity = userEntityRepository.findByAddress(accptrAddress);
             if (accptrUserEntity == null) {
-                result.returnWithoutValue(Code.QUERY_USER_ERROR);
-                return result;
+                throw new UserInvalidException();
             }
             firstOwnerEnterpriseName = firstOwnerUserEntity.getCompanyName();//持有人企业名
             accptrEnterpriseName = accptrUserEntity.getCompanyName();//承兑人企业名
 
-            receivableSimpleListVo.setFirstOwnerName(firstOwnerEnterpriseName);
-            receivableSimpleListVo.setAccptrName(accptrEnterpriseName);
+
 
             long quantity;
             if (StringUtils.isBlank(list2.get(i * 4))) {
@@ -749,7 +747,7 @@ public class ReceivableServiceImpl implements ReceivableService {
             } else {
                 quantity = Long.parseLong(list2.get(i * 4));
             }
-            receivableSimpleListVo.setProductQuantity(quantity);
+
 
             String isseAmtYuan;
             if (StringUtils.isBlank(list2.get(i * 4 + 1))) {
@@ -757,7 +755,7 @@ public class ReceivableServiceImpl implements ReceivableService {
             } else {
                 isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i * 4 + 1)));
             }
-            receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
+
 
             long dueDt;
             if (StringUtils.isBlank(list2.get(i * 4 + 2))) {
@@ -765,7 +763,7 @@ public class ReceivableServiceImpl implements ReceivableService {
             } else {
                 dueDt = Long.parseLong(list2.get(i * 4 + 2));
             }
-            receivableSimpleListVo.setDueDt(dueDt);
+
 
             int status;
             if (StringUtils.isBlank(list2.get(i * 4 + 3))) {
@@ -773,7 +771,7 @@ public class ReceivableServiceImpl implements ReceivableService {
             } else {
                 status = Integer.parseInt(list2.get(i * 4 + 3));
             }
-            receivableSimpleListVo.setStatus(status);
+
 
             long discountApplyTime;
             if (StringUtils.isBlank(list2.get(i * 4 + 4))) {
@@ -781,6 +779,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             } else {
                 discountApplyTime = Long.parseLong(list2.get(i * 4 + 4));
             }
+
+            receivableSimpleListVo.setFirstOwnerName(firstOwnerEnterpriseName);
+            receivableSimpleListVo.setAccptrName(accptrEnterpriseName);
+            receivableSimpleListVo.setProductQuantity(quantity);//商品数量
+            receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
+            receivableSimpleListVo.setDueDt(dueDt);
+            receivableSimpleListVo.setStatus(status);
             receivableSimpleListVo.setDiscountApplyTime(discountApplyTime);
 
             receivableSimpleList.add(receivableSimpleListVo);

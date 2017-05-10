@@ -33,7 +33,7 @@ public class ReparoUtil {
      * @return
      */
     public static long convertYuanToCent(double yuan) {
-        return (long) yuan * 100;
+        return (long) (yuan * 100);
     }
 
     /**
@@ -51,6 +51,7 @@ public class ReparoUtil {
 
     /**
      * 生成业务编号
+     *
      * @param prefix 业务编号前缀
      * @return
      */
@@ -58,4 +59,27 @@ public class ReparoUtil {
         String businessNo = prefix + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
         return businessNo;
     }
+
+    /**
+     * 将利率放大1000倍
+     *
+     * @param rate 未放大1000倍的金融机构贴现利率
+     * @return
+     */
+    public static long enlargeRateThousandfold(double rate) {
+        return (long)(rate * 1000);
+    }
+
+    /**
+     * 将利率缩小1000倍
+     *
+     * @param rateThousandfold 放大1000倍的金融机构贴现利率
+     * @return
+     */
+    public static String minishRateThousandfold(long rateThousandfold) {
+        DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance();
+        df.applyPattern("0.000");
+        return df.format(rateThousandfold / 1000.000);
+    }
+
 }
