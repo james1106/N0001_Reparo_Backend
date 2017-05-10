@@ -733,7 +733,7 @@ public class ReceivableServiceImpl implements ReceivableService{
 //        int length = methodList.size();
 //        List<OrderOverVo> orderOverVoList = new ArrayList<>();
         List<ReceivableSimpleListVo> receivableSimpleList = new ArrayList<>();
-        int length = list1.size() / 3;
+        int length = list1.size() / 5;
 /*        for(int i = 0; i < length; i++){
             ReceivableSimpleListVo receivableSimpleListVo = new ReceivableSimpleListVo();
             receivableSimpleListVo.setReceivableNo(list1.get(i*3));
@@ -750,11 +750,34 @@ public class ReceivableServiceImpl implements ReceivableService{
             receivableSimpleList.add(receivableSimpleListVo);
         }
 */
+
+        AccountEntity firstOwnerAccountEntity;
+        AccountEntity accptrAccountEntity;
+        String firstOwnerAddress;
+        String accptrAddress;
+
+        UserEntity firstOwnerUserEntity;
+        UserEntity accptrUserEntity;
+        String firstOwnerEnterpriseName;
+        String accptrEnterpriseName;
+
         for(int i = length - 1; i >= 0; i--){
             ReceivableSimpleListVo receivableSimpleListVo = new ReceivableSimpleListVo();
             receivableSimpleListVo.setReceivableNo(list1.get(i*3));
             receivableSimpleListVo.setProductName(list1.get(i*3+1));
             receivableSimpleListVo.setEnterpriseName(list1.get(i*3+2));
+
+            firstOwnerAccountEntity = accountEntityRepository.findByAcctId(list1.get(i*3+3));
+            accptrAccountEntity = accountEntityRepository.findByAcctId(list1.get(i*3+4));
+            firstOwnerAddress = firstOwnerAccountEntity.getAddress();
+            accptrAddress = accptrAccountEntity.getAddress();
+            firstOwnerUserEntity = userEntityRepository.findByAddress(firstOwnerAddress);
+            accptrUserEntity = userEntityRepository.findByAddress(accptrAddress);
+            firstOwnerEnterpriseName = firstOwnerUserEntity.getCompanyName();//持有人企业名
+            accptrEnterpriseName = accptrUserEntity.getCompanyName();//承兑人企业名
+
+            receivableSimpleListVo.setFirstOwnerName(firstOwnerEnterpriseName);
+            receivableSimpleListVo.setAccptrName(accptrEnterpriseName);
 
 //            String quantity =(list2.get(i*4) == null || list2.get(i*4).equals("") )? "0": list2.get(i*4);
             long quantity = (String.valueOf(list2.get(i*4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4)));
@@ -763,8 +786,11 @@ public class ReceivableServiceImpl implements ReceivableService{
             String isseAmtYuan = ReparoUtil.convertCentToYuan(Long.parseLong(list2.get(i*4+1)));
             receivableSimpleListVo.setIsseAmt(isseAmtYuan);//票面金额
 
-            receivableSimpleListVo.setDueDt(Long.parseLong(list2.get(i*4+2)));
+            long dueDt = (String.valueOf(list2.get(i*4+2)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4+2)));
+            receivableSimpleListVo.setDueDt(dueDt);
             receivableSimpleListVo.setStatus(Integer.parseInt(list2.get(i*4+3)));
+            long discountApplyTime = (String.valueOf(list2.get(i*4+4)).equals("")) ? 0 : Long.parseLong(String.valueOf(list2.get(i*4+4)));
+            receivableSimpleListVo.setDiscountApplyTime(discountApplyTime);
             receivableSimpleList.add(receivableSimpleListVo);
         }
         BaseResult<Object> result = new BaseResult<>();

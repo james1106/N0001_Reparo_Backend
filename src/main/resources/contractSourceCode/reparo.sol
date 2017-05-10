@@ -325,6 +325,9 @@ contract ReceivableContract{
 //应收款的操作历史，应收款编号 => 交易记录流水号
     mapping(bytes32 => bytes32[]) receivableTransferHistoryMap;
 
+//贴现申请时间，应收款编号 =》 贴现申请时间
+    mapping(bytes32 => uint[]) discountApplyTime;
+
 //判断账号是否存在
     function judgeAccount(address publicKey) internal returns (bool) {
         Account account = accountMap[publicKey];
@@ -626,6 +629,7 @@ contract ReceivableContract{
         accountReceivableRecords[applicantAcctId].push(serialNo);
         receivableTransferHistoryMap[receivableNo].push(serialNo);
         bankToReceivableMap[replyerAcctId].push(receivableNo);
+        discountApplyTime[receivableNo].push(time);
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return(0);
     }
@@ -1009,8 +1013,9 @@ contract ReceivableContract{
         }
 
         uint receivableNosLength = receivableNos.length;
-        bytes32[] memory list1 = new bytes32[](receivableNosLength * 3);//receivableNo，productName,收款人企业名enterpriseName
-        uint[] memory list2 = new uint[](receivableNosLength * 4);//productQuantity,isseAmt, dueDt,status
+        bytes32[] memory list1 = new bytes32[](receivableNosLength * 5);//receivableNo，productName,收款人企业名enterpriseName,本手持有人acctId，承兑人acctId
+        uint[] memory list2 = new uint[](receivableNosLength * 5);//productQuantity,isseAmt, dueDt,status,贴现申请时间
+
 
         for(uint i = 0; i < receivableNosLength; i++){
             list1[i*3] = receivableNos[i];
@@ -1020,10 +1025,19 @@ contract ReceivableContract{
             }else if(roleCode ==1){
                 list1[i*3+2] = callAccountContractGetPyerEnterpriseName(accountAddress, receivableNos[i]);
             }
+            list1[i*3+3] = receivableDetailMap[receivableNos[i]].firstOwner;
+            list1[i*3+4] = receivableDetailMap[receivableNos[i]].accptr;
+
             list2[i*4] = callOrderContractGetProductQuantity(orderAddress, receivableNos[i]);
             list2[i*4+1] = receivableDetailMap[receivableNos[i]].isseAmt;
             list2[i*4+2] = receivableDetailMap[receivableNos[i]].dueDt;
             list2[i*4+3] = receivableDetailMap[receivableNos[i]].status;
+            if(discountApplyTime[receivableNos[i]].length == 0){
+                list2[i*4+4] = 0;
+            }else{
+                list2[i*4+4] = discountApplyTime[receivableNos[i]][discountApplyTime[receivableNos[i]].length - 1];
+            }
+
         }
 
         return (0, list1, list2);
@@ -2604,8 +2618,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, resultAddress, resultBytes32, resultUint, resultMethod, txState);
         }
 
@@ -2617,9 +2631,9 @@ uint OUTCOMED = 6;                  //已出库
 
         Order order = orderDetailMap[orderNo];
         //如果订单与合约调用者无关，"权限拒绝"
-        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
-            return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
-        }
+//        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
+//            return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
+//        }
 
 
         bytes32[] memory param1 = new bytes32[](5);
@@ -2703,8 +2717,8 @@ uint OUTCOMED = 6;                  //已出库
             return (2, partList1, partList2, partList3, methodList, stateList);
         }
 
-        //如果用户不是融资企业，返回"权限拒绝"
-        if(accountContract.queryRoleCode(msg.sender) != 0){
+        //如果用户不是融资企业并且用户不是银行，返回"权限拒绝"
+        if(accountContract.queryRoleCode(msg.sender) != 0 && accountContract.queryRoleCode(msg.sender) != 3){
             return (1, partList1, partList2, partList3, methodList, stateList);
         }
 
