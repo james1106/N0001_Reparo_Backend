@@ -72,7 +72,8 @@ public enum Code {
     PAYER_REPOBUSI_STATE_ERROR(1003,"买方仓储状态错误"),
     NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人"),
     DISOCOUNT_BANK_NOT_EXITS(1041,"贴现金融机构不存在"),
-    DISCOUNTAMOUNT_NOT_MATCH(1042,"实际贴现金额不等于票面金额*（1-贴现利率）");
+    DISCOUNTAMOUNT_NOT_MATCH(1042,"实际贴现金额不等于票面金额*（1-贴现利率）"),
+    RETURN_VALUE_EMPTY(1043,"合约返回的数组为空");
 
     private int code;
     private String msg;
@@ -119,6 +120,8 @@ public enum Code {
                 return INVALID_USER;
             case 3:
                 return PARAMETER_EMPTY;
+            case 5:
+                return QUERY_USER_ERROR;
 
             case 1032:
                 return SERIALNO_EXIST;
@@ -154,6 +157,8 @@ public enum Code {
                 return DISOCOUNT_BANK_NOT_EXITS;
             case 1042:
                 return DISCOUNTAMOUNT_NOT_MATCH;
+            case 1043:
+                return RETURN_VALUE_EMPTY;
 
             case 2001:
                 return ORDER_NOT_EXIST;

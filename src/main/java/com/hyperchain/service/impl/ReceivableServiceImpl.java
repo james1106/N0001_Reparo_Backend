@@ -513,7 +513,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
         if (userEntity == null) {
-            result.returnWithoutValue(Code.ENTITY_EMPTY);
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
             return result;
         }
         String privateKey = userEntity.getPrivateKey();
@@ -526,7 +526,7 @@ public class ReceivableServiceImpl implements ReceivableService {
         List<AccountEntity> accountEntityList = accountEntityRepository.findByAddress(address);
         AccountEntity accountEntity = accountEntityList.get(0);//取出来的结构体
         if (accountEntity == null) {
-            result.returnWithoutValue(Code.ENTITY_EMPTY);
+            result.returnWithoutValue(Code.QUERY_USER_ERROR);
             return result;
         }
         String acctId = accountEntity.getAcctId();
