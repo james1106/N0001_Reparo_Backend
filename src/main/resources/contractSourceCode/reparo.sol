@@ -617,8 +617,8 @@ contract ReceivableContract{
      }
      */
         Receivable receivable = receivableDetailMap[receivableNo];
-        if(receivable.status == 1){
-            return (1038);
+        if(receivable.status != 26){
+            return (1006);
         }
         receivable.lastStatus = receivable.status;
         receivable.status = 41;//贴现待响应
@@ -661,7 +661,7 @@ contract ReceivableContract{
             return (1);
         }
         if(receivable.status != 41){
-            return (1038);
+            return (1006);
         }
         //if((receivable.isseAmt - receivable.isseAmt * receivable.)//todo 校验到手金额
 
@@ -815,7 +815,7 @@ contract ReceivableContract{
             return(1005);
         }
 
-     if(receivable.status != 26){
+     if(receivable.status != 26 && receivable.status != 46){
         return(1006);
      }
      /*
