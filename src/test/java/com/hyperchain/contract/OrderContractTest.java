@@ -1,30 +1,20 @@
 package com.hyperchain.contract;
 
-import cn.hyperchain.common.log.LogUtil;
-import cn.hyperchain.sdk.rpc.Transaction.Transaction;
-import cn.hyperchain.sdk.rpc.returns.CompileReturn;
 import com.alibaba.fastjson.JSON;
-import com.hyperchain.ESDKConnection;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
-import com.hyperchain.common.util.CommonUtil;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.controller.vo.*;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
-import com.hyperchain.exception.ESDKException;
 import com.hyperchain.test.base.SpringBaseTest;
-import jxl.common.BaseUnit;
-import org.apache.commons.collections.map.HashedMap;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -52,7 +42,7 @@ public class OrderContractTest extends SpringBaseTest{
     @Test
     public void ThisIsTheMethodModelTry() throws Exception {
 
-        //1.获取contractKey：ContractKey contractKey = new ContractKey(调用者的私钥, ReparoUtil.getPasswordForPrivateKey(调用者的账户名));
+        //1.获取contractKey：ContractKey contractKey = new ContractKey(调用者的私钥, MoneyUtil.getPasswordForPrivateKey(调用者的账户名));
         //2.创建好需要的 (String)contractMethodName  (Object)contractMethodParams[]  (String)contractReturnsMapKey[]参数列表；
         //3.调用ContractResult contractResult = ContractUtil.invokeContract(contractKey, contractMethodName, contractMethodParams, contractMethodReturns, BaseConstant.合约方法名)
         //  方法，得到contractResult结果
@@ -65,7 +55,7 @@ public class OrderContractTest extends SpringBaseTest{
         String payerAccountName = payerUserEntity.getAccountName();
 
         //1.2获取contractKey
-        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKey, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "updateOrderState";
@@ -100,7 +90,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "createOrder";
@@ -167,7 +157,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "queryOrderDetail";
@@ -282,9 +272,9 @@ public class OrderContractTest extends SpringBaseTest{
             txDetailVo.setPayerCompanyName(payerCompanyName);
             txDetailVo.setPayeeCompanyName(payeeCompanyName);
             txDetailVo.setPayingMethod(payingMethodInt);
-            txDetailVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(productUnitPrice));
+            txDetailVo.setProductUnitPrice(MoneyUtil.convertCentToYuan(productUnitPrice));
             txDetailVo.setProductQuantity(productQuantity);
-            txDetailVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(productTotalPrice));
+            txDetailVo.setProductTotalPrice(MoneyUtil.convertCentToYuan(productTotalPrice));
             txDetailVo.setOrderId(orderId);
             txDetailVo.setOperationRecordVoList(txRecordList);
             txDetailVo.setProductName(productName);
@@ -304,7 +294,7 @@ public class OrderContractTest extends SpringBaseTest{
             receOverVo.setPayingSide(payingSide);
             receOverVo.setDueDate(dueDate);
             receOverVo.setReceGenerateTime(receGenerateTime);
-            receOverVo.setReceAmount(ReparoUtil.convertCentToYuan(receAmount));
+            receOverVo.setReceAmount(MoneyUtil.convertCentToYuan(receAmount));
             receOverVo.setCoupon(coupon);
             receOverVo.setReceLatestStatus(receLatestStatus);
             receOverVo.setReceUpdateTime(receUpdateTime);
@@ -346,7 +336,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "queryAllOrderOverViewInfoList";
@@ -402,10 +392,10 @@ public class OrderContractTest extends SpringBaseTest{
             orderOverVo.setPayeeRepoName(payeeRepoName);
 
             orderOverVo.setProductQuantity(Long.parseLong(partList3.get(i*5)));
-            orderOverVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+1))/100));
+            orderOverVo.setProductUnitPrice(MoneyUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+1))/100));
 
             long orderConfirmTime = partList3.get(i*5+4).equals("")? 0 : Long.parseLong(partList3.get(i*5+4));
-            orderOverVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+2))/100));
+            orderOverVo.setProductTotalPrice(MoneyUtil.convertCentToYuan(Long.parseLong(partList3.get(i*5+2))/100));
             orderOverVo.setOrderGenerateTime(Long.parseLong(partList3.get(i*5+3)));
             orderOverVo.setOrderConfirmTime(orderConfirmTime);
 
@@ -435,7 +425,7 @@ public class OrderContractTest extends SpringBaseTest{
         UserEntity payeeUserEntity = userEntityRepository.findByAddress("f014bae4a69e0e4790214f52b6615a3a5e3d8c28"); //参数为 卖家地址
         String payeePrivateKeyThis = payeeUserEntity.getPrivateKey();
         String payeeAccountName = payeeUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payeePrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payeeAccountName));
+        ContractKey contractKey = new ContractKey(payeePrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(payeeAccountName));
 
         //2.1
         String contractMethodName = "confirmOrder";

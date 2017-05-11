@@ -22,7 +22,7 @@ public class SHA1Util {
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-1");
-            // digest = MessageDigest.getInstance("MD5");
+
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-1 algorithm not available.  Fatal (should be in the JDK).");
         }

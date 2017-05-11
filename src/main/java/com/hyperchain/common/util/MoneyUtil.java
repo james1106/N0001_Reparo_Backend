@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Created by ldy on 2017/4/24.
  */
-public class ReparoUtil {
+public class MoneyUtil {
 
     /**
      * 分转换成元，并且格式化成始终保留两位小数
@@ -43,7 +43,7 @@ public class ReparoUtil {
      * @return
      */
     public static String getPasswordForPrivateKey(String accountName) {
-//        String hash = DigestUtils.md5Hex(BaseConstant.SALT_FOR_PRIVATE_KEY + accountName); //哈希处理后：16个字节，128位 -> hexString -> 32字节
+
         byte[] hashBytes = DigestUtils.md5(BaseConstant.SALT_FOR_PRIVATE_KEY + accountName); //16个字节，128位
         String hash = new String(hashBytes);
         return hash.substring(0, 8); //des密钥为64位，8个字节

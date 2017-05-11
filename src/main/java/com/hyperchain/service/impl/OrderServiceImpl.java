@@ -5,7 +5,7 @@ import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
 import com.hyperchain.common.exception.ValueNullException;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.contract.ContractUtil;
@@ -276,9 +276,9 @@ public class OrderServiceImpl implements OrderService {
         txDetailVo.setPayerCompanyName(payerCompanyName);
         txDetailVo.setPayeeCompanyName(payeeCompanyName);
         txDetailVo.setPayingMethod(payingMethodInt);
-        txDetailVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(productUnitPrice));
+        txDetailVo.setProductUnitPrice(MoneyUtil.convertCentToYuan(productUnitPrice));
         txDetailVo.setProductQuantity(productQuantity);
-        txDetailVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(productTotalPrice));
+        txDetailVo.setProductTotalPrice(MoneyUtil.convertCentToYuan(productTotalPrice));
         txDetailVo.setOrderId(orderId);
         txDetailVo.setOperationRecordVoList(txRecordList);
         txDetailVo.setProductName(productName);
@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
         receOverVo.setPayingSide(payingSide);
         receOverVo.setDueDate(dueDate);
         receOverVo.setReceGenerateTime(receiveGenerateTime);
-        receOverVo.setReceAmount(ReparoUtil.convertCentToYuan(receiveAmount));
+        receOverVo.setReceAmount(MoneyUtil.convertCentToYuan(receiveAmount));
         receOverVo.setCoupon(coupon);
         receOverVo.setReceLatestStatus(receiveLatestStatus);
         receOverVo.setReceUpdateTime(receiveUpdateTime);
@@ -407,7 +407,7 @@ public class OrderServiceImpl implements OrderService {
             orderOverVo.setPayeeRepoName(payeeRepoName);
 
             orderOverVo.setProductQuantity(Long.parseLong(partList3.get(i * 5)));
-            orderOverVo.setProductUnitPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i * 5 + 1))));
+            orderOverVo.setProductUnitPrice(MoneyUtil.convertCentToYuan(Long.parseLong(partList3.get(i * 5 + 1))));
 
             long orderConfirmTime;
             if(partList3.get(i * 5 + 4).equals("")){
@@ -415,7 +415,7 @@ public class OrderServiceImpl implements OrderService {
             }else{
                 orderConfirmTime = Long.parseLong(partList3.get(i * 5 + 4));
             }
-            orderOverVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(Long.parseLong(partList3.get(i * 5 + 2))));
+            orderOverVo.setProductTotalPrice(MoneyUtil.convertCentToYuan(Long.parseLong(partList3.get(i * 5 + 2))));
             orderOverVo.setOrderGenerateTime(Long.parseLong(partList3.get(i * 5 + 3)));
             orderOverVo.setOrderConfirmTime(orderConfirmTime);
 

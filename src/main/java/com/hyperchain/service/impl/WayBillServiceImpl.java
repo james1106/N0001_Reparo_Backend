@@ -6,7 +6,7 @@ import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.WayBillStatus;
 import com.hyperchain.common.exception.*;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -111,12 +111,12 @@ public class WayBillServiceImpl implements WayBillService {
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
 
-        ContractKey requestContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey requestContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String requestContractMethodName = FUNCTION_GENERATE_UN_CONFIRMED_WAY_BILL;
         Object[] requestContractMethodParams = new Object[5];
         Long[] requestLongs = new Long[3];
         requestLongs[0] = new Date().getTime(); //requestTime
-        requestLongs[1] = ReparoUtil.convertYuanToCent(productValue); //productValue
+        requestLongs[1] = MoneyUtil.convertYuanToCent(productValue); //productValue
         requestLongs[2] = productQuantity; //productQuantity
         String[] requestAddrs = new String[5];
         requestAddrs[0] = logisticsAddress; //logisticsAddress
@@ -130,7 +130,7 @@ public class WayBillServiceImpl implements WayBillService {
         requestStrs[2] = senderRepoCertNo; //senderRepoCertNo
         requestStrs[3] = receiverRepoBusinessNo; //receiverRepoBusinessNo
         requestStrs[4] = requestStrs[0] + WayBillStatus.REQUESTING.getCode(); //statusTransId: orderNo + WayBillStatus
-        requestStrs[5] = ReparoUtil.generateBusinessNo(WAYBILL_NO_PREFIX); //waybillNo
+        requestStrs[5] = MoneyUtil.generateBusinessNo(WAYBILL_NO_PREFIX); //waybillNo
         requestContractMethodParams[0] = requestLongs;
         requestContractMethodParams[1] = requestAddrs;
         requestContractMethodParams[2] = requestStrs;
@@ -166,7 +166,7 @@ public class WayBillServiceImpl implements WayBillService {
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
-        ContractKey confirmContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey confirmContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String confirmContractMethodName = FUNCTION_GENERATE_WAY_BILL;
         Object[] confirmContractMethodParams = new Object[4];
         confirmContractMethodParams[0] = orderNo; //orderNo
@@ -198,7 +198,7 @@ public class WayBillServiceImpl implements WayBillService {
         String repoContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_REPOSITORY);
         String orderContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ORDER);
 
-        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey updateToReceivedContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String updateToReceivedMethodName = FUNCTION_UPDATE_WAY_BILL_STATUS_TO_RECEIVED;
         Object[] updateToReceivedMethodParams = new Object[7];
         updateToReceivedMethodParams[0] = orderNo; //orderNo
@@ -228,7 +228,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String methodName = FUNCTION_GET_ALL_WAYBILL_COUNT;
         Object[] methodParams = new Object[0];
         String[] resultMapKey = new String[]{KEY_COUNT};
@@ -252,7 +252,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String methodName = FUNCTION_GET_WAITING_WAYBILL_COUNT;
         Object[] methodParams = new Object[0];
         String[] resultMapKey = new String[]{"count"};
@@ -276,7 +276,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String methodName = FUNCTION_GET_REQUESTING_WAYBILL_COUNT;
         Object[] methodParams = new Object[0];
         String[] resultMapKey = new String[]{KEY_COUNT};
@@ -300,7 +300,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
 
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String methodName = FUNCTION_GET_SENDING_WAYBILL_COUNT;
         Object[] methodParams = new Object[0];
         String[] resultMapKey = new String[]{KEY_COUNT};
@@ -334,7 +334,7 @@ public class WayBillServiceImpl implements WayBillService {
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
         //获取所有用户相关运单的订单号列表
-        ContractKey listOrderNoContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey listOrderNoContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String listOrderNoContractMethodName = FUNCTION_LIST_WAY_BILL_ORDER_NO;
         Object[] listOrderNoContractMethodParams = new Object[1];
         listOrderNoContractMethodParams[0] = accountContractAddr; //accountContractAddr
@@ -358,7 +358,7 @@ public class WayBillServiceImpl implements WayBillService {
         for (int i = orderNoList.size() - 1; i >= 0; i--) {
             LogUtil.debug("运单订单号" + i + " : " + orderNoList.get(i));
 
-            ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+            ContractKey waybillContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
             String waybillContractMethodName = FUNCTION_GET_WAY_BILL;
             Object[] waybillContractMethodParams = new Object[2];
             waybillContractMethodParams[0] = orderNoList.get(i); //orderNo
@@ -390,7 +390,7 @@ public class WayBillServiceImpl implements WayBillService {
         //合约名称
         String accountContractAddr = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);
 
-        ContractKey waybillContractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey waybillContractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String waybillContractMethodName = FUNCTION_GET_WAY_BILL;
         Object[] waybillContractMethodParams = new Object[2];
         waybillContractMethodParams[0] = orderNo; //orderNo
@@ -418,25 +418,7 @@ public class WayBillServiceImpl implements WayBillService {
         List<String> logisticsInfo = (List<String>) waybillResultValueMap.get(KEY_LOGISTICS_INFO);
 
         WayBillDetailVo wayBillDetailVo = new WayBillDetailVo();
-//        System.out.println("productQuantity: " + longs.get(0));
-//        System.out.println("productValue: " + longs.get(1));
-//        System.out.println("requestTime: " + longs.get(2));
-//        System.out.println("receiveTime: " + longs.get(3));
-//        System.out.println("sendTime: " + longs.get(4));
-//        System.out.println("rejectTime: " + longs.get(5));
-//        System.out.println("waitTime: " + longs.get(6));
-//        System.out.println("wayBillStatus: " + longs.get(7));
-//        System.out.println("orderNo: " + strs.get(0));
-//        System.out.println("wayBillNo: " + strs.get(1));
-//        System.out.println("productName: " + strs.get(2));
-//        System.out.println("senderRepoCertNo: " + strs.get(3));
-//        System.out.println("receiverRepoBusinessNo: " + strs.get(4));
-//        System.out.println("logisticsAddress: " + addrs.get(0));
-//        System.out.println("senderAddress: " + addrs.get(1));
-//        System.out.println("receiverAddress: " + addrs.get(2));
-//        System.out.println("senderRepoAddress: " + addrs.get(3));
-//        System.out.println("receiverRepoAddress: " + addrs.get(4));
-//        System.out.println("logisticsInfo: " + logisticsInfo);
+
 
         if (Integer.parseInt(longs.get(7)) != WayBillStatus.WAITING.getCode()) { //只有发货待确认(卖家填完发货申请单)之后才有的数据
             UserEntity logisticsUserEntity = userEntityRepository.findByAddress(addrs.get(0).substring(1, addrs.get(0).length()));
@@ -451,7 +433,7 @@ public class WayBillServiceImpl implements WayBillService {
         //所有状态都有的数据(即从待发货状态就已经有的数据)
         wayBillDetailVo.setOrderNo(strs.get(0));
         wayBillDetailVo.setProductQuantity((Long.parseLong(longs.get(0))));
-        wayBillDetailVo.setProductValue(ReparoUtil.convertCentToYuan(Long.parseLong(longs.get(1))));
+        wayBillDetailVo.setProductValue(MoneyUtil.convertCentToYuan(Long.parseLong(longs.get(1))));
         wayBillDetailVo.setProductName(strs.get(2));
         wayBillDetailVo.setSenderRepoCertNo(strs.get(3));
         wayBillDetailVo.setReceiverRepoBusinessNo(strs.get(4));

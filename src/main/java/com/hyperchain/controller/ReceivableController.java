@@ -1,17 +1,8 @@
 package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
-import cn.hyperchain.common.log.LogUtil;
-import com.hyperchain.ESDKUtil;
-import com.hyperchain.common.constant.BaseConstant;
-import com.hyperchain.common.constant.Code;
-import com.hyperchain.common.util.ReparoUtil;
-import com.hyperchain.common.util.TokenUtil;
-import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
-import com.hyperchain.dal.entity.AccountEntity;
-import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.AccountEntityRepository;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.*;
@@ -26,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Created by YanYufei on 2017/4/9.
@@ -167,136 +156,5 @@ public class ReceivableController extends BaseController{
         return receivableService.getReceivableAllInfoWithSerial(receivableNo, operatorAcctId, request);
 
     }
-
-//    @LogInterceptor
-//    @ApiOperation(value = "贴现金融机构列表", notes = "贴现金融机构列表")
-//    @ResponseBody
-//    @RequestMapping(value = "discountApplyBankList", method = RequestMethod.POST)//路径
-//    public BaseResult<Object> discountApplyBankList(
-//            HttpServletRequest request
-//    ) throws Exception {
-//
-//        return receivableService.discountApplyBankList();
-//    }
-//
-//    @LogInterceptor
-//    @ApiOperation(value = "贴现金融机构列表2", notes = "贴现金融机构列表2")
-//    @ResponseBody
-//    @RequestMapping(value = "getDiscountBankList", method = RequestMethod.POST)//路径
-//    public BaseResult<Object> getDiscountBankList(
-//            HttpServletRequest request
-//    ) throws Exception {
-//        String address = TokenUtil.getAddressFromCookie(request);//用户address
-//        UserEntity userEntity = userEntityRepository.findByAddress(address);
-//        String privateKey = userEntity.getPrivateKey();
-//        String accountName = userEntity.getAccountName();
-//        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
-//
-//        String accountContractAddress = ESDKUtil.getHyperchainInfo(BaseConstant.CONTRACT_NAME_ACCOUNT);//account合约地址
-//        Object[] params = new Object[1];
-//        params[0] = accountContractAddress;
-//        return receivableService.getDiscountBankList(contractKey, params);
-//    }
-
-
-
-    /*
-        @LogInterceptor
-        @ApiOperation(value = "根据应收款编号查应收款详情", notes = "根据应收款编号查应收款详情")
-        @ResponseBody
-        @RequestMapping(value = "receivableInfo", method = RequestMethod.POST)//路径
-        public BaseResult<Object> getReceivableAllInfo(
-                //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
-                @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
-                @ApiParam(value = "操作人账号", required = true) @RequestParam String operatorAcctId,
-                HttpServletRequest request//http请求实体
-        ) throws Exception {
-    //        ContractKey contractKey = new ContractKey(operatorAddress);
-            BaseResult result = new BaseResult();
-            try {
-                String address = TokenUtil.getAddressFromCookie(request);//用户address
-                UserEntity userEntity = userEntityRepository.findByAddress(address);
-                String privateKey = userEntity.getPrivateKey();
-                String accountName = userEntity.getAccountName();
-                ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
-
-                Object[] params = new Object[2];
-                params[0] = receivableNo;
-                params[1] = operatorAcctId;
-
-
-                // 调用合约查询账户，获取返回结果
-                return receivableService.getReceivableAllInfo(contractKey, params);
-            } catch (Exception e) {
-                LogUtil.error("调用方法getReceivableAllInfo异常");
-                e.printStackTrace();
-                result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
-            }
-            return result;
-        }
-
-        @LogInterceptor
-        @ApiOperation(value = "用户根据流水号查交易记录详情", notes = "用户根据流水号查交易记录详情")
-        @ResponseBody
-        @RequestMapping(value = "recordInfo", method = RequestMethod.POST)//路径
-        public BaseResult<Object> getRecordBySerialNo(
-                //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
-                @ApiParam(value = "流水号", required = true) @RequestParam String serialNo,
-                HttpServletRequest request
-        ) throws Exception {
-            BaseResult result = new BaseResult();
-            try {
-    //        ContractKey contractKey = new ContractKey(operatorAddress);
-                String address = TokenUtil.getAddressFromCookie(request);//用户address
-                UserEntity userEntity = userEntityRepository.findByAddress(address);
-                String privateKey = userEntity.getPrivateKey();
-                String accountName = userEntity.getAccountName();
-                ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
-
-                Object[] params = new Object[1];
-                params[0] = serialNo;
-
-                // 调用合约查询账户，获取返回结果
-                return receivableService.getRecordBySerialNo(contractKey, params);
-            } catch (Exception e) {
-                LogUtil.error("调用方法getRecordBySerialNo异常");
-                e.printStackTrace();
-                result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
-            }
-            return result;
-        }
-
-        @LogInterceptor
-        @ApiOperation(value = "应收款历史操作流水号", notes = "应收款历史操作流水号")
-        @ResponseBody
-        @RequestMapping(value = "historySerialNo", method = RequestMethod.POST)//路径
-        public BaseResult<Object> getReceivableHistorySerialNo(
-                //@ApiParam(value = "操作人私钥", required = true) @RequestParam String operatorAddress,
-                @ApiParam(value = "应收款编号", required = true) @RequestParam String receivableNo,
-                HttpServletRequest request
-        ) throws Exception {
-            BaseResult result = new BaseResult();
-            try {
-    //        ContractKey contractKey = new ContractKey(operatorAddress);
-                String address = TokenUtil.getAddressFromCookie(request);//用户address
-                UserEntity userEntity = userEntityRepository.findByAddress(address);
-                String privateKey = userEntity.getPrivateKey();
-                String accountName = userEntity.getAccountName();
-                ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
-
-                Object[] params = new Object[1];
-                params[0] = receivableNo;
-
-                // 调用合约查询账户，获取返回结果
-                return receivableService.getReceivableHistorySerialNo(contractKey, params);
-            } catch (Exception e) {
-                LogUtil.error("调用方法historySerialNo异常");
-                e.printStackTrace();
-                result.returnWithoutValue(Code.UNKNOWN_ABNORMAL);
-            }
-            return result;
-        }
-    */
-
 
 }

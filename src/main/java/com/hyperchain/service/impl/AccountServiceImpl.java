@@ -7,7 +7,7 @@ import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.constant.Role;
 import com.hyperchain.common.exception.*;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
@@ -63,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public BaseResult<Object> getSecurityCode(String phone) {
-        //TODO 完成逻辑代码，待测试（暂时不做）
+
         //手机号是否存在
         if (isPhoneExist(phone)) {
             BaseResult<Object> baseResult = new BaseResult<>();
@@ -91,7 +91,7 @@ public class AccountServiceImpl implements AccountService {
             BaseResult<Object> baseResult = new BaseResult<>();
             baseResult.returnWithoutValue(Code.SYSTEM_ERROR);
             return baseResult;
-//            throw new IOException("请求第三方发送验证码失败");
+
         }
     }
 
@@ -121,13 +121,6 @@ public class AccountServiceImpl implements AccountService {
             return baseResult;
         }
 
-        //TODO 验证码校验逻辑代码完成，待测试（暂时不做）
-//        Code validateResultCode = validateSecurityCode(securityCodeId, securityCode);
-//        if (validateResultCode != Code.SUCCESS) {
-//            BaseResult<Object> baseResult = new BaseResult<>();
-//            baseResult.returnWithoutValue(validateResultCode);
-//            return baseResult;
-//        }
 
         //生成账号
         String[] acctIdList = new String[1];
@@ -151,13 +144,13 @@ public class AccountServiceImpl implements AccountService {
         if (null == accountEntityList) {
             throw new UserInvalidException();
         }
-        AccountEntity accountEntity = accountEntityList.get(0); //TODO 暂时每个address只有一个账号
+        AccountEntity accountEntity = accountEntityList.get(0);
 
         //用户已被锁定
         if (AccountStatus.LOCK.getCode() == userEntity.getUserStatus()) {
             LogUtil.debug("用户在锁定状态");
             Date currentDate = new Date();
-//            Date lockDate = DateUtils.addMinutes(currentDate, -5); // 锁定时间为为5分钟
+
             Date lockDate = DateUtils.addSeconds(currentDate, BaseConstant.ACCOUNT_LOCK_SECOND); // 锁定时间
             if (lockDate.getTime() <= userEntity.getLockTime()) { //在锁定时间内
                 LogUtil.debug("在锁定时间内");
@@ -206,7 +199,7 @@ public class AccountServiceImpl implements AccountService {
         //返回成功状态和用户信息
         UserVo userVo = new UserVo(userEntity, accountEntity);
         if (userVo.getRoleCode() == Role.FINANCE.getCode()) {
-//                userVo.setRate(getRateFromHyperchain(userEntity.getPrivateKey(), userEntity.getAccountName()));
+
             userVo.setRate(userEntity.getRate());
         }
         BaseResult<Object> baseResult = new BaseResult<>();
@@ -216,7 +209,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public BaseResult<Object> forgetPassword(String phone, String newPassword, String securityCode, String securityCodeId) {
-        // TODO 找回密码、修改密码、修改用户信息（暂时不做）
+
         return null;
     }
 
@@ -420,7 +413,7 @@ public class AccountServiceImpl implements AccountService {
                                        String rate)
             throws GeneralSecurityException, IOException, PrivateKeyIllegalParam, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         //生成公私钥和用户地址
-        List<String> keyInfo = ESDKUtil.newAccount(ReparoUtil.getPasswordForPrivateKey(accountName));
+        List<String> keyInfo = ESDKUtil.newAccount(MoneyUtil.getPasswordForPrivateKey(accountName));
         String address = keyInfo.get(0);
         String accountJson = keyInfo.get(1);
         LogUtil.debug("accountJson：" + accountJson);
@@ -453,7 +446,7 @@ public class AccountServiceImpl implements AccountService {
         LogUtil.debug("存入数据库account表：" + savedAccountEntity.toString());
 
         //账户信息存储到区块链
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = FUNCTION_NEW_ACCOUNT;
         Object[] contractMethodParams = new Object[11];
         contractMethodParams[0] = accountName;
@@ -547,7 +540,7 @@ public class AccountServiceImpl implements AccountService {
      * @throws PasswordIllegalParam
      */
     private String getRateFromHyperchain(String accountJson, String accountName) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = FUNCTION_GET_RATE;
         Object[] contractMethodParams = new Object[0];
         String[] resultMapKey = new String[]{KEY_RATE};
@@ -569,7 +562,7 @@ public class AccountServiceImpl implements AccountService {
         userEntityRepository.save(userEntity);
 
         //更新区块链账户利率
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String contractMethodName = FUNCTION_SET_RATE;
         Object[] contractMethodParams = new Object[1];
         contractMethodParams[0] = rate;

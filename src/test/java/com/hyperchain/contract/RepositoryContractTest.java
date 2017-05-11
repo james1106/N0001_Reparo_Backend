@@ -2,7 +2,7 @@ package com.hyperchain.contract;
 
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.BaseConstant;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.test.base.SpringBaseTest;
@@ -34,7 +34,7 @@ public class RepositoryContractTest extends SpringBaseTest {
         UserEntity payerUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 买家地址
         String payerPrivateKeyThis = payerUserEntity.getPrivateKey();
         String payerAccountName = payerUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         //2.1
         String contractMethodName = "incomeApply";
@@ -80,7 +80,7 @@ public class RepositoryContractTest extends SpringBaseTest {
         UserEntity repoUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 仓储地址，必须是仓储地址
         String repoPrivateKeyThis = repoUserEntity.getPrivateKey();
         String repoAccountName = repoUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(repoAccountName));
+        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(repoAccountName));
 
         //2.1
         String contractMethodName = "incomeResponse";
@@ -118,7 +118,7 @@ public class RepositoryContractTest extends SpringBaseTest {
         UserEntity repoUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 仓储地址，必须是仓储地址。
         String repoPrivateKeyThis = repoUserEntity.getPrivateKey();
         String repoAccountName = repoUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(repoAccountName));
+        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(repoAccountName));
 
         //2.1
         String contractMethodName = "incomeConfirm";
@@ -158,7 +158,7 @@ public class RepositoryContractTest extends SpringBaseTest {
         UserEntity repoUserEntity = userEntityRepository.findByAddress("0e1b81184266eaa1bbb19dabcefe78faeae11895"); //参数为 仓储地址，必须是仓储地址。(待填写)
         String repoPrivateKeyThis = repoUserEntity.getPrivateKey();
         String repoAccountName = repoUserEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, ReparoUtil.getPasswordForPrivateKey(repoAccountName));
+        ContractKey contractKey = new ContractKey(repoPrivateKeyThis, MoneyUtil.getPasswordForPrivateKey(repoAccountName));
 
         //2.1
         String contractMethodName = "outcomeResponse";

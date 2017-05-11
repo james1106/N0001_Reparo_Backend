@@ -222,63 +222,63 @@ contract ReceivableContract{
 //==============================test====================================
 //应收款
     struct Receivable {
-    bytes32 receivableNo;//应收款编号
-    bytes32 orderNo;//订单编号
-    bytes32 signer; //签发人账号
-    bytes32 accptr; //承兑人账号
-    bytes32 pyer;//付款人账号
-    bytes32 pyee;//收款人账号
-    bytes32 firstOwner;//本手持有人账号
-    bytes32 secondOwner;//下手持有人账号
-    uint isseAmt; //票面金额
-    uint cashedAmount;//已兑付金额
-    uint status;//应收款状态
-    uint lastStatus;//上一状态
-    uint isseDt; //签发日
-    uint signInDt;//签收日
-    uint dueDt; //到期日
-    bytes32 rate;//利率
-    bytes32 contractNo;//合同号
-    bytes32 invoiceNo;//发票号
-    DiscountedStatus discounted;//是否贴现标志
-    uint discountInHandAmount;//贴现回复时的到手金额
-    uint discountApplyAmount;//贴现申请金额
-    bytes32 discountedRate;//贴现利率
-    bytes note;//备注，暂时不用
+        bytes32 receivableNo;//应收款编号
+        bytes32 orderNo;//订单编号
+        bytes32 signer; //签发人账号
+        bytes32 accptr; //承兑人账号
+        bytes32 pyer;//付款人账号
+        bytes32 pyee;//收款人账号
+        bytes32 firstOwner;//本手持有人账号
+        bytes32 secondOwner;//下手持有人账号
+        uint isseAmt; //票面金额
+        uint cashedAmount;//已兑付金额
+        uint status;//应收款状态
+        uint lastStatus;//上一状态
+        uint isseDt; //签发日
+        uint signInDt;//签收日
+        uint dueDt; //到期日
+        bytes32 rate;//利率
+        bytes32 contractNo;//合同号
+        bytes32 invoiceNo;//发票号
+        DiscountedStatus discounted;//是否贴现标志
+        uint discountInHandAmount;//贴现回复时的到手金额
+        uint discountApplyAmount;//贴现申请金额
+        bytes32 discountedRate;//贴现利率
+        bytes note;//备注，暂时不用
     }
 
 //操作记录
     struct ReceivableRecord {
-    bytes32 receivableNo;//应收款编号
-    bytes32 serialNo;//流水号
-    bytes32 applicantAcctId;//申请人账号
-    bytes32 replyerAcctId;//回复人账号
-    ResponseType responseType;//回复意见
-    uint time;//时间戳
-    bytes32 operateType; //操作类型
-    uint dealAmount;//操作金额
-    uint receivableStatus;//应收款状态
+        bytes32 receivableNo;//应收款编号
+        bytes32 serialNo;//流水号
+        bytes32 applicantAcctId;//申请人账号
+        bytes32 replyerAcctId;//回复人账号
+        ResponseType responseType;//回复意见
+        uint time;//时间戳
+        bytes32 operateType; //操作类型
+        uint dealAmount;//操作金额
+        uint receivableStatus;//应收款状态
     }
 
 //帐户信息
     struct Account {
-    address accountAddress;//用户地址
-    bytes32 accountName;//用户名
-    bytes32 enterpriseName;//企业名称
-    RoleCode roleCode;//角色
-    AccountStatus accountStatus;//账户状态
-    bytes32 certType; //证件类型
-    bytes32 certNo; //证件号码
-    bytes32[] acctId; //账号 多个
-    bytes32 svcrClass; //开户行别
-    bytes32 acctSvcr; //开户行行号
-    bytes32 acctSvcrName; //开户行名称
+        address accountAddress;//用户地址
+        bytes32 accountName;//用户名
+        bytes32 enterpriseName;//企业名称
+        RoleCode roleCode;//角色
+        AccountStatus accountStatus;//账户状态
+        bytes32 certType; //证件类型
+        bytes32 certNo; //证件号码
+        bytes32[] acctId; //账号 多个
+        bytes32 svcrClass; //开户行别
+        bytes32 acctSvcr; //开户行行号
+        bytes32 acctSvcrName; //开户行名称
     }
 
-    enum RoleCode { RC00, RC01,RC02,RC03 } //RC00融资企业, RC01物流公司,RC02仓储公司,RC03金融机构
-    enum AccountStatus { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
-    enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-无
-    enum DiscountedStatus {NO, YES} //贴现标志位
+enum RoleCode { RC00, RC01,RC02,RC03 } //RC00融资企业, RC01物流公司,RC02仓储公司,RC03金融机构
+enum AccountStatus { VALID, INVALID, FROZEN } //账户状态，有效、无效、冻结
+enum ResponseType { YES, NO, NULL } //YES-同意，NO-拒绝，NULL-无
+enum DiscountedStatus {NO, YES} //贴现标志位
 
 //记录所有应收款编号数组
     bytes32[] allReceivableNos;
@@ -415,36 +415,14 @@ contract ReceivableContract{
         if(receivableNo == "" || orderNo == "" || signer == "" || accptr == "" || pyer == "" || pyee == "" || rate == "" ){
             return (3);
         }
-    /*        if(judgeRepetitiveSerialNo(serialNo)){
-     return (1032);
-     }
-     if(isseAmt <= 0){
-     return (1019);
-     }
-     if(judgeAccount(msg.sender)){
-     return (2);
-     }
-     if(judgeAcctIdMatchAddress(signer, msg.sender)){
-     return (1007);
-     }
-     if(judgeReplyerAddressEmpty(accptr)){
-     return (1004);
-     }
-     if(judgeReplyerAccount(accptr)){
-     return (1031);
-     }
-     */
+
         if(judgeRepetitiveReceivableNo(receivableNo)){//判断该应收款编号是否已经存在
             return (1030);
         }
 
         allReceivableNos.push(receivableNo);
         giveReceivableInfo(receivableNo, orderNo, signer, accptr, pyer, pyee, isseAmt, dueDt, rate, contractAndInvoiceNoAndSerialNo, time);
-//        orderCon = OrderContract(orderAddress);
-//        orderCon.updateOrderState(orderNo, "receState", 21);
-//        if(orderCon.updateOrderState(orderNo, "receState", 21) == 3){
-//            return (3);
-//        }
+
         holdingReceivablesMap[signer].push(receivableNo);
         orderNoToReceivableNoMap[orderNo] = receivableNo;
         pyerToReceivableMap[pyer].push(receivableNo);
@@ -478,22 +456,7 @@ contract ReceivableContract{
 
 //签发回复
     function signOutReply(bytes32 receivableNo, bytes32 replyerAcctId, ResponseType response, bytes32 serialNo, uint time, address orderAddress, address wayBillContractAddress) returns (uint){
-    /*        if(receivableNo == "" || replyerAcctId == "" || serialNo == ""){
-     return (3);
-     }
-     if(judgeRepetitiveSerialNo(serialNo)){
-     return (1032);
-     }
-     if(response != ResponseType.NO && response != ResponseType.YES){
-     return (1020);
-     }
-     if(judgeAccount(msg.sender)){
-     return (2);
-     }
-     if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
-     return (1007);
-     }
-     */
+
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.status != 21){
             return (1006);
@@ -522,8 +485,7 @@ contract ReceivableContract{
         }
         receivable.signInDt = time;
 
-    //pyerToReceivableMap[receivable.pyer].push(receivableNo);
-    //pyeeToReceivableMap[receivable.pyee].push(receivableNo);
+
         accptrToReceivableMap[receivable.accptr].push(receivableNo);
         signerToReceivableMap[receivable.signer].push(receivableNo);
         accountReceivableRecords[replyerAcctId].push(serialNo);
@@ -586,10 +548,7 @@ contract ReceivableContract{
         bankDiscountRate[1] = accountCon.getRateByAcctId(bankSvcr[1]);
         bankDiscountRate[2] = accountCon.getRateByAcctId(bankSvcr[2]);
         bankDiscountRate[3] = accountCon.getRateByAcctId(bankSvcr[3]);
-//                bankDiscountRate[0] = "0.1";
-//                bankDiscountRate[1] = "0.2";
-//                bankDiscountRate[2] = "0.3";
-//                bankDiscountRate[3] = "0.4";
+
         return (0, bankSvcr, bankName, bankDiscountRate);
 
     }
@@ -602,20 +561,7 @@ contract ReceivableContract{
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
-    /*
-     if(judgeAccount(msg.sender)){
-     return(2);
-     }
-     if(judgeAcctIdMatchAddress(applicantAcctId, msg.sender)){
-     return (1007);
-     }
-     if(judgeReplyerAddressEmpty(replyerAcctId)){
-     return (1004);
-     }
-     if(judgeReplyerAccount(replyerAcctId)){
-     return (1031);
-     }
-     */
+
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.status != 26){
             return (1006);
@@ -645,17 +591,7 @@ contract ReceivableContract{
         if(judgeRepetitiveSerialNo(serialNo)){
             return (1032);
         }
-//        if(judgeRepetitiveReceivableNo(newReceivableNo)){//判断新应收款编号是否已经存在
-//            return (1030);
-//        }
-    /*
-     if(judgeAccount(msg.sender)){
-     return(2);
-     }
-     if(judgeAcctIdMatchAddress(replyerAcctId, msg.sender)){
-     return (1007);
-     }
-     */
+
         Receivable receivable = receivableDetailMap[receivableNo];
         if(receivable.secondOwner != replyerAcctId){
             return (1);
@@ -680,77 +616,7 @@ contract ReceivableContract{
         updateOrderStateByReceivable(orderAddress, receivable.orderNo, "receState", receivable.status);
         return (0);
     }
-/*
-    function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo) internal {
-        Receivable receivable = receivableDetailMap[receivableNo];
-        uint oriAmount = receivable.isseAmt;
-        if(responseType == ResponseType.NO){
-            receivable.status = receivable.lastStatus;
-        }else{
-            Receivable newReceivable = receivableDetailMap[newReceivableNo];
-            copyValue(receivableNo, newReceivableNo);
-            newReceivable.receivableNo = newReceivableNo;
-            receivable.lastStatus = receivable.status;
-            receivable.status = 49;//已全额贴现
-            receivable.discounted = DiscountedStatus.YES;
-            receivable.signInDt = time;
-            newReceivable.lastStatus = 41;
-            newReceivable.status = 46;//贴现已签收
-            newReceivable.signInDt = time;
-            newReceivable.firstOwner = receivable.secondOwner;
-            newReceivable.secondOwner = "";
-            newReceivable.discounted = DiscountedStatus.YES;
-            newReceivable.signInDt = time;
-        }
-    }
-*/
-/*
- function subDiscount(bytes32 receivableNo, bytes32 serialNo, ResponseType responseType, uint time, bytes32 newReceivableNo, bytes32 discountApplySerialNo) internal {
- Receivable receivable = receivableDetailMap[receivableNo];
- ReceivableRecord receivableRecord = receivableRecordMap[discountApplySerialNo];
- uint discountApplyAmount = receivableRecord.dealAmount;
- uint oriAmount = receivable.isseAmt;
- if(responseType == ResponseType.NO){
- receivable.status = receivable.lastStatus;
- }else{
- Receivable newReceivable = receivableDetailMap[newReceivableNo];
- if(judgeOperateOption(receivableNo, discountApplyAmount)){
- copyValue(receivableNo, newReceivableNo);
- newReceivable.receivableNo = newReceivableNo;
- receivable.lastStatus = receivable.status;
- receivable.status = 49;//已全额贴现
- receivable.discounted = DiscountedStatus.YES;
- receivable.signInDt = time;
- newReceivable.lastStatus = 41;
- newReceivable.status = 46;//贴现已签收
- newReceivable.signInDt = time;
- newReceivable.firstOwner = receivable.secondOwner;
- newReceivable.secondOwner = "";
- newReceivable.discounted = DiscountedStatus.YES;
- newReceivable.signInDt = time;
- newReceivable.isseAmt = discountApplyAmount;
- }else{
- copyValue(receivableNo, newReceivableNo);
- newReceivable.receivableNo = newReceivableNo;
- newReceivable.lastStatus = newReceivable.status;
- newReceivable.status = 46;//贴现已签收
- newReceivable.isseAmt = discountApplyAmount;
- newReceivable.firstOwner = receivable.secondOwner;
- newReceivable.secondOwner = "";
- newReceivable.discounted = DiscountedStatus.YES;
- newReceivable.signInDt = time;
 
- receivable.lastStatus = receivable.status;
- receivable.status = 48;//已部分贴现
- receivable.isseAmt = oriAmount - discountApplyAmount;
- receivable.signInDt = time;
- receivable.firstOwner = receivable.firstOwner;
- //receivable.secondOwner = "";
- }
-
- }
- }
- */
 //判断全额 或 部分
     function judgeOperateOption(bytes32 receivableNum, uint dealAmount) internal returns (bool){
         Receivable receivable = receivableDetailMap[receivableNum];
@@ -815,15 +681,15 @@ contract ReceivableContract{
             return(1005);
         }
 
-     if(receivable.status != 26 && receivable.status != 46){
-        return(1006);
-     }
-     /*
-     //到期日才能兑付
-     if(time < receivable.dueDt){
-     return(1010);
-     }
-     */
+        if(receivable.status != 26 && receivable.status != 46){
+            return(1006);
+        }
+        /*
+         //到期日才能兑付
+         if(time < receivable.dueDt){
+         return(1010);
+         }
+         */
 
         receivable.lastStatus = receivable.status;
         receivable.cashedAmount = cashedAmount;
@@ -861,26 +727,26 @@ contract ReceivableContract{
          */
         if(receivableNoAndAcctId[0] == ""){
             return (3,
-            bytesInfo1,
-            uintInfo,
-            discounted
+                    bytesInfo1,
+                    uintInfo,
+                    discounted
             );
         }
 
         if(receivable.receivableNo == 0x0) {
             return(1005,
-            bytesInfo1,
-            uintInfo,
-            discounted
+                    bytesInfo1,
+                    uintInfo,
+                    discounted
             );
         }
 
 
         if(receivable.signer != receivableNoAndAcctId[1] && receivable.accptr != receivableNoAndAcctId[1] && receivable.pyer != receivableNoAndAcctId[1] && receivable.pyee != receivableNoAndAcctId[1] && receivable.firstOwner != receivableNoAndAcctId[1] && receivable.secondOwner != receivableNoAndAcctId[1]) {
             return(1,
-            bytesInfo1,
-            uintInfo,
-            discounted
+                    bytesInfo1,
+                    uintInfo,
+                    discounted
             );
         }
 
@@ -919,9 +785,9 @@ contract ReceivableContract{
         bytesInfo1[17] = receivable.discountedRate;
 
         return (0,
-        bytesInfo1,
-        uintInfo,
-        receivable.discounted
+                bytesInfo1,
+                uintInfo,
+                receivable.discounted
         );
     }
 
@@ -932,49 +798,49 @@ contract ReceivableContract{
 
         uint[] memory uintInfo = new uint[](8);
         bytes32[] memory bytesInfo1 = new bytes32[](11);
-    //bytes32[] memory bytesInfo2 = new bytes32[](4);
-    /*
-     if(judgeAccount(msg.sender)){
-     return (2,
-     bytesInfo1,
-     //bytesInfo2,
-     uintInfo,
-     discounted,
-     note
-     );
-     }
-     */
+        //bytes32[] memory bytesInfo2 = new bytes32[](4);
+        /*
+         if(judgeAccount(msg.sender)){
+         return (2,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         discounted,
+         note
+         );
+         }
+         */
         if(receivableNo == ""){
             return (3,
-            bytesInfo1,
-            //bytesInfo2,
-            uintInfo,
-            discounted,
-            note
+                    bytesInfo1,
+                    //bytesInfo2,
+                    uintInfo,
+                    discounted,
+                    note
             );
         }
 
         if(receivable.receivableNo == 0x0) {
             return(1005,
-            bytesInfo1,
-            //bytesInfo2,
-            uintInfo,
-            discounted,
-            note
+                    bytesInfo1,
+                    //bytesInfo2,
+                    uintInfo,
+                    discounted,
+                    note
             );
         }
 
-    /*
-     if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
-     return(1,
-     bytesInfo1,
-     //bytesInfo2,
-     uintInfo,
-     discounted,
-     note
-     );
-     }
-     */
+        /*
+         if(receivable.signer != acctId && receivable.accptr != acctId && receivable.pyer != acctId && receivable.pyee != acctId) {
+         return(1,
+         bytesInfo1,
+         //bytesInfo2,
+         uintInfo,
+         discounted,
+         note
+         );
+         }
+         */
         uintInfo[0] = receivable.isseAmt;
         uintInfo[1] = receivable.cashedAmount;
         uintInfo[2] = receivable.isseDt;
@@ -999,11 +865,11 @@ contract ReceivableContract{
 
 
         return (0,
-        bytesInfo1,
-        //acctSvcrNameAndEnterpriseName(receivableNo),
-        uintInfo,
-        discounted,
-        note
+                bytesInfo1,
+                //acctSvcrNameAndEnterpriseName(receivableNo),
+                uintInfo,
+                discounted,
+                note
         );
     }
 
@@ -1076,235 +942,6 @@ contract ReceivableContract{
         return accountCon.getEnterpriseNameByAcctId(acctId);
     }
 
-/*
- function acctSvcrNameAndEnterpriseName(bytes32 receivableNo) returns (bytes32[]){
- Receivable receivable = receivableDetailMap[receivableNo];
- address pyerAddress = acctIdToAddressMap[receivable.pyer];
- address pyeeAddress = acctIdToAddressMap[receivable.pyee];
- Account pyerAccount = accountMap[pyerAddress];
- Account pyeeAccount = accountMap[pyeeAddress];
- bytes32 pyerEnterpriseName = pyerAccount.enterpriseName;
- bytes32 pyerAcctSvcrName = pyerAccount.acctSvcrName;
- bytes32 pyeeEnterpriseName = pyeeAccount.enterpriseName;
- bytes32 pyeeAcctSvcrName = pyeeAccount.acctSvcrName;
-
- bytes32[] memory bytesInfo = new bytes32[](4);
- bytesInfo[0] = pyerEnterpriseName;
- bytesInfo[1] = pyerAcctSvcrName;
- bytesInfo[2] = pyeeEnterpriseName;
- bytesInfo[3] = pyeeAcctSvcrName;
- return bytesInfo;
- }
- */
-
-/*
- function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
- Receivable receivable = receivableDetailMap[receivableNo];
- Account account = accountMap[receivable.py];
- bytesInfo1[13] = account.lastStatus;
- bytesInfo1[14] = account.rate;
- bytesInfo1[15] = account.contractNo;
- bytesInfo1[16] = account.invoiceNo;
- }
- */
-/*
- function getReceivableMostInfo(bytes32 receivableNo) returns(string){
- bytes32[] memory value = new bytes32[](12);
- value = getReceivableValue(receivableNo);
- return SewingBytes32ArrayToString(value);
- }
-
- function getReceivableValue(bytes32 receivableNo) returns(bytes32[]){
- Receivable receivable = receivableDetailMap[receivableNo];
- bytes32[] memory value = new bytes32[](12);
-
- value[0] = receivableNo;
- value[1] = receivable.orderNo;
- value[2] = receivable.signer;
- value[3] = receivable.accptr;
- value[4] = receivable.pyer;
- value[5] = receivable.pyee;
- value[6] = receivable.firstOwner;
- value[7] = receivable.secondOwner;
- value[8] = receivable.status;
- value[9] = receivable.lastStatus;
- value[10] = receivable.rate;
- value[11] = receivable.contractNo;
- value[12] = receivable.invoiceNo;
- return value;
- }
-
- function SewingBytes32ArrayToString(bytes32[] value) internal returns(string){
-
- string  memory TheString ;
- string memory symbol1 = ",";
- uint j=0;
- for(uint i=0;i<value.length;i++){
- string memory temp1 = bytes32ToString(value[i]);
- TheString = sewingTwoString(TheString,temp1);
- if(i < value.length-1){
- TheString = sewingTwoString(TheString,symbol1);
- }
- }
-
- return TheString;
-
- }
-
- function bytes32ToString(bytes32 x) internal returns (string) {
-     bytes memory bytesString = new bytes(32);
-     uint charCount = 0;
-     for (uint j = 0; j < 32; j++) {
-         byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
-         if (char != 0) {
-             bytesString[charCount] = char;
-             charCount++;
-        }
-     }
-     bytes memory bytesStringTrimmed = new bytes(charCount);
-     for (j = 0; j < charCount; j++) {
-            bytesStringTrimmed[j] = bytesString[j];
-     }
-     return string(bytesStringTrimmed);
- }
-
- function sewingTwoString(string a,string b) internal returns(string){
- bytes memory a_ = bytes(a);
- bytes memory b_ = bytes(b);
- bytes memory c = new bytes(a_.length+b_.length);
- uint j = 0;
- for(uint i=0;i< c.length;i++){
- if(i<a_.length){
- c[i] = a_[i];
- }
- else{
- c[i] = b_[j];
- j++;
- }
- }
- return string(c);
- }
- */
-
-/*
- //查找应收款的交易历史，返回流水号
- =======
- /*
- function pyerAndPyeeAccountNameAndAcctSvcrName(bytes32 receivableNo) returns (bytes32[]){
- Receivable receivable = receivableDetailMap[receivableNo];
- Account account = accountMap[receivable.py];
- bytesInfo1[13] = account.lastStatus;
- bytesInfo1[14] = account.rate;
- bytesInfo1[15] = account.contractNo;
- bytesInfo1[16] = account.invoiceNo;
- }
- */
-/*
- function getReceivableMostInfo(bytes32 receivableNo) returns(string){
- bytes32[] memory value = new bytes32[](12);
- value = getReceivableValue(receivableNo);
- return SewingBytes32ArrayToString(value);
- }
-
- function getReceivableValue(bytes32 receivableNo) returns(bytes32[]){
- Receivable receivable = receivableDetailMap[receivableNo];
- bytes32[] memory value = new bytes32[](12);
-
- value[0] = receivableNo;
- value[1] = receivable.orderNo;
- value[2] = receivable.signer;
- value[3] = receivable.accptr;
- value[4] = receivable.pyer;
- value[5] = receivable.pyee;
- value[6] = receivable.firstOwner;
- value[7] = receivable.secondOwner;
- value[8] = receivable.status;
- value[9] = receivable.lastStatus;
- value[10] = receivable.rate;
- value[11] = receivable.contractNo;
- value[12] = receivable.invoiceNo;
- return value;
- }
-
- function SewingBytes32ArrayToString(bytes32[] value) internal returns(string){
-
- string  memory TheString ;
- string memory symbol1 = ",";
- uint j=0;
- for(uint i=0;i<value.length;i++){
- string memory temp1 = bytes32ToString(value[i]);
- TheString = sewingTwoString(TheString,temp1);
- if(i < value.length-1){
- TheString = sewingTwoString(TheString,symbol1);
- }
- }
-
- return TheString;
-
- }
-
- function bytes32ToString(bytes32 x) internal returns (string) {
- bytes memory bytesString = new bytes(32);
- uint charCount = 0;
- for (uint j = 0; j < 32; j++) {
- byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
- if (char != 0) {
- bytesString[charCount] = char;
- charCount++;
- }
- }
- bytes memory bytesStringTrimmed = new bytes(charCount);
- for (j = 0; j < charCount; j++) {
- bytesStringTrimmed[j] = bytesString[j];
- }
- return string(bytesStringTrimmed);
- }
-
- function sewingTwoString(string a,string b) internal returns(string){
- bytes memory a_ = bytes(a);
- bytes memory b_ = bytes(b);
- bytes memory c = new bytes(a_.length+b_.length);
- uint j = 0;
- for(uint i=0;i< c.length;i++){
- if(i<a_.length){
- c[i] = a_[i];
- }
- else{
- c[i] = b_[j];
- j++;
- }
- }
- return string(c);
- }
- */
-
-/*
- //查找应收款的交易历史，返回流水号
- function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint,bytes32[],uint[],ResponseType[]){
- //return (0, receivableTransferHistoryMap[receivableNo]);
- bytes32[] memory historyList1;
- historyList1 = receivableTransferHistoryMap[receivableNo];
- uint len = historyList1.length;
- bytes32[] memory bytesList = new bytes32[](len * 5);//5个值
- uint[] memory intList   = new uint[](len * 2);//2 ge
- ResponseType[] memory responseTypeList = new ResponseType[](len);//1 ge
-
- for (uint index = 0; index < len; index++) {
- bytesList[index * 5] = receivableRecordMap[historyList1[index]].receivableNo;
- bytesList[index * 5 + 1] = receivableRecordMap[historyList1[index]].serialNo;
- bytesList[index * 5 + 2] = receivableRecordMap[historyList1[index]].applicantAcctId;
- bytesList[index * 5 + 3] = receivableRecordMap[historyList1[index]].replyerAcctId;
- bytesList[index * 5 + 4] = receivableRecordMap[historyList1[index]].operateType;
-
- intList[index * 2] = receivableRecordMap[historyList1[index]].time;
- intList[index * 2 + 1] = receivableRecordMap[historyList1[index]].dealAmount;
-
- responseTypeList[index] = receivableRecordMap[historyList1[index]].responseType;
- }
-
- return (0,bytesList,intList,responseTypeList);
- }
- */
     function getReceivableHistorySerialNo(bytes32 receivableNo) returns (uint, bytes32[]){
         return (0, receivableTransferHistoryMap[receivableNo]);
     }
@@ -1315,39 +952,39 @@ contract ReceivableContract{
         ReceivableRecord receivableRecord = receivableRecordMap[serialNm];
         if(serialNm == ""){
             return (3,
-            serialNo,
-            receivableNo,
-            applicantAcctId,
-            replyerAcctId,
-            ResponseType.NULL,
-            0,
-            operateType,
-            0,
-            receivableStatus);
+                serialNo,
+                receivableNo,
+                applicantAcctId,
+                replyerAcctId,
+                ResponseType.NULL,
+                0,
+                operateType,
+                0,
+                receivableStatus);
         }
 
         if(receivableRecord.serialNo == 0x0) {
             return(1013,
-            serialNo,
-            receivableNo,
-            applicantAcctId,
-            replyerAcctId,
-            ResponseType.NULL,
-            0,
-            operateType,
-            0,
-            receivableStatus);
+                serialNo,
+                receivableNo,
+                applicantAcctId,
+                replyerAcctId,
+                ResponseType.NULL,
+                0,
+                operateType,
+                0,
+                receivableStatus);
         }
         return(0,
-        receivableRecord.serialNo,
-        receivableRecord.receivableNo,
-        receivableRecord.applicantAcctId,
-        receivableRecord.replyerAcctId,
-        receivableRecord.responseType,
-        receivableRecord.time,
-        receivableRecord.operateType,
-        receivableRecord.dealAmount,
-        receivableRecord.receivableStatus);
+            receivableRecord.serialNo,
+            receivableRecord.receivableNo,
+            receivableRecord.applicantAcctId,
+            receivableRecord.replyerAcctId,
+            receivableRecord.responseType,
+            receivableRecord.time,
+            receivableRecord.operateType,
+            receivableRecord.dealAmount,
+            receivableRecord.receivableStatus);
 
     }
 
@@ -1470,31 +1107,6 @@ contract RepositoryContract{
         }
     }
 
-    //更新仓储结构体中的物流信息,入库物流公司address，入库运单号，出库物流公司address，出库运单号
-    /*
-     function updateLogisInfo(bytes32 repoCertNo,//仓单编号
-     address logisticsEnterpriseAddress,//物流公司address
-     bytes32 wayBillNo //运单号
-     ) returns (uint){
-
-     //判断仓单编号是否存在，不存在返回“仓单不存在”
-     if(repoCertNoExsit(repoCertNo) == false){
-     return 4001;//“仓单不存在”
-     }
-
-     RepoCert repoCert = repoCertDetailMap[repoCertNo];
-     bytes32 repoBusinessNo = repoCert.repoBusinessNo;
-     //
-     bytes32[]  repoBusinessTransNoList = businessTransNoMap[repoBusinessNo];
-     uint length = repoBusinessTransNoList.length;
-     bytes32 newestBusinessTransNo = repoBusinessTransNoList[length - 1];
-
-     //更新出库物流公司，出库运单号
-     businessDetailMap[newestBusinessTransNo].logisticsEnterpriseAddress = logisticsEnterpriseAddress;
-     businessDetailMap[newestBusinessTransNo].wayBillNo = wayBillNo;
-     return (0);
-     }
-     */
 
     //更新仓储结构体中的物流信息,入库物流公司address，入库运单号，出库物流公司address，出库运单号
     function updateLogisInfo2(
@@ -1917,21 +1529,7 @@ contract RepositoryContract{
         //获取仓储业务编号
         RepoCert repoCert =  repoCertDetailMap[repoCertNo];
         bytes32  repoBusinessNo = repoCert.repoBusinessNo;
-        /*
-         //获取上一个流转号
-         string memory s1 = bytes32ToString(repoBusinessNo);
-         string memory s2 = bytes32ToString(bytes32(REPO_BUSI_INCOMED));
 
-         string memory conStr = concatString(s1, s2);
-         bytes32 lastBusinessTransNo = stringToBytes32(conStr);
-
-         //获取新的流转号
-         string memory s3 = bytes32ToString(bytes32(REPO_BUSI_WATING_OUTCOME));
-         conStr = concatString(s1, s3);
-         bytes32 currBusinessTransNo = stringToBytes32(conStr);
-         */
-        //bytes32 lastBusinessTransNo;
-        //bytes32 currBusinessTransNo;
         //更新仓储状态为待出库
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
@@ -2036,13 +1634,7 @@ contract RepositoryContract{
             return (1);
         }
         //businessDetailMap[businessTransNo].
-        /*
-         RepoBusiness repoBusinsess = businessDetailMap[lastBusinessTransNo];
-         repoBusinsess.repoBusiStatus = 6;//RepoBusiStatus.OUTCOMED;
-         repoBusinsess.businessTransNo = currBusinessTransNo;
-         repoBusinsess.operateOperateTime = operateOperateTime;
-         businessDetailMap[currBusinessTransNo] = repoBusinsess;
-         */
+
         copyStruct(lastBusinessTransNo,currBusinessTransNo);
         RepoBusiness repoBusinsess = businessDetailMap[currBusinessTransNo];
         repoBusinsess.repoBusiStatus = REPO_BUSI_OUTCOMED;//RepoBusiStatus.INCOMED;
@@ -2106,10 +1698,7 @@ contract RepositoryContract{
         return (0,repoCertNo);
     }
     //仓储业务历史列表
-    /* bytes32 businessTransNo ;// 业务流转编号（仓储业务编号仓储状态）
-     uint    repoBusiStatus  ;// 仓储状态（0-未定义,1-入库待响应,2-待入库,3-已入库,4-出库待响应,5-待出库,6-已出库）
 
-     bytes32 operateOperateTime  ;// 操作时间(时间戳)*/
     function getRepoBusiHistoryList(bytes32 repoBusinessNo) returns (uint,bytes32[],uint[]){
         bytes32[] memory historyList1;
         historyList1 = businessTransNoMap[repoBusinessNo];
@@ -2143,11 +1732,6 @@ contract RepositoryContract{
         for (uint index = 0; index < len; index++) {
             //repoBusiTranNo  = historyList1[index];
             repoBusinsess = businessDetailMap[historyList1[index]];
-            /*
-             historyList[index * 2] = historyList1[index];//流水号
-             historyList[index * 2 + 1] = businessDetailMap[historyList1[index]].operateOperateTime;
-             */
-
             historyList[index * 2] = repoBusinsess.repoBusiStatus;//
             historyList[index * 2 + 1] = repoBusinsess.operateOperateTime;
 
@@ -2279,13 +1863,7 @@ contract RepositoryContract{
 
     //将需要返回的各bytes32参数转化为bytes32[]
     function getReceivableValue(bytes32 orderId) returns(bytes32[]){
-        /*Order order = orderDetailMap[orderId];
-         bytes32[] memory value = new bytes32[](5);
-         value[0] = order.orderId;
-         value[1] = order.productName;
-         value[2] = order.payerBank;
-         value[3] = order.payerBankClss;
-         value[4] = order.payerBankAccount;
+        /*
          return value;*/
     }
 
@@ -2389,9 +1967,9 @@ contract OrderContract{
         owner = msg.sender;
     }
 
-    enum PayingMethod {
+enum PayingMethod {
         RECEIVABLE,   //0, 应收账款方式
-        CASH          //1, 现金方式
+            CASH          //1, 现金方式
     }
 
     struct OrderState {
@@ -2495,16 +2073,16 @@ contract OrderContract{
     /****************************买方新建订单**************************************/
 
     function createOrder (
-    address acctContractAddress,    //账户合约地址
-    address payeeAddress,           //卖方地址
-    address payerRepoAddress,       //买方仓储公司地址
-    uint productUnitPrice,          //货品单价
-    uint productQuantity,           //货品数量
-    uint productTotalPrice,         //货品总价
-    bytes32[] bytes32Params,        //数组里有7个参数，orderNo，productName，repoBusinessNo
-    //payerBank, payerBankClss, payerAccount, txSerialNo
-    PayingMethod payingMethod,      //付款方式
-    uint orderGenerateTime) returns(uint){  //生成订单时间
+        address acctContractAddress,    //账户合约地址
+        address payeeAddress,           //卖方地址
+        address payerRepoAddress,       //买方仓储公司地址
+        uint productUnitPrice,          //货品单价
+        uint productQuantity,           //货品数量
+        uint productTotalPrice,         //货品总价
+        bytes32[] bytes32Params,        //数组里有7个参数，orderNo，productName，repoBusinessNo
+        //payerBank, payerBankClss, payerAccount, txSerialNo
+        PayingMethod payingMethod,      //付款方式
+        uint orderGenerateTime) returns(uint){  //生成订单时间
 
         //此处从公用合约处获取调用者的角色和账户状态以做权限控制
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
@@ -2558,9 +2136,9 @@ contract OrderContract{
 
     //根据orderNo查询应收款概要信息，物流信息
     function searchReceAndWayBillInfo(address receAddress, address wbillContractAddress, address accountContractAddr,  bytes32 orderNo) returns(
-    bytes32[] param1,
-    uint[] param2,
-    address[] param3){
+        bytes32[] param1,
+        uint[] param2,
+        address[] param3){
         //此处获取应收款信息
         receivableContract = ReceivableContract(receAddress);
         bytes32[4] memory receBytesList;
@@ -2612,12 +2190,12 @@ contract OrderContract{
 
     /*******************************根据订单编号获取订单详情***********************************/
     function queryOrderDetail(address receAddress, address wbillContractAddress, address accountContractAddr, bytes32 orderNo) returns(
-    uint,
-    address[] resultAddress,    //
-    bytes32[] resultBytes32,    //
-    uint[] resultUint,          //
-    PayingMethod resultMethod,  //
-    uint txState){              //交易状态
+        uint,
+        address[] resultAddress,    //
+        bytes32[] resultBytes32,    //
+        uint[] resultUint,          //
+        PayingMethod resultMethod,  //
+        uint txState){              //交易状态
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         accountContract = AccountContract(accountContractAddr);
         if(!accountContract.isAccountExist(msg.sender)){
@@ -2636,10 +2214,7 @@ contract OrderContract{
 
 
         Order order = orderDetailMap[orderNo];
-        //如果订单与合约调用者无关，"权限拒绝"
-//        if (order.payerAddress != msg.sender && order.payeeAddress != msg.sender) {
-//            return (2005, resultAddress, resultBytes32, resultUint, resultMethod, txState);
-//        }
+
 
 
         bytes32[] memory param1 = new bytes32[](5);
@@ -2711,12 +2286,12 @@ contract OrderContract{
     }
 
     function queryAllOrderOverViewInfoList(address acctContractAddress,uint role)returns(
-    uint,
-    bytes32[] partList1,        //4值 orderNo, productName，payerBank，payerBankAccount
-    address[] partList2,        //4值 payerAddress, payeeAddress, payerRepoAddress, payerRepoAddress
-    uint[] partList3,           //5值 productQuantity,productUnitPrice,productTotalPrice,orderGenerateTime,orderConfirmTime, 某time(没看懂)
-    PayingMethod[] methodList,  //付款方式
-    uint[] stateList){          //仓储状态
+        uint,
+        bytes32[] partList1,        //4值 orderNo, productName，payerBank，payerBankAccount
+        address[] partList2,        //4值 payerAddress, payeeAddress, payerRepoAddress, payerRepoAddress
+        uint[] partList3,           //5值 productQuantity,productUnitPrice,productTotalPrice,orderGenerateTime,orderConfirmTime, 某time(没看懂)
+        PayingMethod[] methodList,  //付款方式
+        uint[] stateList){          //仓储状态
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         accountContract = AccountContract(acctContractAddress);
         if(!accountContract.isAccountExist(msg.sender)){
@@ -2778,24 +2353,20 @@ contract OrderContract{
 
     //买方查询相关订单编号列表
     function queryAllOrderListForPayer() returns (uint, bytes32[] resultList){
-        /*if (!isValidUser()) {
-         return (1, resultList);
-         }*/
+
         return (0, allPayerOrderMap[msg.sender]);
     }
 
     //买方查询相关订单编号列表
     function queryAllOrderListForPayee() returns (uint, bytes32[] resultList){
-        /*if (!isValidUser()) {
-         return (1, resultList);
-         }*/
+
         return (0, allPayeeOrderMap[msg.sender]);
     }
 
     /****************************卖方确认订单**************************************/
 
     function confirmOrder(address acctContractAddress, bytes32 orderNo, address payeeRepoAddress, bytes32 payeeRepoCertNo, bytes32 txSerialNo, uint orderConfirmTime,bytes32 payeeRepoBusinessNo) returns(
-    uint){
+        uint){
         //如果用户不存在，返回"账户不存在，该用户可能未注册或已失效"
         accountContract = AccountContract(acctContractAddress);
         if(!accountContract.isAccountExist(msg.sender)){
@@ -2826,7 +2397,7 @@ contract OrderContract{
         orderDetailMap[orderNo].payeeRepoAddress = payeeRepoAddress;
         orderDetailMap[orderNo].payeeRepoCertNo = payeeRepoCertNo;
         orderDetailMap[orderNo].payeeRepoBusinessNo = payeeRepoBusinessNo;
-        //orderDetailMap[orderNo].orderState.payeeRepoBusiState = 5;
+
         updateOrderState(orderNo, "payeeRepoBusiState", 5, txSerialNo, orderConfirmTime);
         //确认订单后，检查仓储状态，如果为"待入库",则修改应收账款状态为"待签发"
         if(orderDetailMap[orderNo].orderState.payerRepoBusiState == 2){
@@ -2860,12 +2431,12 @@ contract OrderContract{
 
     /***********************根据订单编号查询交易信息给应收账款合约*********************************/
     function queryOrderInfoForRece(bytes32 orderNo)returns (
-    address[4],
-    bytes32[4],
-    uint[2]){
+        address[4],
+        bytes32[4],
+        uint[2]){
         //如果订单不存在，返回"订单不存在"
         if(!orderExists(orderNo)){
-        return (resultAddress, resultBytes32, resultUint);
+            return (resultAddress, resultBytes32, resultUint);
         }
 
 
@@ -3019,7 +2590,7 @@ contract WayBillContract {
         address[] addrs, /*senderAddress, receiverAddress, senderRepoAddress, receiverRepoAddress, orderAddress*/
         bytes32[] strs, /*orderNo, senderRepoCertNo, receiverRepoBusinessNo, productName*/
         uint[] integers /*waitTime, productQuantity, productValue*/
-    ) returns (uint code)
+) returns (uint code)
     {
         orderContract = OrderContract (addrs[4]);
 
@@ -3058,24 +2629,11 @@ contract WayBillContract {
         bytes32[] strs,  /*orderNo, productName, senderRepoCertNo, receiverRepoBusinessNo, statusTransId, waybillNo*/
         address accountContractAddr,
         address repositoryContractAddr)
-        returns (uint code)
+    returns (uint code)
     {
         accountContract = AccountContract (accountContractAddr);
         repositoryContract = RepositoryContract (repositoryContractAddr);
-        // uint requestTime = integers[0];
-        // uint productValue = integers[1];
-        // uint productQuantity = integers[2];
-        // address logisticsAddress = addrs[0];
-        // address senderAddress = addrs[1];
-        // address receiverAddress = addrs[2];
-        // address receiverRepoAddress = addrs[3];
-        // address senderRepoAddress = addrs[4];
-        // bytes32 orderNo = strs[0];
-        // bytes32 productName = strs[1];
-        // bytes32 senderRepoCertNo = strs[2];
-        // bytes32 receiverRepoBusinessNo = strs[3];
-        // bytes32 statusTransId = strs[4];
-        // bytes32 waybillNo = strs[5];
+
         bytes32[] memory logisticsInfo;
 
         //权限控制
@@ -3105,11 +2663,7 @@ contract WayBillContract {
         addressToOrderNoList[addrs[0]].push(strs[0]);
 
         //TODO 更新仓储结构体中的物流信息
-        /*repositoryContract.updateLogisInfo(
-         strs[2],//仓单编号
-         addrs[0],//物流公司address
-         strs[5] //运单号
-         );*/
+
 
         var( tmpcode, payerRepoBusinessNo, payeeRepoBusinessNo) = orderContract.qryRepoBusiNos(strs[0]);
         repositoryContract.updateLogisInfo2(
@@ -3181,9 +2735,7 @@ contract WayBillContract {
         if(accountContract.isAccountExist(msg.sender) == false){ //用户不存在
             return (CODE_INVALID_USER,ints, strs, addrs, logisticsInfo);
         }
-        //if(accountContract.checkRoleCode(msg.sender, ROLE_LOGISTICS) == false && accountContract.checkRoleCode(msg.sender, ROLE_COMPANY) == false){ //用户无权限
-        //    return (CODE_PERMISSION_DENIED,ints, strs, addrs, logisticsInfo);
-        //}
+
 
         //获取运单最新信息
         bytes32[] memory statusTransIdList = orderNoToStatusTransIdList[orderNo];
@@ -3249,7 +2801,7 @@ contract WayBillContract {
 
     //获取运单概要信息。供其他合约调用
     function getWayBillOverview(bytes32 orderNo, address accountContractAddr)
-        returns(bytes32 wayBillNo, uint requestTime, address logisticsAddress, uint waybillStatus, uint operateTime)
+    returns(bytes32 wayBillNo, uint requestTime, address logisticsAddress, uint waybillStatus, uint operateTime)
     {
         /*运单号, 下单时间, 物流公司, 物流当前状态, 更新时间*/
         accountContract = AccountContract (accountContractAddr);

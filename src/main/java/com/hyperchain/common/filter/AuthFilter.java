@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.DesUtils;
 import com.hyperchain.common.util.TokenUtil;
-import com.hyperchain.controller.AccountController;
 import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,8 @@ import java.io.IOException;
 /**
  * Created by ldy on 2017/4/9.
  */
-//@Component
-//@WebFilter(filterName = "AuthFilter", urlPatterns = "/*")
+@Component
+@WebFilter(filterName = "AuthFilter", urlPatterns = "/*")
 public class AuthFilter implements javax.servlet.Filter {
 
     @Autowired

@@ -169,12 +169,9 @@ public class DesUtils {
 
     public static String decryptToken(String token) {
         try {
-//            String test = "{'a':'2','id':1}";
+
             DesUtils des = new DesUtils(strDefaultKey);//自定义密钥
-            /*System.out.println("加密前的字符：" + test);
-            System.out.println("加密后的字符：" + des.encrypt(test));
-            System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));*/
-            //System.out.println("解密后的字符：" + des.decrypt(token));
+
             return des.decrypt(token);
 
         } catch (Exception e) {
@@ -187,12 +184,9 @@ public class DesUtils {
 
     public static String encryptToken(String token) {
         try {
-//            String test = "{'a':'2','id':1}";
+
             DesUtils des = new DesUtils(strDefaultKey);//自定义密钥
-            /*System.out.println("加密前的字符：" + test);
-            System.out.println("加密后的字符：" + des.encrypt(test));
-            System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));*/
-            //System.out.println("解密后的字符：" + des.decrypt(token));
+
             return des.encrypt(token);
 
         } catch (Exception e) {
@@ -207,10 +201,6 @@ public class DesUtils {
         try {
             String test = "{'a':'2','id':1}";
             DesUtils des = new DesUtils("绘声绘色");//自定义密钥
-            System.out.println("加密前的字符：" + test);
-            System.out.println("加密后的字符：" + des.encrypt(test));
-            System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));
-            System.out.println("解密后的字符：" + des.decrypt("2861e08579376739f631b791593267e0b2647f653593b62faace064b2eb2f67599c399dba296a0d453c791c0ece3031a243449ff0a5a0842"));
         } catch (Exception e) {
             e.printStackTrace();
         }

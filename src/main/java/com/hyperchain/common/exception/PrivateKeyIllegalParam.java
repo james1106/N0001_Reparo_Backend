@@ -1,6 +1,5 @@
 package com.hyperchain.common.exception;
 
-import com.hyperchain.common.constant.BaseConstant;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.base.BaseException;
 

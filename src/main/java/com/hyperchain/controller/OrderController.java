@@ -4,7 +4,7 @@ import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.CommonUtil;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.base.BaseController;
@@ -135,15 +135,15 @@ public class OrderController extends BaseController{
         orderParameterList.add(payerAccount);
         orderParameterList.add(txSerialNo);
 
-        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKey, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         Object[] orderParams = new Object[9];
         orderParams[0] = acctContractAddress;
         orderParams[1] = payeeAddress;
         orderParams[2] = payerRepoAddress;
-        orderParams[3] = ReparoUtil.convertYuanToCent(productUnitPrice);
+        orderParams[3] = MoneyUtil.convertYuanToCent(productUnitPrice);
         orderParams[4] = productQuantity;
-        orderParams[5] = ReparoUtil.convertYuanToCent(productTotalPrice);
+        orderParams[5] = MoneyUtil.convertYuanToCent(productTotalPrice);
         orderParams[6] = orderParameterList;
         orderParams[7] = payingMethod;
         orderParams[8] = orderGenerateTime;
@@ -160,8 +160,8 @@ public class OrderController extends BaseController{
         repoParams[6] = orderGenerateTime; //操作时间
         repoParams[7] = productName; //  仓储物名称
         repoParams[8] = productQuantity;     //  仓储物数量
-        repoParams[9] = ReparoUtil.convertYuanToCent(productUnitPrice);      //  货品单价(分)
-        repoParams[10] = ReparoUtil.convertYuanToCent(productTotalPrice);    //  货品合计金额(分)
+        repoParams[9] = MoneyUtil.convertYuanToCent(productUnitPrice);      //  货品单价(分)
+        repoParams[10] = MoneyUtil.convertYuanToCent(productTotalPrice);    //  货品合计金额(分)
         // 调用合约查询账户，获取返回结果
 
         BaseResult createRepoResult = repositoryService.incomeApply(contractKey, repoParams, repoBusinessNo);
@@ -209,7 +209,7 @@ public class OrderController extends BaseController{
             return result;
         }
         String payeeRepoAddress = payeeRepoEntity.getAddress();
-        ContractKey contractKey = new ContractKey(payeePrivateKey, ReparoUtil.getPasswordForPrivateKey(payeeAccountName));
+        ContractKey contractKey = new ContractKey(payeePrivateKey, MoneyUtil.getPasswordForPrivateKey(payeeAccountName));
 
         long txConfirmTime = System.currentTimeMillis();
         String txSerialNo = orderNo + TXNO_POST_BUYEE;
@@ -272,7 +272,7 @@ public class OrderController extends BaseController{
         String receAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_RECEIVABLE);
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
         String wbillContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_WAYBILL);
-        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKey, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         Object[] contractParams = new Object[4];
         contractParams[0] = receAddress;
@@ -304,7 +304,7 @@ public class OrderController extends BaseController{
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(privateKey, MoneyUtil.getPasswordForPrivateKey(accountName));
         Object[] contractParams = new Object[2];
         contractParams[0] = acctContractAddress;
         contractParams[1] = companyRole;

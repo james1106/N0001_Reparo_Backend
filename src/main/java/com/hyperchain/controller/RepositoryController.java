@@ -4,7 +4,7 @@ import cn.hyperchain.common.log.LogInterceptor;
 import com.hyperchain.ESDKUtil;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.CommonUtil;
-import com.hyperchain.common.util.ReparoUtil;
+import com.hyperchain.common.util.MoneyUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.controller.base.BaseController;
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.hyperchain.common.constant.BaseConstant.*;
-import static com.hyperchain.common.util.ReparoUtil.generateBusinessNo;
+import static com.hyperchain.common.util.MoneyUtil.generateBusinessNo;
 
 /**
  * Created by chenxiaoyang on 2017/4/11.
@@ -95,19 +95,19 @@ public class RepositoryController extends BaseController {
         String payerPrivateKey = payerUserEntity.getPrivateKey();
 
         long orderGenerateTime = System.currentTimeMillis();
-        //String orderId = PREFIX_ORDERNO + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
+
         String orderId = generateBusinessNo(PREFIX_ORDERNO);
-        //String txSerialNo = orderId + "00";
+
         String txSerialNo = orderId + TXSERIALNO_ORDER;
-        //String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
+
         String repoBusinessNo = generateBusinessNo(REPO_BUSI_PREFIX);
-        ContractKey contractKey = new ContractKey(payerPrivateKey, ReparoUtil.getPasswordForPrivateKey(payerAccountName));
+        ContractKey contractKey = new ContractKey(payerPrivateKey, MoneyUtil.getPasswordForPrivateKey(payerAccountName));
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         Object[] params = new Object[11];
         params[0] = orderContractAddress;
         params[1] = repoBusinessNo;
-        //params[1] = repoBusinessNo + "0"; //仓储业务流转号
+
         params[2] = repoBusinessNo + REPO_BUSI_WATING_INCOME_RESPONSE;
         params[3] = orderId;
         params[4] = payerAddress; // 存活人
@@ -145,7 +145,7 @@ public class RepositoryController extends BaseController {
 
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
         String acctContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ACCOUNT);
         Object[] params = new Object[6];
@@ -183,7 +183,7 @@ public class RepositoryController extends BaseController {
         }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
 
         //String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
         String repoCertNo = generateBusinessNo(REPO_CERT_PREFIX);
@@ -225,7 +225,7 @@ public class RepositoryController extends BaseController {
         }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
 
         Object[] params_1 = new Object[1];
         params_1[0] = repoCertNo;
@@ -266,7 +266,7 @@ public class RepositoryController extends BaseController {
         }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
 
 
         String orderContractAddress = ESDKUtil.getHyperchainInfo(CONTRACT_NAME_ORDER);
@@ -304,7 +304,7 @@ public class RepositoryController extends BaseController {
         }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         Object[] params = new Object[1];
         params[0] = repoBusinessNo;
         // 调用合约查询账户，获取返回结果
@@ -331,7 +331,7 @@ public class RepositoryController extends BaseController {
         }
         String accountJson = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(accountJson, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(accountJson, MoneyUtil.getPasswordForPrivateKey(accountName));
         Object[] params = new Object[1];
         params[0] = repoCertNo;
 
@@ -357,7 +357,7 @@ public class RepositoryController extends BaseController {
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
         String userAddress = userEntity.getAddress();
-        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(privateKey, MoneyUtil.getPasswordForPrivateKey(accountName));
 
         Object[] params = new Object[1];
         params[0] = userAddress;
@@ -383,7 +383,7 @@ public class RepositoryController extends BaseController {
 
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(privateKey, MoneyUtil.getPasswordForPrivateKey(accountName));
 
         Object[] params = new Object[1];
         params[0] = address;
@@ -419,11 +419,9 @@ public class RepositoryController extends BaseController {
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(privateKey, MoneyUtil.getPasswordForPrivateKey(accountName));
 
-        /*String repoBusinessNo = "130" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);//  仓储业务编号
-        String repoCertNo = "131" + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + (new Random().nextInt(900) + 100);
-        */
+
         String repoBusinessNo = generateBusinessNo(REPO_BUSI_PREFIX);
         String repoCertNo = generateBusinessNo(REPO_CERT_PREFIX);
         //仓单编码
@@ -501,7 +499,7 @@ public class RepositoryController extends BaseController {
         }
         String privateKey = userEntity.getPrivateKey();
         String accountName = userEntity.getAccountName();
-        ContractKey contractKey = new ContractKey(privateKey, ReparoUtil.getPasswordForPrivateKey(accountName));
+        ContractKey contractKey = new ContractKey(privateKey, MoneyUtil.getPasswordForPrivateKey(accountName));
 
         UserEntity storerEntity = userEntityRepository.findByCompanyName(storerName);
         if (CommonUtil.isEmpty(storerEntity)) {

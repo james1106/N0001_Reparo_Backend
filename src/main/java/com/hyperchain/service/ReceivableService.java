@@ -16,20 +16,11 @@ public interface ReceivableService {
     BaseResult<Object> signOutReply(String receivableNo, String replyerAcctId, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
     BaseResult<Object> discountApply(String receivableNo, String applicantAcctId, String replyerAcctId, double discountApplyAmount, double discountedRate, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
     BaseResult<Object> discountReply(String receivableNo, String replyerAcctId, int response, double discountInHandAmount, double discountRate, double isseAmt, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
-//    BaseResult<Object> getReceivableAllInfo(ContractKey contractKey, Object[] contractParams);
-//    BaseResult<Object> getRecordBySerialNo(ContractKey contractKey, Object[] contractParams);
-//    BaseResult<Object> getReceivableHistorySerialNo(ContractKey contractKey, Object[] contractParams);
+
     BaseResult<Object> cash(String receivableNo, double cashedAmount, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
 
     BaseResult<Object> receivableSimpleDetailList(int roleCode, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
     BaseResult<Object> getReceivableAllInfoWithSerial(String receivableNo, String operatorAcctId, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam;
-//    BaseResult<Object> discountApplyBankList();
-//    BaseResult<Object> getDiscountBankList(ContractKey contractKey, Object[] contractParams);
 
-//    0x0000000000000000000000000000000000000000000000000000000000000000discountApplyBankList
-//            0000000000000000000000000000000000000000000000000000000000000060
-//            0000000000000000000000000000000000000000000000000000000000000080
-//            0000000000000000000000000000000000000000000000000000000000000000
-//            0000000000000000000000000000000000000000000000000000000000000000
 
 }
