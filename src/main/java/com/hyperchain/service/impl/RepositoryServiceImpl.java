@@ -4,15 +4,19 @@ import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.ContractInvokeFailException;
 import com.hyperchain.common.exception.PasswordIllegalParam;
+import com.hyperchain.common.exception.UserInvalidException;
 import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.util.CommonUtil;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.contract.ContractKey;
 import com.hyperchain.contract.ContractResult;
 import com.hyperchain.controller.vo.*;
+import com.hyperchain.dal.entity.UserEntity;
 import com.hyperchain.dal.repository.UserEntityRepository;
 import com.hyperchain.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,8 +112,6 @@ public class RepositoryServiceImpl implements RepositoryService {
             Code code = contractResult.getCode();
 
             if (code == Code.SUCCESS) {
-                //List<String> dataList = (List<String>) contractResult.getValue();
-                //result.returnWithoutValue(code);
                 String the_data = (String) contractResult.getValue().get(0);
                 result.returnWithValue(code, the_data);
             } else {
@@ -270,7 +272,7 @@ public class RepositoryServiceImpl implements RepositoryService {
 //         将合约结果转化为接口返回数据
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
-
+//
         List<String> historyList = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);
         List<String> detailInfoList1 = (List<String>) contractResult.getValueMap().get(resultMapKey[1]);
         List<String> detailInfoList2 = (List<String>) contractResult.getValueMap().get(resultMapKey[2]);
@@ -280,8 +282,14 @@ public class RepositoryServiceImpl implements RepositoryService {
         int length = historyList.size();
         List<OperationRecordVo> opVoList = new ArrayList<>();
         for (int i = 0; i < length / 2; i++) {
-            int state = historyList.get(i * 2).equals("") ? 0 : Integer.parseInt(historyList.get(i * 2));
-            long time = historyList.get(i * 2 + 1).equals("") ? 0 : Long.parseLong(historyList.get(i * 2 + 1));
+            int state;
+            long time;
+            /*int state = historyList.get(i * 2).equals("") ? 0 : Integer.parseInt(historyList.get(i * 2));
+            long time = historyList.get(i * 2 + 1).equals("") ? 0 : Long.parseLong(historyList.get(i * 2 + 1));*/
+            state = parseString2Int(historyList.get(i * 2));
+            time = parseString2Long(historyList.get(i * 2 + 1));
+
+
             OperationRecordVo opVo = new OperationRecordVo(state, time);
             opVoList.add(opVo);
         }
@@ -294,19 +302,26 @@ public class RepositoryServiceImpl implements RepositoryService {
         repoBusinessVo.setMeasureUnit(detailInfoList1.get(4));
         repoBusinessVo.setOutWaybillNo(detailInfoList1.get(5));
 
-        int curRepoBusiStatus = detailInfoList2.get(0).equals("") ? 0 : Integer.parseInt(detailInfoList2.get(0));
+        /*int curRepoBusiStatus = detailInfoList2.get(0).equals("") ? 0 : Integer.parseInt(detailInfoList2.get(0));
         long productQuantity = detailInfoList2.get(1).equals("") ? 0 : Long.parseLong(detailInfoList2.get(1));
-        long productTotalPrice = detailInfoList2.get(2).equals("") ? 0 : Long.parseLong(detailInfoList2.get(2));
+        long productTotalPrice = detailInfoList2.get(2).equals("") ? 0 : Long.parseLong(detailInfoList2.get(2));*/
+
+        int curRepoBusiStatus = parseString2Int(detailInfoList2.get(0));
+        long productQuantity = parseString2Long(detailInfoList2.get(1));
+        long productTotalPrice = parseString2Long(detailInfoList2.get(2));
+        long opgTimeOfCurStatus = parseString2Long(detailInfoList2.get(3));
+
 
         repoBusinessVo.setCurRepoBusiStatus(curRepoBusiStatus);
         repoBusinessVo.setProductQuantity(productQuantity);
         repoBusinessVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(productTotalPrice));
-
-        repoBusinessVo.setOpgTimeOfCurStatus(detailInfoList2.get(3).equals("") ? 0 : Long.parseLong(detailInfoList2.get(3)));
+        repoBusinessVo.setOpgTimeOfCurStatus(opgTimeOfCurStatus);
+        //repoBusinessVo.setOpgTimeOfCurStatus(detailInfoList2.get(3).equals("") ? 0 : Long.parseLong(detailInfoList2.get(3)));
         //addressResultList.get(i).substring(1)
 
-        String inLogisticsAddress = detailInfoList3.get(0).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(0).substring(1);
+        /*String inLogisticsAddress = detailInfoList3.get(0).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(0).substring(1);
         String inLogiEnterpriseName = inLogisticsAddress.equals("") ? "" : userEntityRepository.findByAddress(inLogisticsAddress).getCompanyName();//入库物流公司名称
+
 
         String repoEnterpriseAddress = detailInfoList3.get(1).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(1).substring(1);
         String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
@@ -317,6 +332,12 @@ public class RepositoryServiceImpl implements RepositoryService {
 
         String outLogisticsAddress = detailInfoList3.get(3).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList3.get(3).substring(1);
         String outLogiEnterpriseName = outLogisticsAddress.equals("") ? "" : userEntityRepository.findByAddress(outLogisticsAddress).getCompanyName();//出库物流公司名称
+        */
+
+        String inLogiEnterpriseName = getEnterpriseName(detailInfoList3.get(0));
+        String repoEnterpriseName = getEnterpriseName(detailInfoList3.get(1));
+        String sotreEnterpriseName = getEnterpriseName(detailInfoList3.get(2));
+        String outLogiEnterpriseName = getEnterpriseName(detailInfoList3.get(3));
 
         repoBusinessVo.setInLogisticsEntepsName(inLogiEnterpriseName);
         repoBusinessVo.setRepoEnterpriceName(repoEnterpriseName);
@@ -373,6 +394,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         repoCertVo.setStorerAddress(detailInfoList2.get(1));
         repoCertVo.setHolderAddress(detailInfoList2.get(2));
 
+/*
         String repoEnterpriseAddress = detailInfoList2.get(0).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList2.get(0).substring(1);
         String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
 
@@ -381,24 +403,32 @@ public class RepositoryServiceImpl implements RepositoryService {
 
         String holderEnterpriseAddress = detailInfoList2.get(2).equals("x0000000000000000000000000000000000000000") ? "" : detailInfoList2.get(2).substring(1);
         String holderEnterpriseName = holderEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(holderEnterpriseAddress).getCompanyName();
+*/
+        String repoEnterpriseName = getEnterpriseName(detailInfoList2.get(0));
+        String sotreEnterpriseName = getEnterpriseName(detailInfoList2.get(1));
+        String holderEnterpriseName = getEnterpriseName(detailInfoList2.get(2));
 
         repoCertVo.setHolderName(holderEnterpriseName);
         repoCertVo.setRepoEnterpriseName(repoEnterpriseName);
         repoCertVo.setStorerName(sotreEnterpriseName);
 
-        repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
+        /*repoCertVo.setProductQuantity(uintList.get(0).equals("") ? 0 : Long.parseLong(uintList.get(0)));
         repoCertVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(uintList.get(1).equals("") ? 0 : Long.parseLong(uintList.get(1))));
         repoCertVo.setRepoCreateDate(uintList.get(2).equals("") ? 0 : Long.parseLong(uintList.get(2)));
-        //repoCertVo.setRepoCertStatus(uintList.get(3).equals("") ? 0 : Integer.parseInt(uintList.get(3)));
+        */
+        repoCertVo.setProductQuantity(parseString2Long(uintList.get(0)));
+        repoCertVo.setProductTotalPrice(ReparoUtil.convertCentToYuan(parseString2Long(uintList.get(1))));
+        repoCertVo.setRepoCreateDate(parseString2Long(uintList.get(2)));
+
         List<OperationRecordVo> recordVos = new ArrayList<>();
 
         int length = (uintList.size() - 3) / 2;
         for (int i = 3; i < length + 3; i++) {
             OperationRecordVo recordVo = new OperationRecordVo();
-            int status = uintList.get(i).equals("") ? 0 : Integer.parseInt(uintList.get(i));
+            int status = parseString2Int(uintList.get(i));
             recordVo.setState(status);
             repoCertVo.setRepoCertStatus(status);
-            recordVo.setOperateTime(uintList.get(i + length).equals("") ? 0 : Long.parseLong(uintList.get(i + length)));
+            recordVo.setOperateTime(parseString2Long(uintList.get(i + length)));
             recordVos.add(recordVo);
         }
         repoCertVo.setRecordVos(recordVos);
@@ -441,11 +471,17 @@ public class RepositoryServiceImpl implements RepositoryService {
         for (int i = 0; i < length; i++) {
             String repoacertNo = bytesResultList.get(i * 2);
             String productName = bytesResultList.get(i * 2 + 1);
-            String repoEnterpriseAddress = addressResultList.get(i).equals("x0000000000000000000000000000000000000000") ? "" : addressResultList.get(i).substring(1);
-            int productQuantitiy = uintResultList.get(i * 2).equals("") ? 0 : Integer.parseInt(uintResultList.get(i * 2));
-            int repoCertStatus = uintResultList.get(i * 2 + 1).equals("") ? 0 : Integer.parseInt(uintResultList.get(i * 2 + 1));
-            String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
 
+            /*int productQuantitiy = uintResultList.get(i * 2).equals("") ? 0 : Integer.parseInt(uintResultList.get(i * 2));
+            int repoCertStatus = uintResultList.get(i * 2 + 1).equals("") ? 0 : Integer.parseInt(uintResultList.get(i * 2 + 1));
+            */
+            int productQuantitiy = parseString2Int(uintResultList.get(i * 2));
+            int repoCertStatus = parseString2Int(uintResultList.get(i * 2 + 1));
+
+            String repoEnterpriseName = getEnterpriseName(addressResultList.get(i));
+            /*String repoEnterpriseAddress = addressResultList.get(i).equals("x0000000000000000000000000000000000000000") ? "" : addressResultList.get(i).substring(1);
+            String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
+            */
             RepoCertList repoCertVo = new RepoCertList();
             repoCertVo.setRepoCertNo(repoacertNo);
             repoCertVo.setProductName(productName);
@@ -504,7 +540,8 @@ public class RepositoryServiceImpl implements RepositoryService {
             for (int i = 0; i < length; i++) {
                 boolean flag = false;
 
-                int repoBusiStatus = repoBusiDetail2.get(i * 4).equals("") ? 0 : Integer.parseInt(repoBusiDetail2.get(i * 4));
+                //int repoBusiStatus = repoBusiDetail2.get(i * 4).equals("") ? 0 : Integer.parseInt(repoBusiDetail2.get(i * 4));
+                int repoBusiStatus = parseString2Int(repoBusiDetail2.get(i * 4));
                 if (repoBusiStatus == 0) {
                     continue;
                 }
@@ -532,16 +569,25 @@ public class RepositoryServiceImpl implements RepositoryService {
                     repoBusiVo.setMeasureUnit(repoBusiDetail1.get(i * 5 + 4));
 
                     repoBusiVo.setCurRepoBusiStatus(repoBusiStatus);
-                    repoBusiVo.setRepoCertStatus(repoBusiDetail2.get(i * 4 + 1).equals("") ? 0 : Integer.parseInt(repoBusiDetail2.get(i * 4 + 1)));
+                    /*repoBusiVo.setRepoCertStatus(repoBusiDetail2.get(i * 4 + 1).equals("") ? 0 : Integer.parseInt(repoBusiDetail2.get(i * 4 + 1)));
                     repoBusiVo.setProductQuantity(repoBusiDetail2.get(i * 4 + 2).equals("") ? 0 : Long.parseLong(repoBusiDetail2.get(i * 4 + 2)));
                     repoBusiVo.setOpgTimeOfCurStatus(repoBusiDetail2.get(i * 4 + 3).equals("") ? 0 : Long.parseLong((repoBusiDetail2.get(i * 4 + 3))));
 
                     String repoEnterpriseAddress = repoBusiDetail3.get(i * 2).equals("x0000000000000000000000000000000000000000") ? "" : repoBusiDetail3.get(i * 2).substring(1);
                     String repoEnterpriseName = repoEnterpriseAddress.equals("") ? "" : userEntityRepository.findByAddress(repoEnterpriseAddress).getCompanyName();
-                    repoBusiVo.setRepoEnterpriceName(repoEnterpriseName);
+
 
                     String holderAddress = repoBusiDetail3.get(i * 2 + 1).equals("x0000000000000000000000000000000000000000") ? "" : repoBusiDetail3.get(i * 2 + 1).substring(1);
                     String holderEnterpriseName = holderAddress.equals("") ? "" : userEntityRepository.findByAddress(holderAddress).getCompanyName();
+                    */
+                    repoBusiVo.setRepoCertStatus(parseString2Int(repoBusiDetail2.get(i * 4 + 1)));
+                    repoBusiVo.setProductQuantity(parseString2Long(repoBusiDetail2.get(i * 4 + 2)));
+                    repoBusiVo.setOpgTimeOfCurStatus(parseString2Long(repoBusiDetail2.get(i * 4 + 3)));
+
+                    String repoEnterpriseName = getEnterpriseName(repoBusiDetail3.get(i * 2));
+                    String holderEnterpriseName = getEnterpriseName(repoBusiDetail3.get(i * 2 + 1));
+
+                    repoBusiVo.setRepoEnterpriceName(repoEnterpriseName);
                     repoBusiVo.setHolderEnterpriseName(holderEnterpriseName);
                     repoBusinessVos.add(repoBusiVo);
                 }
@@ -621,6 +667,48 @@ public class RepositoryServiceImpl implements RepositoryService {
             throw new PasswordIllegalParam();
         }
         return result;
+    }
+
+    protected String getEnterpriseName(String address) throws Exception {
+        String trueAddress;
+        String enterpriseName;
+        UserEntity usrEntity;
+        if (address.equals("x0000000000000000000000000000000000000000")) {
+            trueAddress = "";
+            enterpriseName = "";
+        } else {
+            trueAddress = address.substring(1);
+            usrEntity = userEntityRepository.findByAddress(trueAddress);
+            if (CommonUtil.isEmpty(usrEntity)) {
+                throw new UserInvalidException();
+            }
+            enterpriseName = usrEntity.getCompanyName();
+        }
+
+
+        return enterpriseName;
+    }
+
+    //仅支持str保存为数字的情况
+    protected int parseString2Int(String str) throws Exception {
+        int parsedInt;
+        if (StringUtils.isBlank(str)) {
+            parsedInt = 0;
+        } else {
+            parsedInt = Integer.parseInt(str);
+        }
+        return parsedInt;
+    }
+
+    //仅支持str保存为数字的情况
+    protected long parseString2Long(String str) throws Exception {
+        long parsedLong;
+        if (StringUtils.isBlank(str)) {
+            parsedLong = 0;
+        } else {
+            parsedLong = Long.parseLong(str);
+        }
+        return parsedLong;
     }
 
 
