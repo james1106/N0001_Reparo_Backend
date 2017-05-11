@@ -617,8 +617,8 @@ contract ReceivableContract{
      }
      */
         Receivable receivable = receivableDetailMap[receivableNo];
-        if(receivable.status == 1){
-            return (1038);
+        if(receivable.status != 26){
+            return (1006);
         }
         receivable.lastStatus = receivable.status;
         receivable.status = 41;//贴现待响应
@@ -661,7 +661,7 @@ contract ReceivableContract{
             return (1);
         }
         if(receivable.status != 41){
-            return (1038);
+            return (1006);
         }
         //if((receivable.isseAmt - receivable.isseAmt * receivable.)//todo 校验到手金额
 
@@ -815,7 +815,7 @@ contract ReceivableContract{
             return(1005);
         }
 
-     if(receivable.status != 26){
+     if(receivable.status != 26 && receivable.status != 46){
         return(1006);
      }
      /*
@@ -2326,21 +2326,21 @@ contract RepositoryContract{
     }
 }
 contract OrderContract{
-address owner;
-//==========运单状态=======
-uint UNDEFINED = 0;           //未定义
-uint WAITSEND = 1;            //待发货
-uint REQUESTING = 2;          //发货待响应
-uint REJECTED = 3;            //发货被拒绝
-uint SENDING = 4;             //已发货
-uint RECEIVED = 5;            //已送达
-//=========仓储状态=======
-uint WATING_INCOME_RESPONSE = 1;    //入库待响应
-uint WATING_INCOME = 2;             //待入库
-uint INCOMED = 3;                   //已入库
-uint WATING_OUTCOME_RESPONSE = 4;   //出库待响应
-uint WATING_OUTCOME = 5;            //待出库
-uint OUTCOMED = 6;                  //已出库
+    address owner;
+    //==========运单状态=======
+    uint UNDEFINED = 0;           //未定义
+    uint WAITSEND = 1;            //待发货
+    uint REQUESTING = 2;          //发货待响应
+    uint REJECTED = 3;            //发货被拒绝
+    uint SENDING = 4;             //已发货
+    uint RECEIVED = 5;            //已送达
+    //=========仓储状态=======
+    uint WATING_INCOME_RESPONSE = 1;    //入库待响应
+    uint WATING_INCOME = 2;             //待入库
+    uint INCOMED = 3;                   //已入库
+    uint WATING_OUTCOME_RESPONSE = 4;   //出库待响应
+    uint WATING_OUTCOME = 5;            //待出库
+    uint OUTCOMED = 6;                  //已出库
 
     //=========仓单状态=======
     uint TRANSABLE = 1;                //可流转

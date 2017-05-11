@@ -56,7 +56,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //签发申请
     @Override
-    public BaseResult<Object> signOutApply(String orderNo, String pyer, String pyee, double isseAmt, long dueDt, String rate, String contractNo, String invoiceNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {//第二个参数是给合约的参数
+    public BaseResult<Object> signOutApply(String orderNo, String pyer, String pyee, double isseAmt, long dueDt, String rate, String contractNo, String invoiceNo, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {//第二个参数是给合约的参数
         BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
@@ -101,13 +101,15 @@ public class ReceivableServiceImpl implements ReceivableService {
         try {
             contractResult = ContractUtil.invokeContract(contractKey, SIGN_OUT_APPLY, params, resultMapKey, CONTRACT_NAME_RECEIVABLE);
             LogUtil.debug("调用合约ReceivableContract-signOutApply返回结果：" + contractResult.toString());
-        } catch (
-                ContractInvokeFailException e) {
+        } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
 
 
@@ -126,7 +128,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //签发回复
     @Override
-    public BaseResult<Object> signOutReply(String receivableNo, String replyerAcctId, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
+    public BaseResult<Object> signOutReply(String receivableNo, String replyerAcctId, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
 //        catch (Exception e) {
 //            LogUtil.error("调用方法signOutReply异常");
 //            e.printStackTrace();
@@ -167,10 +169,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             LogUtil.debug("调用合约ReceivableContract-signOutReply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
 
 
@@ -190,7 +195,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //贴现申请
     @Override
-    public BaseResult<Object> discountApply(String receivableNo, String applicantAcctId, String replyerAcctId, double discountApplyAmount, double discountedRate, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {//第二个参数是给合约的参数
+    public BaseResult<Object> discountApply(String receivableNo, String applicantAcctId, String replyerAcctId, double discountApplyAmount, double discountedRate, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {//第二个参数是给合约的参数
         BaseResult<Object> result = new BaseResult<>();
 
         long discountApplyTime = System.currentTimeMillis();
@@ -226,10 +231,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             LogUtil.debug("调用合约ReceivableContract-discountApply返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
 
 
@@ -248,7 +256,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //贴现回复
     @Override
-    public BaseResult<Object> discountReply(String receivableNo, String replyerAcctId, int response, double discountInHandAmount, double discountRate, double discountApplyAmount, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
+    public BaseResult<Object> discountReply(String receivableNo, String replyerAcctId, int response, double discountInHandAmount, double discountRate, double discountApplyAmount, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         BaseResult<Object> result = new BaseResult<>();
 
 //        double doubleDiscountRate = Double.parseDouble(discountRate);
@@ -298,10 +306,13 @@ public class ReceivableServiceImpl implements ReceivableService {
 //            result.returnWithoutValue(code);
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
@@ -316,7 +327,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //兑付
     @Override
-    public BaseResult<Object> cash(String receivableNo, double cashedAmount, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
+    public BaseResult<Object> cash(String receivableNo, double cashedAmount, int response, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         BaseResult<Object> result = new BaseResult<>();
 
         long cashTime = System.currentTimeMillis();
@@ -349,10 +360,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             LogUtil.debug("调用合约ReceivableContract-cash返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
         int resultCode = contractResult.getCode().getCode();
         Code code = Code.fromInt(resultCode);
@@ -367,7 +381,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //单张应收款详情,包含流水信息
     @Override
-    public BaseResult<Object> getReceivableAllInfoWithSerial(String receivableNo, String operatorAcctId, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
+    public BaseResult<Object> getReceivableAllInfoWithSerial(String receivableNo, String operatorAcctId, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         BaseResult<Object> result = new BaseResult<>();
         String address = TokenUtil.getAddressFromCookie(request);//用户address
         UserEntity userEntity = userEntityRepository.findByAddress(address);
@@ -406,10 +420,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             LogUtil.debug("调用合约ReceivableContract-getReceivableAllInfoWithSerial返回结果：" + contractResult.toString());
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
 
 
@@ -621,7 +638,7 @@ public class ReceivableServiceImpl implements ReceivableService {
 
     //返回买卖方应收款列表
     @Override
-    public BaseResult<Object> receivableSimpleDetailList(int roleCode, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException {
+    public BaseResult<Object> receivableSimpleDetailList(int roleCode, HttpServletRequest request) throws PrivateKeyIllegalParam, ReadFileException, PropertiesLoadException, UserInvalidException, ContractInvokeFailException, ValueNullException, PasswordIllegalParam {
         BaseResult<Object> result = new BaseResult<>();
 
         String address = TokenUtil.getAddressFromCookie(request);//用户address
@@ -665,10 +682,13 @@ public class ReceivableServiceImpl implements ReceivableService {
             }
         } catch (ContractInvokeFailException e) {
             e.printStackTrace();
+            throw new ContractInvokeFailException();
         } catch (ValueNullException e) {
             e.printStackTrace();
+            throw new ValueNullException();
         } catch (PasswordIllegalParam passwordIllegalParam) {
             passwordIllegalParam.printStackTrace();
+            throw new PasswordIllegalParam();
         }
 
         List<String> list1 = (List<String>) contractResult.getValueMap().get(resultMapKey[0]);

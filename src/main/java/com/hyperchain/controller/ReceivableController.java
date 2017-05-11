@@ -8,6 +8,7 @@ import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.util.ReparoUtil;
 import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.contract.ContractKey;
+import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.dal.entity.AccountEntity;
 import com.hyperchain.dal.entity.UserEntity;
@@ -35,7 +36,7 @@ import java.util.*;
 @Api(value = "Receivable", description = "应收款", position = 1)
 @Controller
 @RequestMapping("/v1/receivable")
-public class ReceivableController {
+public class ReceivableController extends BaseController{
     @Autowired
     ReceivableService receivableService;
 
