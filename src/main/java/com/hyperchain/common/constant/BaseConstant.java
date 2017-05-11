@@ -23,6 +23,9 @@ public class BaseConstant {
     public static final String CONTRACT_NAME_REPOSITORY = "RepositoryContract";
     public static final String CONTRACT_NAME_ORDER = "OrderContract";
 
+    //仓储
+    public static final String REPO_BUSI_PREFIX="130";
+    public static final String REPO_CERT_PREFIX="131";
     public static final String REPO_BUSI_WATING_INCOME_RESPONSE= "1";//入库待响应
     public static final String REPO_BUSI_WATING_INCOME= "2";//待入库
     public static final String REPO_BUSI_INCOMED = "3";//已入库
@@ -43,4 +46,10 @@ public class BaseConstant {
     public static final String DISCOUNT_APPLY_SERIALNO = "123";
     public static final String DISCOUNT_REPLY_SERIALNO = "124";
     public static final String CASH_SERIALNO = "125";
+
+    //order订单
+    public static final String PREFIX_ORDERNO = "100";
+    public static final String TXSERIALNO_ORDER = "00";
+
+
 }

@@ -27,6 +27,7 @@ public enum Code {
     REPOCERT_ALREADY_EXSIT(4004, "仓单编号已经存在"),
     REPOBUSINO_NOT_EXSIT(4005, "仓储业务编号不存在"),
     LASTBUSITRANSNO_NOT_EXSIT(4006, "上一个业务流转编号不存在"),
+    STORE_NOT_EXSIT(4007, "存货人不存在"),
 
     //订单管理部分
     ORDER_NOT_EXIST(2001, "订单不存在"),
@@ -54,6 +55,7 @@ public enum Code {
     WAY_BILL_NO_DATA(3001, "该用户暂无数据"),
     WAY_BILL_STATUS_TRANSFER_DENIED(3002, "运单状态转换拒绝"),
     WAY_BILL_CONTENT_INVALID(3050, "运单内容不合法"),
+    WAY_BILL_COMPANY_INVALID(3051, "物流公司未注册或已失效"),
 
     //应收款部分
     SERIALNO_EXIST(1032, "流水号已存在"),
