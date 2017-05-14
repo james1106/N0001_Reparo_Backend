@@ -1,10 +1,9 @@
 package com.hyperchain.service;
 
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
 import com.hyperchain.controller.vo.BaseResult;
+import com.hyperchain.exception.PropertiesLoadException;
+import com.hyperchain.exception.ReadFileException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,11 +37,15 @@ public interface AccountService {
             GeneralSecurityException,
             PrivateKeyIllegalParam,
             ContractInvokeFailException,
-            IOException, ValueNullException;
+            IOException, ValueNullException, ReadFileException, PropertiesLoadException, UserInvalidException;
 
-    BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response);
+    BaseResult<Object> login(String accountName, String password, HttpServletRequest request, HttpServletResponse response) throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException;
 
     BaseResult<Object> forgetPassword(String phone, String newPassword, String securityCode, String securityCodeId);
 
     BaseResult<Object> findAllEnterpriseNameByRoleCode(int roleCode);
+
+    BaseResult<Object> setRateForFinancial(String rate, String address) throws ContractInvokeFailException, PasswordIllegalParam, PrivateKeyIllegalParam, ValueNullException, UserInvalidException;
+
+    BaseResult<Object> getAllFinancialEnterpriseNameAndRate();
 }

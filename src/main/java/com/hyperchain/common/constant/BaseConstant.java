@@ -23,10 +23,33 @@ public class BaseConstant {
     public static final String CONTRACT_NAME_REPOSITORY = "RepositoryContract";
     public static final String CONTRACT_NAME_ORDER = "OrderContract";
 
+    //仓储
+    public static final String REPO_BUSI_PREFIX="130";
+    public static final String REPO_CERT_PREFIX="131";
     public static final String REPO_BUSI_WATING_INCOME_RESPONSE= "1";//入库待响应
     public static final String REPO_BUSI_WATING_INCOME= "2";//待入库
     public static final String REPO_BUSI_INCOMED = "3";//已入库
     public static final String REPO_BUSI_WATING_OUTCOME = "5";//待出库
     public static final String REPO_BUSI_OUTCOMED = "6";//已出库
+
+    public static final String DEFAULT_RATE = "5"; //金融机构默认利率
+
+    public static final String TOKEN_NAME = "token";
+    public static final String COOKIE_PATH = "/";
+    public static final String KEY_ADDRESS = "address";
+    public static final String KEY_TIMESTAMP = "timestamp";
+    public static final String KEY_ROLECODE = "roleCode";
+
+    public static final String RECEIVABLE_NO_GENERATE = "120";
+    public static final String SIGNOUT_APPLY_SERIALNO = "121";
+    public static final String SIGNOUT_REPLY_SERIALNO = "122";
+    public static final String DISCOUNT_APPLY_SERIALNO = "123";
+    public static final String DISCOUNT_REPLY_SERIALNO = "124";
+    public static final String CASH_SERIALNO = "125";
+
+    //order订单
+    public static final String PREFIX_ORDERNO = "100";
+    public static final String TXSERIALNO_ORDER = "00";
+
 
 }

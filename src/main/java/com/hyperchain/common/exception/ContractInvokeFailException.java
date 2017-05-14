@@ -10,11 +10,7 @@ import org.apache.poi.ss.formula.functions.T;
  * Created by linbo on 16/12/16.
  */
 public class ContractInvokeFailException extends BaseException{
-    public ContractInvokeFailException(Code code) {
-        super(code);
-    }
-
-    public ContractInvokeFailException(Code code, String errorValue) {
-        super(code, errorValue);
+    public ContractInvokeFailException() {
+        super(Code.HYPERCHAIN_ERROR);
     }
 }

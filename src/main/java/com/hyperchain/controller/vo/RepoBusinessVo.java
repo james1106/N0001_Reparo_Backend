@@ -19,14 +19,47 @@ public class RepoBusinessVo {
     private Long productQuantity;//货品数量
     private String measureUnit;//计量单位
     private String productTotalPrice;//货品总价
-    private String logisticsEntepsName;//物流公司名称
-    private String waybillNo;//运单号
+    private String inLogisticsEntepsName;//入库物流公司名称
+    private String inWaybillNo;//入库运单号
+    private String outLogisticsEntepsName;//出库物流公司名称
+    private String outWaybillNo;//出库运单号
     private List<OperationRecordVo> operationRecordVoList;//仓储操作历史列表
     private String orderNo;//订单号
     private int repoCertStatus;//仓单状态
     private String holderEnterpriseName;//持有人
     private String storeEnterpriseName;//存货人
 
+    public String getInLogisticsEntepsName() {
+        return inLogisticsEntepsName;
+    }
+
+    public void setInLogisticsEntepsName(String inLogisticsEntepsName) {
+        this.inLogisticsEntepsName = inLogisticsEntepsName;
+    }
+
+    public String getInWaybillNo() {
+        return inWaybillNo;
+    }
+
+    public void setInWaybillNo(String inWaybillNo) {
+        this.inWaybillNo = inWaybillNo;
+    }
+
+    public String getOutLogisticsEntepsName() {
+        return outLogisticsEntepsName;
+    }
+
+    public void setOutLogisticsEntepsName(String outLogisticsEntepsName) {
+        this.outLogisticsEntepsName = outLogisticsEntepsName;
+    }
+
+    public String getOutWaybillNo() {
+        return outWaybillNo;
+    }
+
+    public void setOutWaybillNo(String outWaybillNo) {
+        this.outWaybillNo = outWaybillNo;
+    }
     public String getStoreEnterpriseName() {
         return storeEnterpriseName;
     }
@@ -133,21 +166,7 @@ public class RepoBusinessVo {
         this.productTotalPrice = productTotalPrice;
     }
 
-    public String getLogisticsEntepsName() {
-        return logisticsEntepsName;
-    }
 
-    public void setLogisticsEntepsName(String logisticsEntepsName) {
-        this.logisticsEntepsName = logisticsEntepsName;
-    }
-
-    public String getWaybillNo() {
-        return waybillNo;
-    }
-
-    public void setWaybillNo(String waybillNo) {
-        this.waybillNo = waybillNo;
-    }
 
     public List<OperationRecordVo> getOperationRecordVoList() {
         return operationRecordVoList;

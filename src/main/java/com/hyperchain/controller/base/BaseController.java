@@ -3,6 +3,7 @@ package com.hyperchain.controller.base;
 import cn.hyperchain.common.log.LogUtil;
 import com.hyperchain.common.constant.Code;
 import com.hyperchain.common.exception.*;
+import com.hyperchain.common.exception.base.BaseException;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,82 +20,16 @@ import com.hyperchain.controller.vo.BaseResult;
 public abstract class BaseController {
 
     /**
-     * 参数格式错误-私钥
+     * 自定义异常
      *
      * @param e
      * @return
      */
-    @ExceptionHandler(PrivateKeyIllegalParam.class)
+    @ExceptionHandler(BaseException.class)
     @ResponseBody
-    public BaseResult<T> handleValidationException(PrivateKeyIllegalParam e) {
+    public BaseResult<T> handleBaseException(BaseException e) {
         LogUtil.error(e);
         return e.getBaseResult();
-    }
-
-    /**
-     * 参数格式错误-密码
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(PasswordIllegalParam.class)
-    @ResponseBody
-    public BaseResult<T> handleValidationException(PasswordIllegalParam e) {
-        LogUtil.error(e);
-        return e.getBaseResult();
-    }
-
-
-    /**
-     * 签名校验异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(ValidationException.class)
-    @ResponseBody
-    public BaseResult<T> handleValidationException(ValidationException e) {
-        LogUtil.error(e);
-        return e.getBaseResult();
-    }
-
-    /**
-     * 合约调用失败
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(ContractInvokeFailException.class)
-    @ResponseBody
-    public BaseResult<T> handleContractInvokeFailException(ContractInvokeFailException e) {
-        LogUtil.error(e);
-        return e.getBaseResult();
-    }
-
-    /**
-     * 合约返回空值异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(ValueNullException.class)
-    @ResponseBody
-    public BaseResult<T> handleValueNullException(ValueNullException e) {
-        LogUtil.error(e);
-        return e.getBaseResult();
-    }
-
-    /**
-     * json转换异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(HttpMessageNotWritableException.class)
-    @ResponseBody
-    public BaseResult<T> handleJSONConvertException(HttpMessageNotWritableException e) {    //JSON格式转换异常
-        LogUtil.error(e);
-        return new BaseResult(Code.JSON_TRANSFER_ERROR);
     }
 
     /**

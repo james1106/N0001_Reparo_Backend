@@ -11,6 +11,7 @@ public enum Code {
     INVALID_USER(2, "账户不存在，该用户可能未注册或已失效"),
     PARAMETER_EMPTY(3, "入参为空"),
     UNKNOWN_ABNORMAL(4,"未知异常"),
+    QUERY_USER_ERROR(5,"获取账户信息异常"),
 
     HYPERCHAIN_ERROR(15, "区块链异常"),
     INVALID_PARAM_PRIVATE_KEY(16, "参数输入错误：私钥private-key"),
@@ -26,6 +27,7 @@ public enum Code {
     REPOCERT_ALREADY_EXSIT(4004, "仓单编号已经存在"),
     REPOBUSINO_NOT_EXSIT(4005, "仓储业务编号不存在"),
     LASTBUSITRANSNO_NOT_EXSIT(4006, "上一个业务流转编号不存在"),
+    STORE_NOT_EXSIT(4007, "存货人不存在"),
 
     //订单管理部分
     ORDER_NOT_EXIST(2001, "订单不存在"),
@@ -53,6 +55,7 @@ public enum Code {
     WAY_BILL_NO_DATA(3001, "该用户暂无数据"),
     WAY_BILL_STATUS_TRANSFER_DENIED(3002, "运单状态转换拒绝"),
     WAY_BILL_CONTENT_INVALID(3050, "运单内容不合法"),
+    WAY_BILL_COMPANY_INVALID(3051, "物流公司未注册或已失效"),
 
     //应收款部分
     SERIALNO_EXIST(1032, "流水号已存在"),
@@ -68,8 +71,11 @@ public enum Code {
     CASH_TIME_ERROR(1010,"兑付时应收款还未到期"),
     RECEIVABLE_RECORD_NOT_EXITS(1013,"未找到该流水号对应的交易记录"),
     TXSTATE_ERROR(1002,"订单状态错误"),
-    PAYERREPOBUSISTATE(1003,"买方仓储状态错误"),
-    NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人");
+    PAYER_REPOBUSI_STATE_ERROR(1003,"买方仓储状态错误"),
+    NOT_RECEIVABLE_FIRSTOWNER(1008,"申请人不是本手持有人"),
+    DISOCOUNT_BANK_NOT_EXITS(1041,"贴现金融机构不存在"),
+    DISCOUNTAMOUNT_NOT_MATCH(1042,"校验实际贴现金额未通过"),
+    RETURN_VALUE_EMPTY(1043,"合约返回的数组为空");
 
     private int code;
     private String msg;
@@ -116,6 +122,8 @@ public enum Code {
                 return INVALID_USER;
             case 3:
                 return PARAMETER_EMPTY;
+            case 5:
+                return QUERY_USER_ERROR;
 
             case 1032:
                 return SERIALNO_EXIST;
@@ -143,6 +151,16 @@ public enum Code {
                 return CASH_TIME_ERROR;
             case 1013:
                 return RECEIVABLE_RECORD_NOT_EXITS;
+            case 1002:
+                return TXSTATE_ERROR;
+            case 1003:
+                return PAYER_REPOBUSI_STATE_ERROR;
+            case 1041:
+                return DISOCOUNT_BANK_NOT_EXITS;
+            case 1042:
+                return DISCOUNTAMOUNT_NOT_MATCH;
+            case 1043:
+                return RETURN_VALUE_EMPTY;
 
             case 2001:
                 return ORDER_NOT_EXIST;
@@ -172,14 +190,6 @@ public enum Code {
             case 3050:
                 return WAY_BILL_CONTENT_INVALID;
 
-            /*
-            REPOCERT_NOT_EXSIT(4001, "仓单不存在"),
-    REPOBUSINO_ALREADY_EXSIT(4002, "仓储业务编号已经存在"),
-    BUSITRANSNO_ALREADY_EXSIT(4003, "业务流转编号已经存在"),
-    REPOCERT_ALREADY_EXSIT(4004, "仓单编号已经存在"),
-    REPOBUSINO_NOT_EXSIT(4005, "仓储业务编号不存在"),
-    LASTBUSITRANSNO_NOT_EXSIT(4006, "上一个业务流转编号不存在"),
-             */
             case 4001:
                 return REPOCERT_NOT_EXSIT;
             case 4002:
@@ -193,8 +203,22 @@ public enum Code {
             case 4006:
                 return LASTBUSITRANSNO_NOT_EXSIT;
 
+            case 5001:
+                return PHONE_ALREADY_EXIST;
             case 5002:
                 return ACCOUNT_ALREADY_EXIST;
+            case 5003:
+                return INVALID_SECURITY_CODE;
+            case 5004:
+                return NON_EXIST_SECURITY_CODE;
+            case 5005:
+                return WRONG_SECURITY_CODE;
+            case 5006:
+                return ACCOUNT_STATUS_LOCK;
+            case 5007:
+                return ERROR_PASSWORD;
+            case 5008:
+                return INVALID_TOKEN;
 
             default:
                 return UNDEFINED;

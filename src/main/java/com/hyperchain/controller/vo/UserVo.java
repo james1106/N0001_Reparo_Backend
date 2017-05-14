@@ -28,6 +28,8 @@ public class UserVo {
     private String acctSvcr;
     @ApiModelProperty(value = "开户行名称")
     private String acctSvcrName;
+    @ApiModelProperty(value = "金融机构利率")
+    private String rate;
 
     public UserVo(UserEntity userEntity, AccountEntity accountEntity) {
         this.accountName = userEntity.getAccountName();
@@ -122,10 +124,18 @@ public class UserVo {
         this.acctSvcrName = acctSvcrName;
     }
 
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
+
     @Override
     public String toString() {
         return "UserVo{" +
-                ", accountName='" + accountName + '\'' +
+                "accountName='" + accountName + '\'' +
                 ", company_name='" + company_name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", roleCode=" + roleCode +
@@ -135,6 +145,7 @@ public class UserVo {
                 ", svcrClass='" + svcrClass + '\'' +
                 ", acctSvcr='" + acctSvcr + '\'' +
                 ", acctSvcrName='" + acctSvcrName + '\'' +
+                ", rate='" + rate + '\'' +
                 '}';
     }
 }

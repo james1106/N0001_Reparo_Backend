@@ -2,10 +2,8 @@ package com.hyperchain.controller;
 
 import cn.hyperchain.common.log.LogInterceptor;
 import cn.hyperchain.common.log.LogUtil;
-import com.hyperchain.common.exception.ContractInvokeFailException;
-import com.hyperchain.common.exception.PasswordIllegalParam;
-import com.hyperchain.common.exception.PrivateKeyIllegalParam;
-import com.hyperchain.common.exception.ValueNullException;
+import com.hyperchain.common.exception.*;
+import com.hyperchain.common.util.TokenUtil;
 import com.hyperchain.controller.base.BaseController;
 import com.hyperchain.controller.vo.BaseResult;
 import com.hyperchain.exception.PropertiesLoadException;
@@ -54,7 +52,7 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "收货仓储业务编号", required = true) @RequestParam("receiverRepoBusinessNo") String receiverRepoBusinessNo,
             HttpServletRequest request,
             HttpServletResponse response)
-            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException {
         LogUtil.debug("logisticsEnterpriseName：" + logisticsEnterpriseName);
         LogUtil.debug("receiverEnterpriseName：" + receiverEnterpriseName);
         LogUtil.debug("senderEnterpriseName：" + senderEnterpriseName);
@@ -72,7 +70,7 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
             HttpServletRequest request,
             HttpServletResponse response)
-            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException {
         return wayBillService.generateConfirmedWaybill(orderNo, request);
     }
 
@@ -84,7 +82,7 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
             HttpServletRequest request,
             HttpServletResponse response)
-            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException {
         return wayBillService.updateWayBillStatusToReceived(orderNo, request);
     }
 
@@ -96,7 +94,7 @@ public class WayBillController extends BaseController{
             @ApiParam(value = "订单编号", required = true) @RequestParam("orderNo") String orderNo,
             HttpServletRequest request,
             HttpServletResponse response)
-            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException, QueryNotExistUserException {
         return wayBillService.getWayBillDetailByOrderNo(orderNo, request);
     }
 
@@ -107,8 +105,47 @@ public class WayBillController extends BaseController{
     public BaseResult<Object> getAllRelatedWayBillDetail(
             HttpServletRequest request,
             HttpServletResponse response)
-            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException {
+            throws PasswordIllegalParam, ReadFileException, PrivateKeyIllegalParam, ContractInvokeFailException, PropertiesLoadException, ValueNullException, UserInvalidException, QueryNotExistUserException {
         return wayBillService.getAllRelatedWayBillDetail(request);
     }
 
+    @LogInterceptor
+    @ApiOperation(value = "查询所有与自己相关的运单数量", notes = "查询所有与自己相关的运单数量")
+    @ResponseBody
+    @RequestMapping(value = "/allWayBillCount", method = RequestMethod.GET)
+    public BaseResult<Object> getAllWaybillCount(
+            HttpServletRequest request) throws UserInvalidException, ValueNullException, PasswordIllegalParam, PrivateKeyIllegalParam, ContractInvokeFailException {
+        String address = TokenUtil.getAddressFromCookie(request);
+        return wayBillService.getAllWayBillCount(address);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询所有与自己相关的待发货运单数量", notes = "查询所有与自己相关的待发货运单数量")
+    @ResponseBody
+    @RequestMapping(value = "/waitingWayBillCount", method = RequestMethod.GET)
+    public BaseResult<Object> getWaitingWaybillCount(
+            HttpServletRequest request) throws UserInvalidException, ValueNullException, PasswordIllegalParam, PrivateKeyIllegalParam, ContractInvokeFailException {
+        String address = TokenUtil.getAddressFromCookie(request);
+        return wayBillService.getWaitingWayBillCount(address);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询所有与自己相关的发货待响应运单数量", notes = "查询所有与自己相关的发货待响应运单数量")
+    @ResponseBody
+    @RequestMapping(value = "/requestingWayBillCount", method = RequestMethod.GET)
+    public BaseResult<Object> getRequestingWaybillCount(
+            HttpServletRequest request) throws UserInvalidException, ValueNullException, PasswordIllegalParam, PrivateKeyIllegalParam, ContractInvokeFailException {
+        String address = TokenUtil.getAddressFromCookie(request);
+        return wayBillService.getRequestingWayBillCount(address);
+    }
+
+    @LogInterceptor
+    @ApiOperation(value = "查询所有与自己相关的已发货（发货中）运单数量", notes = "查询所有与自己相关的已发货（发货中）运单数量")
+    @ResponseBody
+    @RequestMapping(value = "/sendingWayBillCount", method = RequestMethod.GET)
+    public BaseResult<Object> getSendingWaybillcount(
+            HttpServletRequest request) throws UserInvalidException, ValueNullException, PasswordIllegalParam, PrivateKeyIllegalParam, ContractInvokeFailException {
+        String address = TokenUtil.getAddressFromCookie(request);
+        return wayBillService.getSendingWayBillCount(address);
+    }
 }
